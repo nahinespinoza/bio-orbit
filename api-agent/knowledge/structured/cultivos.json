@@ -1,0 +1,3234 @@
+{
+ "_meta": {
+  "descripcion": "Fichas por cultivo del pool de out/arbol-de-decision-rotacion.html. Un dato sin fuente es null y se anota en huecos.",
+  "generado": "2026-11-14",
+  "alcance_geografico": "Sierra andina. No extrapolar a costa ni Amazonía.",
+  "escalas": "mano_obra.nivel_1a5: 1 = muy poca, 5 = muchísima. facilidad_cultivo.nivel_1a5: 1 = muy difícil, 5 = muy fácil. mercado.nivel_1a5: 5 = mayor valor (inferencia, ver nivel_criterio).",
+  "campos_auxiliares": "suelo.drenaje_requerido, suelo.profundidad_min_cm, clima.requiere_riego y efecto_rotacion.mejora_estructura alimentan los filtros duros; null = sin dato, no descarta.",
+  "nota_precios": "Los precios cambian: cada dato lleva fecha_dato y volatilidad."
+ },
+ "fuentes": {
+  "1": {
+   "titulo": "FAO, Producción orgánica de cultivos andinos (Ecuador)",
+   "fiabilidad": "alta",
+   "region": "Sierra de Ecuador",
+   "url": "https://www.fao.org/fileadmin/user_upload/mountain_partnership/docs/produccion_organica_de_cultivos_andinos.pdf"
+  },
+  "2": {
+   "titulo": "FAO y ANPE-Perú, Guía de campo de los cultivos andinos (Tapia y Fries)",
+   "fiabilidad": "alta",
+   "region": "Andes de Perú y Bolivia",
+   "url": "https://www.fao.org/4/ai185s/ai185s.pdf"
+  },
+  "3": {
+   "titulo": "MAGAP, Política agropecuaria ecuatoriana 2015-2025",
+   "fiabilidad": "alta como respaldo de política; no aporta datos de cultivo",
+   "region": "Ecuador",
+   "url": "https://faolex.fao.org/docs/pdf/ecu183434.pdf"
+  },
+  "4": {
+   "titulo": "Montesdeoca et al. (2023), Rentabilidad de cultivos en rotación, Tumbaco, Siembra 10(2)",
+   "fiabilidad": "alta en lo medido (fréjol, maíz)",
+   "region": "Tumbaco, Ecuador",
+   "url": "https://www.redalyc.org/journal/6538/653875071011/html/"
+  },
+  "5": {
+   "titulo": "Radeco Agro, blog comercial (2025)",
+   "fiabilidad": "baja: NO es evidencia",
+   "region": "Ecuador, general",
+   "url": "https://radeco-agro.com/Blog/rotacion-cultivos-sostenible.html"
+  },
+  "6": {
+   "titulo": "FAO EcoCrop (hojas de datos: tomate id 1379, brócoli id 556, lenteja id 7209, soya id 1150, alfalfa id 1428)",
+   "fiabilidad": "alta",
+   "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=1379",
+   "fecha_consulta": "2026-11-14"
+  },
+  "7": {
+   "titulo": "Ulcuango Lanchango (2018). Evaluación morfoagronómica de variedades locales de fréjol arbustivo, Chaltura, Antonio Ante. Tesis UTN (revisión de literatura)",
+   "fiabilidad": "media",
+   "url": "https://repositorio.utn.edu.ec/bitstream/123456789/8122/1/03%20AGP%20232%20TRABAJO%20DE%20GRADO.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "8": {
+   "titulo": "Proyecto de investigación UTC (2025): biofertilizante en arveja INIAP-342/432 Lojanita, Salache (revisión de literatura, cita Checa et al. 2022 y Peralta et al. 1997)",
+   "fiabilidad": "media",
+   "url": "https://repositorio.utc.edu.ec/bitstreams/483f8da7-cbcb-4937-a68d-bde5e7442208/download",
+   "fecha_consulta": "2026-11-14"
+  },
+  "9": {
+   "titulo": "Cornejo Calvachi et al. (2024). Dosis óptima de N, P y K en brócoli híbrido Avenger en Ecuador. Siembra 11(2) e6658, INIAP/UCE",
+   "fiabilidad": "alta",
+   "url": "https://revistadigital.uce.edu.ec/index.php/SIEMBRA/article/download/6658/8844/39866",
+   "fecha_consulta": "2026-11-14"
+  },
+  "10": {
+   "titulo": "Agripac (2014). El cultivo de la soya en el Ecuador (charla técnica, incluye datos de ensayos INIAP)",
+   "fiabilidad": "baja",
+   "url": "https://agripac.com.ec/wp-content/uploads/2023/12/CHARLA-CULTIVO-DE-SOYA-2014_FR.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "11": {
+   "titulo": "INIAP repositorio: Prodiplosis longifila principal plaga de tomate en el Ecuador (y estudios de Manabí, virus en Pimampiro). Solo resumen de búsqueda, documentos no leídos completos",
+   "fiabilidad": "media",
+   "url": "https://repositorio.iniap.gob.ec/handle/41000/1324",
+   "fecha_consulta": "2026-11-14"
+  },
+  "12": {
+   "titulo": "Agrocalidad, Revista Ecuador es Calidad: estudio de residuos de plaguicidas en brócoli de exportación y consumo nacional. Solo resumen de búsqueda",
+   "fiabilidad": "media",
+   "url": "https://revistaecuadorescalidad.agrocalidad.gob.ec/revistaecuadorescalidad/index.php/revista/article/view/12",
+   "fecha_consulta": "2026-11-14"
+  },
+  "20": {
+   "titulo": "MAG-SIPA, Boletin de Precios Promedios Ponderados al Productor, diciembre 2025",
+   "fiabilidad": "alta",
+   "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_diciembre_2025.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "21": {
+   "titulo": "MAG-SIPA, Boletin de Precios Promedios Ponderados al Productor, agosto 2025",
+   "fiabilidad": "alta",
+   "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_agosto_2025.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "22": {
+   "titulo": "MAG-SIPA, Boletin de Precios Mayoristas N. 316-317, junio 2026",
+   "fiabilidad": "alta",
+   "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/mayoristas/2026/precios_mayoristas_junio_2026.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "23": {
+   "titulo": "El Diario (Ecuador), el MAG establece el nuevo precio del maiz 2026 (2026-04-02)",
+   "fiabilidad": "media",
+   "url": "https://www.eldiario.ec/ecuador/ecuador-ministerio-de-agricultura-establecio-el-nuevo-precio-del-maiz-para-2026-02042026/",
+   "fecha_consulta": "2026-11-14"
+  },
+  "24": {
+   "titulo": "AgroLatam, compras industriales de maiz y soja en Ecuador, agosto 2026 (cita reporte URTF del MAG)",
+   "fiabilidad": "media",
+   "url": "https://www.agrolatam.com/mercados-latam/maiz-soja-compras-industriales-ecuador-agosto-2026/",
+   "fecha_consulta": "2026-11-14"
+  },
+  "25": {
+   "titulo": "Expreso, productores e industriales fijan USD 30 como precio del quintal de soya (2022-09-13)",
+   "fiabilidad": "media",
+   "url": "https://www.expreso.ec/actualidad/economia/productores-e-industriales-fijan-30-precio-quintal-soya-135750.html",
+   "fecha_consulta": "2026-11-14"
+  },
+  "26": {
+   "titulo": "El Comercio, los productores indigenas de la Sierra siembran menos mellocos (2022)",
+   "fiabilidad": "media",
+   "url": "https://www.elcomercio.com/actualidad/ecuador/indigenas-sierra-siembran-menos-mellocos/",
+   "fecha_consulta": "2026-11-14"
+  },
+  "27": {
+   "titulo": "El Comercio, 600 familias productoras de chochos (Chimborazo, aprox. 2020-2021)",
+   "fiabilidad": "media",
+   "url": "https://www.elcomercio.com/actualidad/ecuador/chocho-union-familias-chimborazo-comercializacion/",
+   "fecha_consulta": "2026-11-14"
+  },
+  "28": {
+   "titulo": "Tridge, precios de quinua y melloco en Ecuador (agregador comercial; solo contraste)",
+   "fiabilidad": "baja",
+   "url": "https://dir.tridge.com/prices/quinoa/EC",
+   "fecha_consulta": "2026-11-14"
+  },
+  "29": {
+   "titulo": "UTN, articulo sobre costos de produccion de quinua en Carchi e Imbabura (leido solo via resumen; enlace dio 410)",
+   "fiabilidad": "baja",
+   "url": "https://repositorio.utn.edu.ec/jspui/bitstream/123456789/8677/3/03%20AGN%20037%20ARTICULO.pdf",
+   "fecha_consulta": "2026-11-14"
+  },
+  "30": {
+   "titulo": "Ciencia Latina, estudio de papa en Chimborazo (costos e ingresos; leido solo via resumen)",
+   "fiabilidad": "baja",
+   "url": "https://ciencialatina.org/index.php/cienciala/article/download/15803/22502?inline=1",
+   "fecha_consulta": "2026-11-14"
+  },
+  "31": {
+   "titulo": "El Oriente, programa Siembra por contrato (cebada; fecha incierta)",
+   "fiabilidad": "baja",
+   "url": "https://www.eloriente.com/articulo/2-mil-agricultores-se-han-acogido-al-programa-siembra-por-contrato/16248",
+   "fecha_consulta": "2026-11-14"
+  },
+  "32": {
+   "titulo": "Expreso, el trigo importado desplaza al maiz local (2025-12-17)",
+   "fiabilidad": "media",
+   "url": "https://www.expreso.ec/actualidad/economia/defensa-de-los-agricultores-el-trigo-importado-desplaza-al-maiz-local-268244.html",
+   "fecha_consulta": "2026-11-14"
+  },
+  "33": {
+   "titulo": "Universidad Tecnica de Cotopaxi, tesis sobre haba con abonos organicos (B/C 2,33; leido solo via resumen)",
+   "fiabilidad": "baja",
+   "url": "https://repositorio.utc.edu.ec/bitstreams/6a67fb27-6146-4731-8b19-cd2b8b68582e/download",
+   "fecha_consulta": "2026-11-14"
+  },
+  "34": {
+   "titulo": "Selina Wamucii, precios de cebada en Ecuador (agregador que cita FAOSTAT; solo contraste)",
+   "fiabilidad": "baja",
+   "url": "https://www.selinawamucii.com/insights/prices/ecuador/barley/",
+   "fecha_consulta": "2026-11-14"
+  }
+ },
+ "cultivos": {
+  "papa": {
+   "id": "papa",
+   "nombre": "Papa (Solanum tuberosum, S. phureja, S. andigenum, S. chaucha)",
+   "familia": "Solanáceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franca, franco-arenosa y rica para tubérculo de carne suave; suelos húmedos y pesados dan tubérculo más firme",
+    "profundidad": "profundos, más de 50 cm, sueltos (franco y franco-arenosos), según fuente 1 sec. 5.1.1",
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": "alta",
+    "notas": "Fuente 1 recomienda terrenos donde antes hubo maíz, cereales o leguminosas, libres de plagas y no propensos a sequía, heladas ni granizo; predominan suelos negro-andinos. pH no indicado. Exigencia de fertilidad 'alta' es inferencia (la fuente insiste en fertilización balanceada y alta aplicación de compost; no la califica).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2400,
+    "altitud_msnm_max": 3700,
+    "temperatura_c": "media anual 6 a 14 C (fuente 1)",
+    "lluvia_mm": "700 a 1200 mm anuales (fuente 1)",
+    "notas": "Fuente 2 (Perú) ubica la papa entre 2000 y 3800 msnm en su tabla de distribución; las heladas pueden dañar el cultivo (variedades sensibles y tolerantes). Siembras en Ecuador: mayo-junio y octubre-diciembre, o todo el año en algunos sectores.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 7,
+    "nota": "Fuente 1: cosecha a los 6 a 7 meses de la siembra. Fuente 2, cuadro de variedades comerciales de Cajamarca (Perú): periodo vegetativo de 110 a 210 días (3,7 a 7 meses)."
+   },
+   "plagas": [
+    "Pulguilla (Epitrix sp)",
+    "Trips (Frankliniella sp)",
+    "Pulgón (Myzus persicae, Macrosiphum euphorbiae)",
+    "Minador de la hoja (Liriomyza sp)",
+    "Gusanos de la hoja (Copitarsia sp)",
+    "Gusano blanco o gorgojo de los Andes (Premnotrypes vorax; fuente 2: P. solaniperda, P. latithorax)",
+    "Gusano trozador negro (Agrotis ypsilon) y cutzos (Barotheus sp)",
+    "Nemátodos (Heterodera pallida)",
+    "Polilla de la papa (Phthorimaea operculella, Scrobipalpula absoluta; fuente 2, Puno)"
+   ],
+   "enfermedades": [
+    "Lancha tardía o tizón tardío (Phytophthora infestans; 'rancha' en fuente 2, problema principal en sierra norte del Perú)",
+    "Mildiú velloso (Peronospora sp)",
+    "Roya (Puccinia pittieriana)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "alto",
+    "hospedero_de": [
+     "Phytophthora infestans",
+     "Premnotrypes (gorgojo de los Andes)",
+     "Heterodera pallida (nemátodo)",
+     "trozadores y cutzos",
+     "Epitrix"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1 (sec. 5.3.8) dice que se rota 'para evitar el agotamiento de la fertilidad y romper el hábitat de plagas (insectos, ácaros, nemátodos y patógenos)'; no califica el agotamiento de la papa en sí: 'alto' es inferencia (cultivo de alta demanda de fertilización). Rotación que propone la fuente 1 (Cuadro 5): pasto (varios años) -> papa (2 siembras) -> cereales (cebada, trigo, maíz, quinua, ataco; 1 siembra) -> leguminosas (haba, arveja, vicia; 1 siembra) -> pasto. Se asocia o alterna con mashua, melloco, oca, haba, chocho, arveja, quinua. Fuente 2 (Cusco, sistema muyuy): papa -> oca/lizas -> olluco/añu -> cebada -> descanso 4-7 años. 'hospedero_de' se deduce de las plagas que la fuente le atribuye (inferencia).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 5,
+    "jornales_ha": 90,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 6 (costos de 1 ha de papa orgánica, UNOCANC): mano de obra USD 900 a USD 10/jornal = 90 jornales/ha (limpieza, abono, fitosanitarios, siembra, riegos, retape, medio aporque, aporque, cosecha, postcosecha, manipuleo) más 11 horas de tractor (arada, rastrada, surcada). Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable 'parcial' es inferencia: la fuente usa tractor solo para preparación del suelo y todo lo demás es manual. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 2,
+    "nota": "Inferencia propia: muchas plagas y enfermedades de manejo frecuente (aspersiones cada 8 a 15 días) y la lancha tardía es el problema principal según fuente 2; demanda alta de insumos y mano de obra (90 jornales). No hay escala en la fuente.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 18.47,
+    "unidad": "USD/qq (papa superchola, precio al productor; qq aprox. 100 lb)",
+    "fecha_dato": "2025-12",
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "Rango observado SIPA para superchola: 29,39 (dic-2024), 15,20 (jul-2025), 16,68 (ago-2025), 24,94 (nov-2025), 18,47 (dic-2025) USD/qq; variacion nov-dic 2025 de -25,95%. Papa china: 31,67 (dic-2024), 19,00 (ago-2025), 20,25 (nov-2025), 21,33 (dic-2025). Estudio en Chimborazo (segun fragmento de busqueda, NO verificado en el texto completo): costo medio USD 3.330/ha e ingreso por venta USD 4.620/ha (ingreso neto aprox. USD 1.290/ha, B/C aprox. 1,39 por calculo propio). ESPAC 2021 (citado en un estudio): rendimiento 24,8 t/ha.",
+    "nivel_1a5": 3,
+    "nivel_criterio": "(inferencia) Precio por kg bajo (aprox. 0,41 USD/kg) pero rendimiento alto (20-30 t/ha) e ingreso bruto/ha alto frente a granos; el ingreso neto es incierto por la volatilidad y porque varios estudios indican que el productor a veces no cubre costos. Nivel intermedio.",
+    "fuentes": [
+     {
+      "n": 20,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_diciembre_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Papa superchola 18,47 USD/qq y papa china 21,33 USD/qq en dic-2025; dic-2024: 29,39 y 31,67; nov-2025: 24,94 y 20,25."
+     },
+     {
+      "n": 21,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_agosto_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Papa superchola 16,68 USD/qq (jul-2025: 15,20); papa china 19,00."
+     },
+     {
+      "n": 30,
+      "url": "https://ciencialatina.org/index.php/cienciala/article/download/15803/22502?inline=1",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Segun resumen de busqueda: costos USD 3.330/ha e ingresos USD 4.620/ha en Chimborazo (no se pudo leer el documento completo)."
+     }
+    ],
+    "confianza": "media",
+    "huecos": [
+     "No se hallo boletin SIPA de 2026 legible; dato mas reciente es dic-2025.",
+     "Costos/ingreso por ha de fuente oficial verificada (solo fragmento de un estudio de Chimborazo).",
+     "Mayorista (Ambato/Riobamba) en cifras: las tablas mayoristas SIPA son imagenes sin texto extraible."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1 Papa, sec. 3 (líneas ~491-506)",
+     "dato": "altitud 2400-3700 msnm, T media 6-14 C, lluvia 700-1200 mm, texturas"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1, sec. 5.1.1 (~570-580) y 5.2 (~630-641)",
+     "dato": "terreno profundo >50 cm, franco; antecesores maíz, cereales, leguminosas; asociación"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1, sec. 5.3.8 Cuadro 5 (~881-897)",
+     "dato": "rotación pasto-papa-cereales-leguminosas-pasto"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1, sec. 6 (~899-987)",
+     "dato": "plagas y enfermedades principales"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1, sec. 7 (~1019)",
+     "dato": "cosecha a los 6-7 meses"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1, sec. 8 Cuadro 6 (~1105-1241)",
+     "dato": "90 jornales/ha, 490 qq (22 272 kg)/ha, costos USD 3474,79"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Papa, Cuadro 17 (~2084-2127) y Cuadro 19 (~2298-2316)",
+     "dato": "periodo vegetativo 110-210 días; plagas de Puno; rancha"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "pH del suelo (no indicado)",
+    "drenaje requerido (no indicado)",
+    "exigencia de fertilidad no calificada por la fuente (inferida)",
+    "efecto de agotamiento del suelo no cuantificado",
+    "mercado (otro agente)"
+   ]
+  },
+  "mashua": {
+   "id": "mashua",
+   "nombre": "Mashua / mashwa / isaño / añu (Tropaeolum tuberosum)",
+   "familia": "Tropaeoláceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franco a franco-arenoso suelto (misma elección de terreno que la papa)",
+    "profundidad": "profundos",
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": "baja",
+    "notas": "Fuente 1: prefiere suelos profundos con buen contenido de materia orgánica, pero es 'muy rústica': se cultiva en suelos pobres sin fertilizantes ni pesticidas sintéticos. Fuente 2: fertilización preferentemente orgánica, más 20-40-20 para pasar de 15 t/ha. Exigencia 'baja' es inferencia a partir de esa rusticidad.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2400,
+    "altitud_msnm_max": 3700,
+    "temperatura_c": "media anual 6 a 14 C (fuente 1, igual que papa)",
+    "lluvia_mm": "700 a 1200 mm anuales (fuente 1)",
+    "notas": "Fuente 2 (Perú/Bolivia): se concentra entre 1500 y 4200 msnm y soporta bien el frío. Siembra mayor octubre-diciembre, menor mayo-junio; siembras escalonadas para evitar las heladas de julio-septiembre (fuente 1).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 4,
+    "max": 6,
+    "nota": "Fuente 1: cosecha a los 4 meses en sitios que no excedan 2900 msnm y a los 5-6 meses sobre 2900 msnm. Fuente 2 no da ciclo."
+   },
+   "plagas": [
+    "Cutzo",
+    "Gusano trozador",
+    "Gusano cortador 'chucllucuru' (ataca raíces, verdeamiento y alargamiento del tubérculo)",
+    "Gusanos de la hoja"
+   ],
+   "enfermedades": [
+    "Roya"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "bajo",
+    "hospedero_de": [
+     "cutzo",
+     "gusano trozador",
+     "roya"
+    ],
+    "rompe_ciclos_de": [
+     "nemátodos e insectos (efecto nematicida/insecticida atribuido por la fuente 1 a la planta en asociación con melloco, oca y papas nativas)"
+    ],
+    "notas": "Fuente 1: la incidencia de insectos no es mayormente significativa; asociación con melloco, oca y papa nativa explicada por 'principios de control nematicida e insecticida' de la planta; en el capítulo de oca sugiere bordes de mashua para proteger a la oca de insectos y hongos. Rotación recomendada: alternar con leguminosas (haba) y cereales (quinua, trigo, cebada). Fuente 2: rotar los campos reduce plagas. 'agota_suelo: bajo' es inferencia desde 'cultivo rústico en suelos pobres sin fertilizantes' (no medido). El efecto nematicida es dato de fuente 1, no cuantificado ni verificado con otra fuente.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 82,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 2 (mashua orgánica, UNOCANC): mano de obra USD 820 a USD 10/jornal = 82 jornales/ha, más 10 horas de tractor para preparación. Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable parcial: inferencia (tractor solo en preparación). Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 5,
+    "nota": "Inferencia propia a partir de la fuente 1 ('muy rústica', incidencia de insectos 'no mayormente significativa') y fuente 2 ('poco atacada por enfermedades o plagas', un aporque). Solo hay 1 enfermedad (roya) y pocos insectos listados.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 2 Mashua, sec. 2.1 (~1316-1342)",
+     "dato": "rusticidad, rendimiento hasta 750 qq/ha, efecto nematicida/insecticida en asociación"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 2, sec. 3 (~1385-1401)",
+     "dato": "altitud 2400-3700, T 6-14 C, lluvia 700-1200 mm, suelos profundos con MO"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 2, sec. 5.3.4 y 6 (~1615-1676)",
+     "dato": "rotación con haba y cereales; plagas y roya"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 2, sec. 7.1 (~1682-1685)",
+     "dato": "cosecha a 4 meses (<2900 msnm) o 5-6 meses (>2900 msnm)"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 2, sec. 8 Cuadro 2 (~1773-1890)",
+     "dato": "82 jornales/ha, 750 qq (34 091 kg)/ha"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Mashwa, isaño o añu (~2855-2952)",
+     "dato": "familia, altitud 1500-4200, fertilización, sanidad, rendimiento 12-15 t/ha"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "pH no indicado",
+    "drenaje no indicado",
+    "plagas sin nombres científicos ni nivel de daño cuantificado",
+    "efecto nematicida solo afirmado, sin estudio citado",
+    "rendimiento: fuente 1 dice 750 qq/ha (34 t) y fuente 2 12-15 t/ha, rango amplio",
+    "mercado (otro agente)"
+   ]
+  },
+  "melloco": {
+   "id": "melloco",
+   "nombre": "Melloco (Ullucus tuberosus; olluco, lizas)",
+   "familia": "Baseláceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "liviana; en suelos pesados (arcillosos) se inhibe la tuberización y el engrosamiento",
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 1: pH 'ligeramente ácido' (sin cifras) y alto contenido de materia orgánica. Fuente 2: preferencia de suelos semejante a la oca; abonos orgánicos suplementados con 80-40-20. Exigencia 'media' es inferencia. Melloco (Ecuador), olluco (Perú/Bolivia) y lizas/papa lisa (sur del Perú) son la misma especie según la fuente 2.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2600,
+    "altitud_msnm_max": 3800,
+    "temperatura_c": "8 a 14 C (fuente 1); tolerante a heladas, rebrota hasta tres veces",
+    "lluvia_mm": "600 a 1000 mm anuales; otros autores 800 a 1400 mm (fuente 1)",
+    "notas": "Óptimo 3000-3600 msnm en Ecuador (fuente 1). Fuente 2: se adapta hasta 4000 msnm, mayor producción entre 3600 y 3800 msnm, y 2000-4000 por diversidad de variedades.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 5.3,
+    "max": 8.7,
+    "nota": "Fuente 1: 160 a 260 días de siembra a cosecha (5,3 a 8,7 meses). Fuente 2 (olluco): 180 a 220 días."
+   },
+   "plagas": [
+    "Gusano cortador (lepidóptero)",
+    "Cutzo",
+    "Minador de la hoja",
+    "Larvas de lepidópteros que atacan el tubérculo",
+    "Pulguilla saltona Epitrix sp (fuente 2)"
+   ],
+   "enfermedades": [
+    "Pudrición radicular y marchitamiento",
+    "Mancha de la hoja",
+    "Mancha amarilla de la hoja"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "cutzo",
+     "gusano cortador",
+     "minador de la hoja",
+     "Epitrix"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1: rotaciones con buenos resultados haba-melloco, chocho-melloco, quinua-melloco y cereales-melloco; rara vez monocultivo, se asocia con oca y haba. Fuente 2 (Cusco): papa -> oca/lizas -> olluco/añu -> cebada -> descanso. Fuente 2 lo califica de bastante resistente a enfermedades y plagas. Agotamiento del suelo: no hay dato (null). Hospedero_de se deduce de las plagas atribuidas (inferencia).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 80,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 3 (melloco orgánico, UNOCANC): mano de obra USD 800 a USD 10/jornal = 80 jornales/ha (control: costos directos 2324,84 - 120 maquinaria - 1403,84 insumos = 801). Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable 'parcial' es inferencia. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Inferencia propia: plagas de baja importancia económica en la planta (alta capacidad de rebrote) y tolerancia a heladas, pero exige suelo liviano con alta materia orgánica, el daño al tubérculo reduce la calidad comercial y requiere mucha mano de obra (80 jornales).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 15,
+    "unidad": "USD/qq (100 lb; melloco blanco; el rojo USD 12)",
+    "fecha_dato": "2022-07",
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": "Sin costos ni rendimiento en la fuente. Tridge (agregador comercial, baja fiabilidad) reporta precio en finca de 0,55 USD/kg el 2025-04-04 y un rango de 0,45-0,94 USD/kg en 4 semanas; no se usa como precio de referencia. Un estudio del CIP en Colta (Chimborazo) segun fragmento de busqueda reporta perdida neta por unidad de area en sistema tradicional (no verificado).",
+    "nivel_1a5": 2,
+    "nivel_criterio": "(inferencia) Precio por kg aprox. 0,33 USD/kg (15 USD/qq), similar a papa; sin dato de rendimiento ni costos, asignado nivel bajo-medio con poca base.",
+    "fuentes": [
+     {
+      "n": 26,
+      "url": "https://www.elcomercio.com/actualidad/ecuador/indigenas-sierra-siembran-menos-mellocos/",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Quintal de 100 lb de melloco blanco USD 15, rojo USD 12; 30% se vende en mercados y 70% se consume localmente. Fecha segun metadatos: 2022-07-29."
+     },
+     {
+      "n": 28,
+      "url": "https://dir.tridge.com/prices/fresh-melloco/EC",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Precio en finca 0,55 USD/kg (2025-04-04); rango 4 semanas 0,45-0,94 USD/kg (agregador comercial, solo contraste)."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio oficial SIPA/mayorista no hallado.",
+     "Precio con fecha reciente (el dato es prensa de 2022).",
+     "Costos de produccion y rendimiento."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3 Melloco, sec. 3 (~2082-2110)",
+     "dato": "suelos, altitud 2600-3800, T 8-14 C, lluvia 600-1000 / 800-1400 mm, tolerancia a heladas"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3, sec. 5.3.3 y 6 (~2359-2425)",
+     "dato": "rotaciones, plagas y enfermedades"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3, sec. 7.1 (~2444-2446)",
+     "dato": "160-260 días; 10 000 a 45 000 kg/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3, sec. 8 Cuadro 3 (~2478-2598)",
+     "dato": "80 jornales/ha, 600 qq (27 273 kg)/ha"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Olluco (~2735-2850) y Cuadro 3 de rotaciones (~1310-1325)",
+     "dato": "nombres comunes, altitud, ciclo 180-220 días, Epitrix, fertilización"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "pH numérico (solo 'ligeramente ácido')",
+    "profundidad del suelo",
+    "drenaje",
+    "enfermedades sin agente causal identificado",
+    "agotamiento del suelo",
+    "mercado (otro agente)"
+   ]
+  },
+  "olluco": {
+   "id": "olluco",
+   "nombre": "Olluco / ulluku / añu según región (Ullucus tuberosus), sinónimo de melloco y lizas",
+   "familia": "Baseláceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "liviana; en suelos pesados (arcillosos) se inhibe la tuberización y el engrosamiento",
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 1: pH 'ligeramente ácido' (sin cifras) y alto contenido de materia orgánica. Fuente 2: preferencia de suelos semejante a la oca; abonos orgánicos suplementados con 80-40-20. Exigencia 'media' es inferencia. Melloco (Ecuador), olluco (Perú/Bolivia) y lizas/papa lisa (sur del Perú) son la misma especie según la fuente 2. ALIAS: misma especie que 'melloco'; los datos de Ecuador (fuente 1) provienen del capítulo de melloco. Nota: la fuente 2 usa 'añu' como nombre de la mashua (Tropaeolum), no del olluco.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2000,
+    "altitud_msnm_max": 4000,
+    "temperatura_c": "fuente 2 no da rango; fuente 1 (melloco, Ecuador): 8 a 14 C",
+    "lluvia_mm": "fuente 2 no da rango; fuente 1 (melloco): 600-1000 mm (otros 800-1400)",
+    "notas": "Fuente 2: la diversidad de variedades permite cultivarlo de 2000 a 4000 msnm; mayor producción entre 3600 y 3800 msnm en lugares algo protegidos del frío; a menor altura se asocia con maíz.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 7.3,
+    "nota": "Fuente 2: 180 a 220 días según altitud y variedad. Fuente 1 (melloco Ecuador): 160 a 260 días."
+   },
+   "plagas": [
+    "Pulguilla saltona Epitrix sp (fuente 2; adulto perfora hojas, larva ataca raíz y puede minar tubérculos)",
+    "Gusano cortador, cutzo y minador de hoja (fuente 1, capítulo melloco)"
+   ],
+   "enfermedades": [
+    "Pudrición radicular y marchitamiento",
+    "Mancha de la hoja",
+    "Mancha amarilla de la hoja"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "cutzo",
+     "gusano cortador",
+     "minador de la hoja",
+     "Epitrix"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "ALIAS de melloco. Fuente 2: 'bastante resistente a enfermedades y plagas'; en el sistema muyuy de Cusco entra como tercer año (papa -> oca/lizas -> olluco/añu -> cebada -> descanso 4-7 años). Rotaciones de Ecuador (fuente 1, melloco): haba, chocho, quinua o cereales antes del cultivo.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 80,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 3 (melloco orgánico, UNOCANC): mano de obra USD 800 a USD 10/jornal = 80 jornales/ha (control: costos directos 2324,84 - 120 maquinaria - 1403,84 insumos = 801). Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable 'parcial' es inferencia. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Inferencia propia: plagas de baja importancia económica en la planta (alta capacidad de rebrote) y tolerancia a heladas, pero exige suelo liviano con alta materia orgánica, el daño al tubérculo reduce la calidad comercial y requiere mucha mano de obra (80 jornales).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos (en Ecuador suele confundirse con melloco; no se investigo por separado)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Olluco (~2735-2850); Cuadro 3 rotaciones (~1310-1325); tabla de distribución (~1471)",
+     "dato": "nombre científico y familia, altitud 2000-4000, ciclo 180-220 días, Epitrix, rotación en Cusco"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3 Melloco (misma especie)",
+     "dato": "clima, plagas, mano de obra 80 jornales/ha: ver ficha 'melloco'"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "Ficha derivada: es la misma especie que melloco; no hay información independiente. Conviene tratar olluco, melloco y lizas como un solo cultivo en el agente.",
+    "pH, profundidad, drenaje, temperatura y lluvia para Perú/Bolivia no están en la fuente 2",
+    "mercado (otro agente)"
+   ]
+  },
+  "lizas": {
+   "id": "lizas",
+   "nombre": "Lizas / papa lisa (Ullucus tuberosus), sinónimo de olluco y melloco",
+   "familia": "Baseláceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "liviana; en suelos pesados (arcillosos) se inhibe la tuberización y el engrosamiento",
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": "media",
+    "notas": "ALIAS: 'lizas' o 'papa lisa' es el nombre en español usado en el sur del Perú para el olluco (fuente 2, ~2742); misma especie que 'melloco'. Fuente 1: pH 'ligeramente ácido' (sin cifras) y alto contenido de materia orgánica. Fuente 2: preferencia de suelos semejante a la oca; abonos orgánicos suplementados con 80-40-20. Exigencia 'media' es inferencia. Melloco (Ecuador), olluco (Perú/Bolivia) y lizas/papa lisa (sur del Perú) son la misma especie según la fuente 2.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2000,
+    "altitud_msnm_max": 4000,
+    "temperatura_c": "fuente 2 no da rango; fuente 1 (melloco, Ecuador): 8 a 14 C",
+    "lluvia_mm": "fuente 2 no da rango; fuente 1 (melloco): 600-1000 mm (otros 800-1400)",
+    "notas": "Fuente 2: la diversidad de variedades permite cultivarlo de 2000 a 4000 msnm; mayor producción entre 3600 y 3800 msnm en lugares algo protegidos del frío; a menor altura se asocia con maíz.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 7.3,
+    "nota": "Fuente 2: 180 a 220 días según altitud y variedad. Fuente 1 (melloco Ecuador): 160 a 260 días."
+   },
+   "plagas": [
+    "Pulguilla saltona Epitrix sp (fuente 2; adulto perfora hojas, larva ataca raíz y puede minar tubérculos)",
+    "Gusano cortador, cutzo y minador de hoja (fuente 1, capítulo melloco)"
+   ],
+   "enfermedades": [
+    "Pudrición radicular y marchitamiento",
+    "Mancha de la hoja",
+    "Mancha amarilla de la hoja"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "cutzo",
+     "gusano cortador",
+     "minador de la hoja",
+     "Epitrix"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "ALIAS de olluco/melloco. Fuente 2, Cuadro 3 (Cusco, sistema muyuy): 'Oca/lizas' en el 2do año y 'Olluco/añu' en el 3er año; el texto de la tabla es ambiguo sobre si 'lizas' ahí es lo mismo que olluco (la tabla de distribución de la fuente 2, ~1471, usa 'Olluco/lizas' para Ullucus tuberosus). Rotaciones de Ecuador: ver 'melloco'.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 80,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 3 (melloco orgánico, UNOCANC): mano de obra USD 800 a USD 10/jornal = 80 jornales/ha (control: costos directos 2324,84 - 120 maquinaria - 1403,84 insumos = 801). Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable 'parcial' es inferencia. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Inferencia propia: plagas de baja importancia económica en la planta (alta capacidad de rebrote) y tolerancia a heladas, pero exige suelo liviano con alta materia orgánica, el daño al tubérculo reduce la calidad comercial y requiere mucha mano de obra (80 jornales).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "No investigado por instruccion.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No investigado (pedido explicito)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Olluco, nombres comunes (~2741-2742); tabla de distribución (~1471); Cuadro 3 (~1314)",
+     "dato": "lizas = papa lisa = olluco = Ullucus tuberosus"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 3 Melloco",
+     "dato": "ver ficha 'melloco'"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "Ficha derivada: sin información propia; mismo cultivo que melloco/olluco",
+    "mercado (otro agente)"
+   ]
+  },
+  "oca": {
+   "id": "oca",
+   "nombre": "Oca (Oxalis tuberosa)",
+   "familia": "Oxalidáceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franca",
+    "profundidad": "profundos",
+    "ph_min": 5.3,
+    "ph_max": 7.8,
+    "drenaje": null,
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 1: suelos francos, profundos con buen contenido de materia orgánica; tolerancia de acidez de pH 5,3 a 7,8 ('se ha reportado'). Responde mucho a fertilización, aporque, escarda y control sanitario, con rendimientos de hasta 40-50 t/ha. Exigencia 'media' es inferencia.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 3000,
+    "altitud_msnm_max": 3800,
+    "temperatura_c": "resistente a bajas temperaturas; las heladas destruyen el follaje; más de 28 C destruye la planta (fuente 1). Requiere días menores de 12 h para formar tubérculo",
+    "lluvia_mm": "570 a 2150 mm distribuidos uniformemente (fuente 1); fuente 2: >600 mm",
+    "notas": "Rango 3000-3800 es la franja de mayor concentración (fuente 1 y 2); fuente 2 da 2500-4100 msnm de presencia total.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 8,
+    "nota": "Fuente 1: cosecha a los 6-8 meses según variedad. Fuente 2: 220 a 269 días de crecimiento (7,3 a 9 meses); tuberización desde ~110 días."
+   },
+   "plagas": [
+    "Gusanos trozadores (Agrotis deprivata, A. ipsilon)",
+    "Gusanos cortadores o defoliadores (Copitarsia sp, Spodoptera sp, Peridroma saucia)",
+    "Coleóptero cortador (Naupactus sp)",
+    "Cutzo (Barotheus sp)",
+    "Pulgones (Aphididae)",
+    "Minador de las hojas (Liriomyza sp)"
+   ],
+   "enfermedades": [
+    "Pudrición radicular (Rhizoctonia sp)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Rhizoctonia",
+     "cutzo (Barotheus)",
+     "trozadores"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1: rotaciones con buenos resultados haba-oca, chocho-oca, quinua-oca y cereales-oca; se asocia con haba, maíz y chocho; se recomienda sembrar bordes de mashua para proteger a la oca de insectos y hongos. Fuente 2 (Cusco): papa -> oca/lizas -> olluco/añu -> cebada -> descanso. Agotamiento: sin dato (null). Hospedero_de deducido de las plagas atribuidas (inferencia).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 82,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 4 (oca orgánica, UNOCANC): mano de obra USD 820 a USD 10/jornal = 82 jornales/ha. Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable parcial es inferencia. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "Inferencia propia: cultivo rústico y de frío, rotación y bordes de mashua bastan en general, pero hay ~6 plagas de insectos listadas y exige 82 jornales/ha; no hay escala en la fuente.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio por saco/qq en fuente oficial ni de prensa; El Comercio solo indica que el excedente se vende en Ambato y Riobamba sin cifras."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 4 Oca, sec. 3 (~2744-2780)",
+     "dato": "altitud 3000-3800, suelos francos, pH 5,3-7,8, T, lluvia 570-2150 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 4, sec. 5.3.5, 6 y Cuadro 3 (~2998-3098)",
+     "dato": "rotaciones, plagas, Rhizoctonia"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 4, sec. 7.1 (~3105)",
+     "dato": "cosecha a los 6-8 meses"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 4, sec. 8 Cuadro 4 (~3144-3252)",
+     "dato": "82 jornales/ha, 400 qq (18 182 kg)/ha"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Oca (~2519-2640)",
+     "dato": "familia, altitud 2500-4100, ciclo 220-269 días"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "drenaje",
+    "profundidad numérica",
+    "agotamiento del suelo",
+    "severidad de plagas",
+    "mercado (otro agente)"
+   ]
+  },
+  "achira": {
+   "id": "achira",
+   "nombre": "Achira / achera / atzera (Canna edulis)",
+   "familia": "Cannáceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "suelos sueltos, francos, franco-arenosos o franco-limosos, ricos en materia orgánica",
+    "profundidad": null,
+    "ph_min": 5,
+    "ph_max": 6.5,
+    "drenaje": "susceptible a encharcamientos prolongados; requiere canales de drenaje (fuente 1)",
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 1: tolera acidez y crece en pH 4,5 a 8,0; mejor comportamiento en pH 5,0 a 6,5 (ph_min/max aquí = óptimo), con mayores proporciones de N y K. Fuente 2: prefiere suelos sueltos con buena MO. Exigencia 'media' es inferencia.",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 0,
+    "altitud_msnm_max": 3000,
+    "temperatura_c": "9 a 30-32 C; sin heladas durante la maduración (fuente 1)",
+    "lluvia_mm": "800 a 1120 mm en el periodo vegetativo, bien distribuidos (fuente 1)",
+    "notas": "Fuente 1: desde el nivel del mar hasta 3000 msnm; rendimientos óptimos en Ecuador entre 800 y 2500 msnm. Fotoperiodo neutro. Fuente 2: valles interandinos abrigados; rendimiento favorable con baja humedad relativa.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 14,
+    "nota": "Fuente 1: cosecha entre 6 y 9 meses según cultivar, altitud y suelo. Fuente 2: 10 a 14 meses después del transplante (discrepancia entre fuentes)."
+   },
+   "plagas": [
+    "Gusano tornillo (Castniomera humboltti)",
+    "Cutzo (Platicoelia valida, Podischnus agenor, Anomala sp)",
+    "Gusano cogollero (Spodoptera sp)",
+    "Enrolladores y comedores de hojas (fuente 2)"
+   ],
+   "enfermedades": [
+    "Podredumbre de yemas y brotes (Xanthomonas cannae)",
+    "Podredumbre del tallo y rizomas (Rhizoctonia, Fusarium)",
+    "Alternariosis (Alternaria)",
+    "Roya (Puccinia cannacearum)",
+    "Virosis"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Rhizoctonia",
+     "Fusarium",
+     "cutzos"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1: 'no hay experiencia previa de rotaciones con achira'; según agricultores, buenos resultados con haba-achira, chocho-achira y cereales-achira; asociación con maíz, hortalizas y tomate de árbol. Es perenne y de ciclo largo (inferencia: ocupa el terreno varios meses y su rotación no está validada). Agotamiento: sin dato (null); la fuente 1 solo indica que requiere mayores proporciones de N y K.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": 61,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 4 de achira (UNOCANC): mano de obra USD 610 a USD 10/jornal = 61 jornales/ha, más 8 horas de tractor. Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable parcial es inferencia. La fuente 2 dice que no requiere mayores cuidados salvo mantener limpios los surcos, un riego en sequía prolongada y un ligero aporque a medio ciclo. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "Inferencia propia: la fuente 2 la describe como 'planta bastante rústica', sin plagas que afecten seriamente la producción, aunque la fuente 1 lista gusano tornillo y varias enfermedades fungosas y virosis; sensible al encharcamiento.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 5 Achira, sec. 3 (~3419-3452)",
+     "dato": "suelos, pH 4,5-8,0 (óptimo 5,0-6,5), altitud 0-3000, T 9-32 C, lluvia 800-1120 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 5, sec. 5.3.5 y 6 (~3625-3709)",
+     "dato": "rotaciones según agricultores, plagas y enfermedades"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 5, sec. 7.1 (~3715-3729)",
+     "dato": "cosecha 6-9 meses; rendimiento 33 900 kg/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 5, sec. 8 Cuadro 4 (~3765-3867)",
+     "dato": "61 jornales/ha, 600 qq (27 273 kg)/ha"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Achira (~3249-3330)",
+     "dato": "ciclo 10-14 meses, rendimiento 15-40 t/ha, sanidad"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "rotaciones sin validación formal (dicho por agricultores)",
+    "agotamiento del suelo",
+    "discrepancia de ciclo entre fuentes (6-9 vs 10-14 meses)",
+    "mercado (otro agente)"
+   ]
+  },
+  "jicama": {
+   "id": "jicama",
+   "nombre": "Jícama / yacón (Smallanthus sonchifolius)",
+   "familia": "Asteráceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "suelos moderadamente profundos a profundos, sueltos (francos, arenosos), con buena estructura; en suelos pesados el crecimiento es pobre",
+    "profundidad": "moderadamente profundos a profundos",
+    "ph_min": 6,
+    "ph_max": 7.5,
+    "drenaje": "bien drenados; los excesos de agua rajan las raíces y las pudren en almacenamiento",
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 1: pH 6 a 7,5 ('tolera un amplio rango, de ácidos a ligeramente alcalinos'); responde mejor a suelos ricos. Exigencia 'media' es inferencia.",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 900,
+    "altitud_msnm_max": 2750,
+    "temperatura_c": "media anual 14 a 20 C; <10 C retarda crecimiento; >26 C con suelo seco estresa; muy susceptible a heladas pero rebrota bien (fuente 1)",
+    "lluvia_mm": "550 a 1000 mm anuales; agua uniforme y frecuente los primeros 5 meses (fuente 1)",
+    "notas": "Fuente 1: en los Andes 900-2750 msnm; en Ecuador parcelas campesinas hasta 3500 msnm asociadas con otros cultivos; a nivel del mar la tuberización no es eficiente. Al menos 9 h de luz.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 10,
+    "nota": "Fuente 1: las raíces maduran entre 6 y 10 meses según la zona (más corto en zonas bajas)."
+   },
+   "plagas": [
+    "Pulguilla",
+    "Cutzo",
+    "Minador de la hoja",
+    "Arañita roja"
+   ],
+   "enfermedades": [
+    "Pudriciones de la raíz por hongos (Penicillium, Rhizopus, Cladosporium)",
+    "Daño por frío poscosecha (desorden fisiológico, <10 C)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "cutzo",
+     "pulguilla",
+     "hongos de pudrición radicular"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1: según agricultores, rotaciones haba-jícama, chocho-jícama y cereales-jícama; asociación con maíz, hortalizas y tomate de árbol. Agotamiento: sin dato (null). Hospedero_de deducido de las plagas atribuidas (inferencia).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 80,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 4 de jícama (UNOCANC): mano de obra USD 800 a USD 10/jornal = 80 jornales/ha, más 10 horas de tractor. ADVERTENCIA: la tabla de jícama es prácticamente idéntica (mismos subtotales y totales, USD 3 527,32) a la de melloco, lo que sugiere una plantilla copiada; el dato propio de jícama es dudoso. Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Nota de calidad: el texto extraído del PDF desordena las columnas de la tabla; los jornales se reconstruyeron sumando cantidades a USD 10/jornal contra el subtotal de mano de obra. Las tablas de costos de la fuente 1 de varios cultivos tienen valores casi idénticos (posible plantilla copiada), úsese con cautela.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Inferencia propia: pocas plagas y ciclo medio-largo, pero exigente en agua uniforme los 5 primeros meses, sin heladas, y delicada en poscosecha (daño por frío, pudriciones).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 6 Jícama, sec. 3 (~4040-4092)",
+     "dato": "suelos, pH 6-7,5, altitud 900-2750, T 14-20 C, lluvia 550-1000 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 6, sec. 5.4.5 y 6 (~4269-4337)",
+     "dato": "rotaciones y plagas"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 6, sec. 7.2 (~4343-4347)",
+     "dato": "madurez a 6-10 meses"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 6, sec. 8 Cuadro 4 (~4396-4505)",
+     "dato": "80 jornales/ha, 600 qq (27 273 kg)/ha; tabla idéntica a melloco"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "agotamiento del suelo",
+    "tabla de costos probablemente copiada de melloco",
+    "fuente 2 no revisada para este cultivo (aparece como yacón, ~6076 y ~6675)",
+    "mercado (otro agente)"
+   ]
+  },
+  "arracacha": {
+   "id": "arracacha",
+   "nombre": "Arracacha / zanahoria blanca (Arracacia xanthorrhiza)",
+   "familia": "Apiáceas",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "suelos profundos, bien drenados",
+    "profundidad": "profundos",
+    "ph_min": 5,
+    "ph_max": 6,
+    "drenaje": "bien drenados; en lluvias intensas requiere zanjas de drenaje para evitar 'melado' (Septoria) y pudrición de raíz",
+    "exigencia_fertilidad": "alta",
+    "notas": "Fuente 1: suelos profundos con buena MO, fértiles, bien drenados, pH 5 a 6; prefiere días cortos para el enraizamiento. 'alta' se infiere de 'fértiles' (la fuente no califica exigencia).",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 1500,
+    "altitud_msnm_max": 3300,
+    "temperatura_c": "óptima 14 a 21 C; clima templado sin heladas (fuente 1); también 15-20 C a 1500-3300 msnm",
+    "lluvia_mm": "ideal 1200 mm y nunca menos de 800 mm anuales, bien distribuidos (fuente 1)",
+    "notas": "Fuente 2: 1500-3200 msnm, lluvia muy variable 300-3000 mm, requiere al menos 7 a 8 meses libres de heladas fuertes.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 10,
+    "max": 12,
+    "nota": "Fuente 1: período vegetativo completo a los 10-12 meses de sembrada (follaje amarillo hasta defoliación total). Fuente 2: capado posible desde los 8 meses."
+   },
+   "plagas": [
+    "Gusanos trozadores o tierreros (Agrotis ipsilon)",
+    "Pulgones (Aphididae)"
+   ],
+   "enfermedades": [
+    "Pudrición de la raíz / mal del esclerosio (Sclerotium rolfsii)",
+    "Melado o mela mela (Septoria sp), con lluvias intensas"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Agrotis ipsilon",
+     "Sclerotium rolfsii",
+     "Septoria"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1: 'aparentemente no tiene plagas importantes, por lo que la rotación es muy importante'; aconseja rotar con leguminosas (haba, lenteja, vicia-avena). Es la única apiácea de este grupo, así que no comparte familia con las demás. Cultivo de ciclo largo (10-12 meses; inferencia: ocupa el terreno casi un año) y perenne según fuente 2. Agotamiento: sin dato (null).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 2,
+    "jornales_ha": 41,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, Cuadro 3 (arracacha orgánica, UNOCANC): mano de obra USD 410 a USD 10/jornal = 41 jornales/ha (abono 4, siembra 4, deshierbas 15, cosecha 15, manipuleo 3, asignación por rubro aproximada), más 9 horas de tractor. Escala mano de obra por jornales/ha (inferencia propia): <=30=1, 31-50=2, 51-70=3, 71-85=4, >85=5. Mecanizable parcial es inferencia. Esta tabla no coincide con la plantilla común de otros cultivos, así que es la más creíble. El texto extraído desordena columnas; el total sí cuadra con el subtotal.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Inferencia propia: pocas plagas ('aparentemente no tiene plagas importantes'), pero ciclo muy largo (10-12 meses), no tolera heladas, necesita drenaje y riego semanal en época seca.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador, Cotopaxi/UNOCANC según fuente 1; Perú/Bolivia según fuente 2). No extrapolar a costa ni Amazonía",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 7 Arracacha, sec. 3 (~4660-4694)",
+     "dato": "suelos pH 5-6, altitud 1500-3300, T 14-21 C, lluvia 800-1200 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 7, sec. 5.3.4 y 6 Cuadro 2 (~4975-5053)",
+     "dato": "rotación con leguminosas, plagas y enfermedades"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 7, sec. 7.1 (~5060-5083)",
+     "dato": "cosecha a 10-12 meses, rendimiento 4 000-12 000 kg/ha (hasta 40 t)"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 7, sec. 8 Cuadro 3 (~5114-5205)",
+     "dato": "41 jornales/ha, 9 090 kg (200 qq)/ha"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Arracacha (~2982-3035)",
+     "dato": "familia, altitud 1500-3200, heladas, lluvia 300-3000 mm"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "agotamiento del suelo",
+    "textura exacta",
+    "severidad de plagas",
+    "mercado (otro agente)"
+   ]
+  },
+  "cebada": {
+   "id": "cebada",
+   "nombre": "Cebada",
+   "familia": "Poaceae (gramínea)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": null,
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": null,
+    "notas": "Las fuentes locales no describen requerimientos de suelo de este cereal (solo lo citan en rotaciones y en el cuadro de altitud).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 0,
+    "altitud_msnm_max": 3900,
+    "temperatura_c": null,
+    "lluvia_mm": null,
+    "notas": "Rango de 'altura óptima de cultivo' del Cuadro 7 de F2 (Perú y Bolivia, Mario Tapia) para Hordeum vulgare: 0-3900 msnm; se define por mayor frecuencia de cultivo y varía con la latitud; en Ecuador no hay dato en las fuentes. Listado como cultivo 'andinizado' (introducido).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "Sin dato de ciclo en F1/F2 para este cultivo."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "medio",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [],
+    "notas": "En F1 y F2 la cebada aparece como cereal que sigue a papa/quinua y precede a leguminosa (haba), avena, oca o barbecho; en F1 se usa en franjas densas para frenar la erosión. Que no fije nitrógeno es característica botánica general (gramínea), no dato de las fuentes. 'agota_suelo: medio' es inferencia (sin dato de fuente).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 2,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "(inferencia) Cereal de siembra al voleo/denso y cosecha mecanizable; F1 menciona que cebada y quinua 'se siembran al voleo' en fajas. Sin jornales/ha en las fuentes para este cultivo.",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "(inferencia) Cultivo andinizado, difundido; las fuentes no dan datos de manejo. Valor provisional.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 13,
+    "unidad": "USD/qq (precio de mercado; Cerveceria Nacional pagaria USD 20/qq en contrato 'Siembra por contrato')",
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": "Sin costos ni rendimiento verificados. Nota de 2011: un agricultor de Imbabura recordaba USD 5/qq que desmotivo el cultivo. FAOSTAT via agregador: precio al productor 391,7 USD/t en 2018 (aprox. 0,39 USD/kg; dato antiguo).",
+    "nivel_1a5": 2,
+    "nivel_criterio": "(inferencia) Precio por kg de 0,29 a 0,44 USD/kg (13-20 USD/qq) y rendimientos tipicos modestos; entre los mas bajos con dato. El ingreso por ha no es comparable por falta de datos propios.",
+    "fuentes": [
+     {
+      "n": 31,
+      "url": "https://www.eloriente.com/articulo/2-mil-agricultores-se-han-acogido-al-programa-siembra-por-contrato/16248",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Quintal de cebada aprox. USD 13 en mercado; Cerveceria Nacional paga USD 20 en 'Siembra por contrato'. Fecha del texto incierta."
+     },
+     {
+      "n": 34,
+      "url": "https://www.selinawamucii.com/insights/prices/ecuador/barley/",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Agregador que cita FAOSTAT: 391,7 USD/t (2018). Solo contraste."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Fecha del dato de USD 13/20 por quintal no verificada.",
+     "Precio oficial SIPA no hallado (cebada no aparece en el boletin de productor).",
+     "Costos y rendimiento."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador/Perú/Bolivia según fuente)",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 7, 'Cultivos andinizados' (~línea 1542)",
+     "dato": "Hordeum vulgare, Gramínea, altura óptima 0-3 900 msnm (Perú y Bolivia)"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 4 rotaciones en Puno (~líneas 1358-1374) y Cuadro 25 Cusco (~línea 3727)",
+     "dato": "Cebada va tras papa+quinua (o papa) y antes de avena/oca/haba/barbecho; en Suni altiplano B va tras papa y antes de qañiwa"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Quinua sec. 5.2.1 (~línea 5539) y Papa Cuadro 5 (~línea 895)",
+     "dato": "Cebada como cultivo denso sembrado al voleo en fajas con papa/haba contra la erosión; cereal (1 siembra) tras 2 siembras de papa y antes de leguminosas"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Haba, rotaciones (~líneas 7954-7965)",
+     "dato": "Rotaciones papa-haba-cebada-haba/trigo; haba-papa-cebada-haba o chocho"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "pH, textura, profundidad, drenaje y exigencia de fertilidad del suelo",
+    "temperatura y lluvia",
+    "ciclo en meses",
+    "plagas y enfermedades principales (y si es hospedero de plagas de papa u otras)",
+    "jornales/ha y costos (F1 no tiene capítulo ni tabla de costos para este cultivo)",
+    "altitud en Ecuador (el rango es de Perú/Bolivia)"
+   ]
+  },
+  "trigo": {
+   "id": "trigo",
+   "nombre": "Trigo",
+   "familia": "Poaceae (gramínea)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": null,
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": null,
+    "notas": "Las fuentes locales no describen requerimientos de suelo de este cereal (solo lo citan en rotaciones y en el cuadro de altitud).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 0,
+    "altitud_msnm_max": 3300,
+    "temperatura_c": null,
+    "lluvia_mm": null,
+    "notas": "Rango de 'altura óptima de cultivo' del Cuadro 7 de F2 (Perú y Bolivia, Mario Tapia) para Triticum sativum: 0-3300 msnm; se define por mayor frecuencia de cultivo y varía con la latitud; en Ecuador no hay dato en las fuentes. Listado como cultivo 'andinizado' (introducido).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "Sin dato de ciclo en F1/F2 para este cultivo."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "medio",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [],
+    "notas": "En F1 y F2 el trigo es cereal intermedio de la rotación (tras papa/quinua/maíz, antes de haba). Que no fije nitrógeno es característica botánica general (gramínea), no dato de las fuentes. 'agota_suelo: medio' es inferencia (sin dato de fuente).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 2,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "(inferencia) Cereal de siembra al voleo/denso y cosecha mecanizable; F1 menciona que cebada y quinua 'se siembran al voleo' en fajas. Sin jornales/ha en las fuentes para este cultivo.",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "(inferencia) Cultivo andinizado, difundido; las fuentes no dan datos de manejo. Valor provisional.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": "Un fragmento de busqueda indica que el Consejo Consultivo de la Cadena del Trigo subio el quintal nacional de USD 22 a USD 24 (el anio no se pudo confirmar; el articulo de Expreso de 2025-12-17 NO lo menciona). La produccion nacional cubre como maximo 1% de la demanda; importaciones subieron de 150.972 t (2023) a 785.686 t (2025) segun gremio de agricultores.",
+    "nivel_1a5": null,
+    "nivel_criterio": "No se asigna: precio sin fecha verificada.",
+    "fuentes": [
+     {
+      "n": 32,
+      "url": "https://www.expreso.ec/actualidad/economia/defensa-de-los-agricultores-el-trigo-importado-desplaza-al-maiz-local-268244.html",
+      "fecha_consulta": "2026-11-14",
+      "dato": "2025-12-17: importaciones de trigo de 150.972 t (2023) a 785.686 t (2025); no da precio por quintal. Contexto de presion competitiva."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio vigente al productor con fecha (USD 22-24/qq sin anio confirmado).",
+     "Costos y rendimiento.",
+     "SIPA tiene fila 'TRIGO (qq)' en un boletin de 2025 pero la tabla no se pudo leer con fiabilidad."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador/Perú/Bolivia según fuente)",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 7, 'Cultivos andinizados' (~línea 1541)",
+     "dato": "Triticum sativum, Gramínea, altura óptima 0-3 300 msnm (Perú y Bolivia)"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 4 Puno (~líneas 1359, 1362) y Cuadro 25 Cusco rotación IV (~línea 3729)",
+     "dato": "Trigo como 'cereal' tras papa+quinua y antes de haba; en secano Cusco: maíz-trigo-haba-maíz"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Papa Cuadro 5 (~línea 895); Haba rotaciones (~líneas 7782, 7959); Chocho (~línea 7244)",
+     "dato": "Trigo como cereal de rotación con papa y haba; haba se siembra tras papa, cebada o trigo; chocho seguido de cereales (cebada, trigo)"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "pH, textura, profundidad, drenaje y exigencia de fertilidad del suelo",
+    "temperatura y lluvia",
+    "ciclo en meses",
+    "plagas y enfermedades principales (y si es hospedero de plagas de papa u otras)",
+    "jornales/ha y costos (F1 no tiene capítulo ni tabla de costos para este cultivo)",
+    "altitud en Ecuador (el rango es de Perú/Bolivia)"
+   ]
+  },
+  "avena": {
+   "id": "avena",
+   "nombre": "Avena",
+   "familia": "Poaceae (gramínea)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": null,
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": null,
+    "notas": "Las fuentes locales no describen requerimientos de suelo de este cereal (solo lo citan en rotaciones y en el cuadro de altitud).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 500,
+    "altitud_msnm_max": 4000,
+    "temperatura_c": null,
+    "lluvia_mm": null,
+    "notas": "Rango de 'altura óptima de cultivo' del Cuadro 7 de F2 (Perú y Bolivia, Mario Tapia) para Avena sativa: 500-4000 msnm; se define por mayor frecuencia de cultivo y varía con la latitud; en Ecuador no hay dato en las fuentes. Listado como cultivo 'andinizado' (introducido).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "Sin dato de ciclo en F1/F2 para este cultivo."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "medio",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [],
+    "notas": "En F2 la avena cierra la fase de cereales en Puno, seguida de barbecho/oca/pasto. Que no fije nitrógeno es característica botánica general (gramínea), no dato de las fuentes. 'agota_suelo: medio' es inferencia (sin dato de fuente).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 2,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "(inferencia) Cereal de siembra al voleo/denso y cosecha mecanizable; F1 menciona que cebada y quinua 'se siembran al voleo' en fajas. Sin jornales/ha en las fuentes para este cultivo.",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "(inferencia) Cultivo andinizado, difundido; las fuentes no dan datos de manejo. Valor provisional.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio para avena grano.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos de avena grano en Ecuador."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador/Perú/Bolivia según fuente)",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 7, 'Cultivos andinizados' (~línea 1543)",
+     "dato": "Avena sativa, Gramínea, altura óptima 500-4 000 msnm (Perú y Bolivia)"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 4 Puno (~líneas 1360, 1370)",
+     "dato": "Avena tras cebada (papa-quinua-cebada-avena-barbecho) y 'Ceb/Avena' en Suni altiplano A (papa-qañiwa-ceb/avena-oca+TA-pasto)"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Zanahoria blanca, rotaciones (~línea 4979)",
+     "dato": "Mención de vicia-avena como leguminosas asociadas (uso indirecto, sin datos de la avena como cultivo)"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "pH, textura, profundidad, drenaje y exigencia de fertilidad del suelo",
+    "temperatura y lluvia",
+    "ciclo en meses",
+    "plagas y enfermedades principales (y si es hospedero de plagas de papa u otras)",
+    "jornales/ha y costos (F1 no tiene capítulo ni tabla de costos para este cultivo)",
+    "altitud en Ecuador (el rango es de Perú/Bolivia)"
+   ]
+  },
+  "quinua": {
+   "id": "quinua",
+   "nombre": "Quinua",
+   "familia": "Amaranthaceae (Chenopodiaceae)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franco limosa o franco arcillosa (F1); francos semiprofundos con buena materia orgánica (F2); terrenos sueltos franco y franco arenosos (F1, elección del terreno)",
+    "profundidad": "más de 50 cm (terrenos descansados profundos, F1); semiprofundos (F2)",
+    "ph_min": 6.3,
+    "ph_max": 7.3,
+    "drenaje": "bueno; no soporta excesos de agua (F1); 4-5 días de exceso de humedad afectan o matan la planta (F2)",
+    "exigencia_fertilidad": "media",
+    "notas": "pH 6.3-7.3 (F1); F2: neutro o ligeramente alcalino, algunas variedades de salares toleran hasta pH 8,0 y una colección creció en suelo ácido (pH 4,5). F2: puede crecer en suelos pobres pero rinde poco; campesinos no fertilizan y aprovechan el abono de la papa anterior; recomiendan al menos 5 t/ha de estiércol; responde a 80-120 kg N/ha con más de 600 mm. 'exigencia media' es inferencia a partir de esto. F1 recomienda sembrarla tras maíz, cereales y leguminosas libres de plagas.",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2200,
+    "altitud_msnm_max": 3000,
+    "temperatura_c": "9 a 16 °C, soporta heladas de -5 °C (F1); variedades de valle 10-18 °C no resistentes a heladas, quinuas de color hasta -2 °C (F2)",
+    "lluvia_mm": "600 a 2600 mm anuales apropiados; mínimo 400 mm durante el ciclo para buen rendimiento (F1); valle 700-1500, altiplano 400-800 (F2 Cuadro 28)",
+    "notas": "Altitud 2200-3000 msnm en Ecuador (F1). Variedades INIAP-Tunkahuan 2000-3400 msnm y Taruka Chaqui 2800-3800 msnm (F1). F2: quinua de valle 2000-3400 y de altiplano 3800-4000 msnm. Veranillos prolongados con alta temperatura diurna bajan el rendimiento (F1). Evitar zonas ventosas. Siembra octubre-enero (F1).",
+    "requiere_riego": "si"
+   },
+   "ciclo_meses": {
+    "min": 4.8,
+    "max": 7.3,
+    "nota": "F1: cosecha a 145-220 días según variedad, altitud y clima (4.8-7.3 meses, conversión propia a 30 d/mes); F2: 5 a 8 meses hasta madurez fisiológica."
+   },
+   "plagas": [
+    "Gusanos trozadores (Agrotis spp.)",
+    "Gusanos cortadores/defoliadores (Copitarsia, Spodoptera, Peridroma saucia)",
+    "Gusano pegador de hojas (Tuta absoluta)",
+    "Coleóptero cortador (Naupactus sp.)",
+    "Saltón de hojas (Paranatus), chinche del follaje (Proba), pulgones, minador de hojas (Liriomyza)",
+    "Kcona kcona (polilla; plaga más importante en F2, puede causar pérdida total)",
+    "Aves (hasta 40% de pérdidas en variedades dulces, F2); ratones, liebres y pájaros en plántulas"
+   ],
+   "enfermedades": [
+    "Mildiú (Peronospora)",
+    "Cercosporiosis (Cercospora sp.)",
+    "Mancha ojival (Phoma)",
+    "Podredumbre marrón del tallo (Phoma exigua)",
+    "Mal del tallo / damping off",
+    "Mancha foliar (Ascochyta, F2)",
+    "Falso nematodo (Nacobbus, F2; control: rotación)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "medio",
+    "hospedero_de": [
+     "Nacobbus (falso nematodo), según F2",
+     "gusanos cortadores y trozadores polífagos (Agrotis, Copitarsia, Spodoptera)"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "En F2 va tras papa (aprovecha su fertilización) y antes de cereal/haba (Cuadro 4 Puno). F1 propone alternar con arveja y rotaciones con maíz, cereales y leguminosas; F2 indica que la rotación controla el nematodo Nacobbus. 'agota_suelo: medio' es inferencia (responde a N, F2, pero no hay dato directo de extracción). No es leguminosa. Las fuentes no dicen que rompa ciclos de plagas de la papa; no se asigna.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": 64,
+    "mecanizable": "parcial",
+    "nota": "F1 Cuadro 3 (UNOCANC, Ecuador): subtotal mano de obra USD 640 a USD 10/jornal, es decir cerca de 64 jornales/ha (cálculo propio; la tabla extraída está desordenada, líneas ~5987-6048); más 4+2+1 horas de tractor (arada, rastrada, surcada). Rendimiento 1 500 kg/ha. Siega con segadora, cosecha con cosechadora combinada y trilla estacionaria si el cultivo supera 2 ha (F1). Nivel 3 por rango de jornales.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "(inferencia) Cultivo andino adaptado pero sensible a exceso de agua, heladas en floración, veranillos, granizo en maduración, aves, kcona kcona y mildiú; cosecha oportuna crítica (F1, F2). F2: rendimientos 600-800 kg/ha en manejo tradicional vs 1 500-2 500 kg/ha comercial, 'muy variables'.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": "USD/kg (exportacion, Tridge) 2,49-4,83 en 2024; precio productor oficial no hallado",
+    "fecha_dato": "2024",
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "Precio de EXPORTACION (no del productor), via Tridge (agregador comercial): rango 2024 de 2,49 a 4,83 USD/kg; 2023 de 2,44 a 14,32; 2022 de 2,19 a 3,90 (rango muy amplio, volatilidad alta). Referencias locales segun resumenes de tesis (no verificadas en el texto): en Carchi/Imbabura el costo fue USD 1.841 (pequeno), 2.282 (mediano), 2.184 (grande) por ha y UNA EP compro grano a USD 80/qq en 2015; en Tarqui (Cuenca) una tesis estima ganancias de hasta USD 4.205/ha/ano con 10 t/ha (cifra optimista y atipica; descartar como referencia). Manual INIAP No. 130 (2023) tiene capitulo de costos pero no se pudo leer.",
+    "nivel_1a5": 5,
+    "nivel_criterio": "(inferencia) Precio por kg el mas alto junto con chocho (farmgate aprox. 1,76 USD/kg con USD 80/qq en 2015; exportacion 2,5-4,8 USD/kg). El ingreso por ha no es comparable: rendimientos de 1-3 t/ha y precio de productor actual desconocido.",
+    "fuentes": [
+     {
+      "n": 28,
+      "url": "https://dir.tridge.com/prices/quinoa/EC",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Precios de exportacion de Ecuador 2022-2024 (rango por anio); no distingue precio productor."
+     },
+     {
+      "n": 29,
+      "url": "https://repositorio.utn.edu.ec/jspui/bitstream/123456789/8677/3/03%20AGN%20037%20ARTICULO.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Segun resumen de busqueda: costos USD 1.840-2.282/ha y compra a USD 80/qq (2015) en Carchi. El enlace devolvio 410 al abrirlo; dato no verificado."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio al productor actual con fecha.",
+     "Costos, rendimiento y B/C verificados (manual INIAP 2023 no leido).",
+     "Fecha de precio de USD 80/qq es 2015."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador principalmente; Perú/Bolivia según F2)",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. Quinua, sec. 3 Condiciones agroecológicas (~líneas 5380-5417)",
+     "dato": "altitud 2200-3000, suelos franco limosos/franco arcillosos, pH 6.3-7.3, temperatura 9-16 °C, heladas -5 °C, lluvia 600-2600 mm (mín 400)"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 4.2 y 5.1.1 (~líneas 5447, 5459-5471)",
+     "dato": "variedades INIAP y rangos de altitud; terrenos profundos >50 cm, tras maíz/cereales/leguminosas"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 5.2.1 (~líneas 5539-5553)",
+     "dato": "asociaciones y alternar con arveja; arreglos papa-haba / quinua / cebada"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 6 Cuadro 2 (~líneas 5792-5880)",
+     "dato": "plagas y enfermedades principales"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 7.1 (~línea 5891)",
+     "dato": "cosecha a 145-220 días"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 8 Cuadro 3 (~líneas 5984-6061)",
+     "dato": "costos: subtotal mano de obra USD 640, USD 10/jornal, 1 500 kg/ha, B/C 2.28 (texto: 'se ganan 1.28 dólares')"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Quinua (~líneas 3792-4520) y Cuadros 4, 5, 6, 28, 30, 32",
+     "dato": "suelos y pH, fertilización, lluvia por grupo, plagas (kcona kcona), enfermedades (incl. Nacobbus), ciclo 5-8 meses, rendimientos 600-3 000 kg/ha"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "Jornales/ha: la tabla de F1 es ilegible en detalle (64 es cálculo propio desde el subtotal en USD)",
+    "Cuánto agota el suelo (sin dato directo)",
+    "Hospedero concreto de plagas compartidas con papa u otros cultivos (no explícito)",
+    "Efecto sobre nematodos u otras plagas de otros cultivos de la rotación"
+   ]
+  },
+  "amaranto": {
+   "id": "amaranto",
+   "nombre": "Amaranto (ataco / sangorache / kiwicha)",
+   "familia": "Amaranthaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franca (suelos francos, F1; francos con buen contenido de materia orgánica, F2)",
+    "profundidad": null,
+    "ph_min": 6.2,
+    "ph_max": 7.8,
+    "drenaje": "bueno (suelos francos de buen drenaje, F1)",
+    "exigencia_fertilidad": "baja",
+    "notas": "F1: 'no se requiere de suelos con una alta fertilidad'; los suelos aptos para quinua lo son para amaranto; tolera cierta salinidad. F2 recomienda 3-5 t/ha de compost/estiércol (orgánico) y 80-120 kg N/ha en cultivo comercial.",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2700,
+    "altitud_msnm_max": 3200,
+    "temperatura_c": "15 a 20 °C, clima templado a frío (F1)",
+    "lluvia_mm": "no menos de 600 mm por ciclo; en zonas más secas riego suplementario (F1)",
+    "notas": "F1: sierra ecuatoriana 2700-3200 msnm. F2: kiwicha en zonas libres de heladas, 2000-3300 msnm (sierra sur y centro de Perú) y hasta 3000 en sierra norte; Cuadro 7 óptimo 2800-3300 msnm. Planta de días cortos (florece con 10-11 h de luz, F1). Siembra con las primeras lluvias, octubre-noviembre (F1).",
+    "requiere_riego": "si"
+   },
+   "ciclo_meses": {
+    "min": 5,
+    "max": 7,
+    "nota": "F1: cosecha de 5 a 7 meses después de la siembra según cultivar y localidad; F2: más de 200 días a 2800-3200 msnm (en Majes, 800 msnm, 130 días)."
+   },
+   "plagas": [
+    "Pulgones, chinches, moscas blancas (chupadores)",
+    "Gusanos trozadores, grillos, moscas minadoras (masticadores)",
+    "Gusano barrenador del tallo",
+    "Pájaros en maduración (pérdidas sensibles)",
+    "Diabrotica 'loritos' y gusanos del cogollo (F2)"
+   ],
+   "enfermedades": [
+    "Rhizoctonia spp. (estrangulamiento del cuello)",
+    "Phytophthora spp. ('lancha')",
+    "Carbón de la espiga (Ustilago)",
+    "Pythium, Fusarium, Aspergillus en semilla/plántula; Sclerotinia y Alternaria en tallo y raíz (F2)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "medio",
+    "hospedero_de": [
+     "barrenadores y trozadores con amplio rango de hospederas (F1: usan malezas hospederas; en riego, ahogar pupas si el cultivo anterior fue susceptible)"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "F1: fuerte incidencia de plagas en cultivo comercial en parcelas grandes; sin problemas mayores en parcelas pequeñas, bordes o en mezcla con otros cultivos (la asociación reduce plagas). No es leguminosa. 'agota_suelo: medio' es inferencia: F1 dice que no requiere suelos de alta fertilidad pero F2 reporta respuesta a N.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": 62,
+    "mecanizable": "parcial",
+    "nota": "F1 Cuadro 4 (UNOCANC, Ecuador): subtotal mano de obra USD 620 a USD 10/jornal, es decir cerca de 62 jornales/ha (cálculo propio; tabla desordenada, líneas ~6785-6881). F1 también dice que la cosecha del grano pequeño requiere 20 a 40 jornales/ha y recomienda trilladora estacionaria de trigo (3 obreros trillan 1 200 kg en 4-6 h); cosechadoras combinadas en campos uniformes. Rendimiento 2 000 kg/ha.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "(inferencia) Poco exigente en suelo y fertilidad, pero la plántula compite mal con malezas, requiere cama de semilla fina, control de pájaros y cosecha laboriosa; F1 señala fuerte incidencia de plagas en lote comercial.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos; el manual de quinua de INIAP y su programa cubren amaranto pero no se leyeron."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador principalmente; Perú/Bolivia según F2)",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. Amaranto, sec. 3 (~líneas 6303-6329)",
+     "dato": "suelos francos buen drenaje, pH 6.2-7.8, altitud 2700-3200, 15-20 °C, 600 mm/ciclo mínimo"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 5.1.1 (~línea 6355)",
+     "dato": "no requiere alta fertilidad; aptos los suelos de quinua"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 6 (~líneas 6593-6692)",
+     "dato": "plagas, aves y enfermedades"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 7.1 (~líneas 6698-6711)",
+     "dato": "cosecha 5-7 meses; cosecha 20-40 jornales/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 8 Cuadro 4 (~líneas 6782-6895)",
+     "dato": "costos: mano de obra subtotal USD 620 (USD 10/jornal), 2 000 kg/ha, B/C 1.58"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Kiwicha (~líneas 4662-4797) y Cuadro 7",
+     "dato": "altitud, suelos francos, N, enfermedades de plántula, ciclo >200 días a 2800-3200 msnm"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "Jornales/ha de otras labores: tabla de F1 ilegible en detalle (62 es cálculo propio del subtotal)",
+    "Profundidad de suelo",
+    "Efecto sobre nematodos o ciclos de plagas de otros cultivos",
+    "Dato directo de agotamiento del suelo"
+   ]
+  },
+  "qaniwa": {
+   "id": "qaniwa",
+   "nombre": "Qañiwa (cañihua)",
+   "familia": "Amaranthaceae (Chenopodiaceae)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": null,
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": "no tolera encharcamiento: los charcos en desniveles matan la planta; conviene nivelar (F2)",
+    "exigencia_fertilidad": "baja",
+    "notas": "F2: requiere estructura fina del suelo por el tamaño de la semilla; normalmente no se fertiliza cuando va tras papa; da buenos resultados con estiércol de ovino y N 80 + P 40. 'exigencia baja' se basa en que no se fertiliza tras papa (F2).",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 3800,
+    "altitud_msnm_max": 4200,
+    "temperatura_c": null,
+    "lluvia_mm": null,
+    "notas": "Altura óptima 3 800-4 200 msnm (F2 Cuadro 7; altiplano de Puno, Perú, y Bolivia). Con la maca es el cultivo que más resiste bajas temperaturas y heladas (sin cifra); sensible a la falta de humedad al inicio del crecimiento. F1 no la trata: sin dato para Ecuador. Granizadas de marzo antes de la maduración pueden reducir el rendimiento 40-50%.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "F2 solo da la época de cosecha en Puno (principios de marzo a mayo); no da duración del ciclo."
+   },
+   "plagas": [],
+   "enfermedades": [
+    "Mildiú (ataques al comienzo de floración; es uno de los cultivos más resistentes a enfermedades, F2)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "bajo",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [],
+    "notas": "F2 Cuadro 4 (Puno, Suni altiplano): papa-qañiwa-cebada/avena-oca+tubérculos-pasto, o papa-qañiwa-cebada-barbecho-barbecho; en Suni B: papa-cebada-qañiwa. Va tras papa aprovechando su fertilización. 'agota_suelo: bajo' es inferencia (no se fertiliza y el sistema incluye barbecho).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": null,
+    "mecanizable": "parcial",
+    "nota": "(inferencia) Labores descritas en F2: siembra al voleo o en surcos de 40-50 cm, aporque, cosecha escalonada de marzo a mayo arrancando plantas, trilla manual con palos o trilladora mecánica y venteo; con variedades seleccionadas se puede segar con segadora. Sin jornales/ha en las fuentes.",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "(inferencia) Muy resistente a frío y enfermedades (F2), pero exige cama de semilla fina, sensible a sequía inicial, maduración desigual, granizo; cultivo poco estudiado y de difusión limitada.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "No investigado por instruccion.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No investigado (pedido explicito)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "altiplano de Perú/Bolivia (Puno, Cochabamba); sin evidencia para Ecuador en las fuentes locales",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Qañiwa (~líneas 4521-4657)",
+     "dato": "distribución, resistencia a frío, sensibilidad a sequía inicial, suelos y fertilización, siembra, sanidad, cosecha, granizo"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro 7 (~línea 1493) y Cuadro 4 rotaciones Puno (~líneas 1370-1374)",
+     "dato": "altitud 3800-4200 msnm; secuencias de rotación"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "pH, textura y profundidad",
+    "temperatura (cifras) y lluvia",
+    "duración del ciclo",
+    "plagas insectiles",
+    "jornales/ha y costos",
+    "cualquier dato de adaptación en Ecuador (F1 no incluye este cultivo)"
+   ]
+  },
+  "maiz": {
+   "id": "maiz",
+   "nombre": "Maíz",
+   "familia": "Poaceae (gramínea)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "franco, franco arcilloso, franco arenoso y arcillo arenoso (F1)",
+    "profundidad": "profundos (F1)",
+    "ph_min": 6.5,
+    "ph_max": 7.5,
+    "drenaje": "bueno; no soporta excesos de agua ni encharcamiento (F1, F2)",
+    "exigencia_fertilidad": "alta",
+    "notas": "F1: suelos ricos en materia orgánica; abonado de base de 6-8 t compost o gallinaza + 500 kg roca fosfórica + 500 kg sulpomag/ha. F2: terrenos fértiles con más de 2,5% de materia orgánica, no ácidos, no muy pendientes; 'es uno de los pocos cultivos andinos que siempre se fertiliza' (80-80-0 en algunos casos).",
+    "drenaje_requerido": "bueno",
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2200,
+    "altitud_msnm_max": 3000,
+    "temperatura_c": "10 a 20 °C; soporta mínimas hasta 8 °C; desde 30 °C hay problemas de absorción (F1)",
+    "lluvia_mm": "400 a 1 300 mm (F1)",
+    "notas": "F1: variedades INIAP de altura entre 2200 y 3000 msnm. F4: INIAP 122 Chaucho Mejorado 2200-2800 msnm; ensayo en Tumbaco a 2465 msnm, 15 °C, 927 mm/año. F2 (Perú/Bolivia): óptimo 2500-3500 msnm. Requiere 1 500-2 000 horas de luz (F1). Siembra octubre-diciembre con inicio de lluvias (F1). Evitar zonas ventosas.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6.8,
+    "max": 9,
+    "nota": "F1 Cuadro 1: variedades INIAP de 205 a 270 días de siembra a cosecha (6.8-9 meses, conversión propia a 30 d/mes). El choclo se cosecha antes (F2: 40-50 días tras floración) pero no hay ciclo total en las fuentes."
+   },
+   "plagas": [
+    "Gusanos trozadores (Agrotis)",
+    "Gusanos cortadores o defoliadores (Copitarsia, Spodoptera/cogollero, Peridroma)",
+    "Gusano de la mazorca y mosca del choclo (Heliothis, Euxesta)",
+    "Gorgojo y polilla en almacén (F2)"
+   ],
+   "enfermedades": [
+    "Pudrición de la raíz (Pythium y bacterias)",
+    "Tizón (Helminthosporium)",
+    "Roya de la hoja (Puccinia sorghi)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "alto",
+    "hospedero_de": [
+     "gusanos trozadores y cortadores polífagos (Agrotis, Copitarsia, Spodoptera) compartidos con quinua (mismo cuadro de plagas en F1)"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "No es leguminosa. 'agota_suelo: alto' es inferencia a partir de la alta exigencia de fertilidad (siempre se fertiliza, F2); no hay dato directo de extracción. Se asocia con haba, fréjol, quinua, cucurbitáceas, oca/olluco (F2). F4: la rotación con leguminosas incorpora N fijado y mejora rendimiento. F2 Cuadro 25 (Cusco): maíz-maíz-maíz-papa, maíz-trigo-haba-maíz. F2: rotación adecuada, control del exceso de agua y semilla sana previenen enfermedades. F1 recomienda la quinua tras maíz.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": 44,
+    "mecanizable": "si",
+    "nota": "F1 Cuadro 3 (UNOCANC, Ecuador, var. Morocho): subtotal mano de obra USD 440 a USD 10/jornal, es decir cerca de 44 jornales/ha (cálculo propio; las líneas sueltas suman 46; tabla desordenada, ~líneas 8981-9042), más 3+2+2 horas de tractor; rendimiento 70 qq (3 182 kg/ha). F2 (Perú): 110-120 jornales/ha para todo el proceso (discrepancia entre fuentes). Hay desgranadoras y secadores. F4: jornal USD 20 en Tumbaco; la labranza convencional usó más mano de obra en deshierba que la siembra directa. Nivel 3 por rango.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "(inferencia) Cultivo muy conocido con variedades INIAP, pero exigente en fertilidad, drenaje y humedad; plagas del cogollo y mazorca. F4: rendimiento y rentabilidad del maíz menos dependientes del clima que el fréjol.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 20.67,
+    "unidad": "USD/saco aprox. 80 lb (maiz suave CHOCLO, fresco), dic-2025. Ademas maiz DURO seco (amarillo): 12,75 USD/qq en dic-2025.",
+    "fecha_dato": "2025-12",
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "Maiz suave choclo: 15,52 USD/saco (ago-2025), 12,78 (jul-2025), 20,67 (dic-2025); rango observado 12,78-20,67. Maiz duro seco (NO es de sierra; costa): 17,84 (dic-2024), 17,95 (ene-2025), 20,89 (feb-2025), 17,28 (mar), 14,47 (abr), 15,76 (ago), 11,91 (nov), 12,75 (dic-2025). Banda de precio oficial 2026 para maiz amarillo duro: minimo 17,45 y maximo 19,61 USD/qq (fijada por el MAG, abril 2026); en 2025 el precio minimo de sustentacion fue 17,35 USD/qq (13% humedad, 1% impurezas). El precio SIPA de dic-2025 (12,75) estuvo por debajo del minimo de sustentacion. Sin precio SIPA para maiz suave SECO (choclo se vende fresco).",
+    "nivel_1a5": 2,
+    "nivel_criterio": "(inferencia) Choclo aprox. 0,57 USD/kg fresco (peso con mazorca); maiz duro seco aprox. 0,28 USD/kg. Para sierra interesa el suave; no hay dato de maiz suave seco ni de ingreso/ha. Nivel bajo-medio con baja base.",
+    "fuentes": [
+     {
+      "n": 20,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_diciembre_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Maiz duro seco 12,75 USD/qq (nov 11,91; dic-2024 17,84); maiz suave choclo 20,67 USD/saco 80 lb."
+     },
+     {
+      "n": 21,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_agosto_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Maiz duro seco 15,76 USD/qq (ago-2025); maiz suave choclo 15,52 USD/saco (jul 12,78)."
+     },
+     {
+      "n": 23,
+      "url": "https://www.eldiario.ec/ecuador/ecuador-ministerio-de-agricultura-establecio-el-nuevo-precio-del-maiz-para-2026-02042026/",
+      "fecha_consulta": "2026-11-14",
+      "dato": "2026-04-02: el MAG fija banda de 17,45 a 19,61 USD/qq."
+     },
+     {
+      "n": 24,
+      "url": "https://www.agrolatam.com/mercados-latam/maiz-soja-compras-industriales-ecuador-agosto-2026/",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Confirma banda 17,45-19,61 USD/qq para campana 2026 (maiz amarillo duro) citando reporte quincenal URTF del MAG."
+     }
+    ],
+    "confianza": "media",
+    "huecos": [
+     "Maiz suave seco (grano): sin precio oficial.",
+     "El maiz duro es de costa y no aplica a sierra; se reporta solo como referencia.",
+     "Costos de produccion y rendimiento."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "sierra andina (Ecuador principalmente: UNOCANC y Tumbaco; Perú/Bolivia según F2)",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. Maíz, sec. 3 (~líneas 8558-8583)",
+     "dato": "suelos y pH 6.5-7.5, temperatura 10-20 °C, lluvia 400-1300 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 4.2 Cuadro 1 (~líneas 8609-8622) y 5.1.5 (~líneas 8666-8674)",
+     "dato": "variedades INIAP: zona 2200-3000 msnm, 205-270 días; fertilización de base"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 6 Cuadro 2 (~líneas 8837-8884)",
+     "dato": "plagas principales"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Sec. 8 Cuadro 3 (~líneas 8978-9054)",
+     "dato": "costos: mano de obra subtotal USD 440 (USD 10/jornal), 70 qq (3 182 kg/ha), B/C 1.19"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Maíz (~líneas 3567-3789) y Cuadros 5, 6, 7, 25",
+     "dato": "suelo >2,5% MO, fertilización, asociaciones y rotaciones, plagas y enfermedades, 110-120 jornales/ha, rendimientos 0,8-2,5 t/ha en Perú/Bolivia"
+    },
+    {
+     "fuente": 4,
+     "ubicacion": "Tablas 2 y 3 y sec. 2-3 (Redalyc, Tumbaco, Pichincha, 2023)",
+     "dato": "INIAP 122 a 2200-2800 msnm; ensayo a 2465 msnm; grano seco 3 774 kg/ha (siembra directa) y 3 128 kg/ha (labranza convencional), B/C 1,63 y 1,22; choclo ~38 227 kg/ha en SD, B/C 2,90 vs 1,76; jornal USD 20"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "Dato directo de agotamiento del suelo",
+    "Efecto de rompimiento de ciclos de plagas",
+    "Jornales/ha de F1 por cálculo propio desde subtotal en USD; F2 da 110-120 (Perú)",
+    "Ciclo del choclo"
+   ]
+  },
+  "haba": {
+   "id": "haba",
+   "nombre": "Haba (Vicia faba L.)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Poco exigente; prospera en suelos negros arcillo-limosos (retienen humedad) y también franco-arenosos; prefiere arcillo-limoso-calizos con materia orgánica",
+    "profundidad": "Capa suelta y uniforme de unos 20 cm tras la preparación del suelo",
+    "ph_min": 6,
+    "ph_max": 7.5,
+    "drenaje": "Necesita zanjas de drenaje para evacuar excesos de agua; el exceso de humedad es perjudicial",
+    "exigencia_fertilidad": "baja",
+    "notas": "Fuente 1: «poco exigente en cuanto a calidad de suelos, pudiendo desarrollarse casi en todos los tipos de suelo». Si el suelo es muy pobre se sugiere 1,7 t/ha de compost o humus + 1 t/ha de roca fosfórica. Recomienda sembrar en terrenos sometidos a rotación.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2000,
+    "altitud_msnm_max": 3600,
+    "temperatura_c": "5 a 16 °C (germinación y crecimiento 4-6; floración 10-12; maduración 16). Soporta 1 a 8 °C durante una hora sin perder producción",
+    "lluvia_mm": "800 a 1 500 mm durante todo el ciclo (otra sección: lámina de agua de 800 a 1 000 mm); en Ecuador se cultiva casi solo con lluvia",
+    "notas": "Siembras: ene-feb y desde octubre; meses más adecuados agosto-abril; sobre 3 200 msnm sembrar en octubre. Rango altitudinal amplio en fuente 2 (Perú/Bolivia): 1 000-3 800 msnm.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 6,
+    "max": 12,
+    "nota": "Fuente 1: grano listo entre 6 y 12 meses según variedad y altitud; verde desde ~190 días (6-10 meses); seco 10-12 meses (75-90 días después de floración). Convertido de meses del texto."
+   },
+   "plagas": [
+    "Gusanos trozadores (Agrotis spp.)",
+    "Gusano de la vaina (Copitarsia, Spodoptera, Peridroma)",
+    "Mosca minadora (Liriomyza sp.)",
+    "Saltón de la hoja o lorito verde (transmite virus)",
+    "Pulgones (Aphididae)"
+   ],
+   "enfermedades": [
+    "Mildiú o cenicilla (Peronospora effusa)",
+    "Cercosporiosis (Cercospora sp.)",
+    "Mancha chocolate (Botrytis fabae)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Gorgojo de los Andes (Premnotrypes), según fuente 2 (capítulo papa): el haba es planta hospedadora",
+     "Liriomyza (minadores) propia del cultivo (fuente 1)"
+    ],
+    "rompe_ciclos_de": [
+     "Fuente 1: la rotación protege contra insectos, ácaros, nemátodos y enfermedades; haba intercalada con papa controla minadores y mancha chocolate (posible alelopatía)"
+    ],
+    "notas": "Fijación de N: la fuente 1 la presenta como leguminosa y la usa como abono verde (se entierran vainas y planta); no cuantifica N fijado (inferencia: fija N por ser leguminosa). Rotaciones de fuente 1: papa-haba-cebada/papa-haba/trigo y haba-papa-cebada-haba/chocho. Tensión entre fuentes: fuente 1 la rota con papa, fuente 2 la lista como hospedera del gorgojo de los Andes de la papa.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 45,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, cuadro 4 (haba verde, UNOCANC): mano de obra USD 450 a USD 10/jornal = 45 jornales/ha (abono 4, fitosanitarios 4, siembra 4, deshierbas 15, cosecha 15, manipuleo 3), más 9 horas/tractor en preparación. Haba seca (cuadro 5): 610 USD = 61 jornales/ha (siembra, deshierba/aporque 20-25, cosecha/trilla). Jornales deducidos dividiendo valor total para USD 10 (el texto extraído de la tabla está desordenado). Nivel 4 es inferencia sobre la escala. Arada, rastrada y trilla pueden mecanizarse (fuente 1).",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "Fuente 1 la describe como «muy rústico y resistente a bajas temperaturas», poco exigente en suelo y con preparación sin mucho esmero; pero largo ciclo y 2-3 deshierbas y varias plagas foliares (inferencia: nivel 4).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": "Tesis UTC (Cotopaxi) segun fragmento de busqueda: B/C de 2,33 con humus de lombriz (ensayo de fertilizacion, no es un promedio de productor; no verificado).",
+    "nivel_1a5": null,
+    "nivel_criterio": "No se asigna: sin precio.",
+    "fuentes": [
+     {
+      "n": 33,
+      "url": "https://repositorio.utc.edu.ec/bitstreams/6a67fb27-6146-4731-8b19-cd2b8b68582e/download",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Segun resumen: B/C 2,33 USD en tratamiento humus de lombriz (no verificado en el texto)."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio de haba seca o tierna: no aparece en boletines SIPA de productor.",
+     "Costos y rendimiento."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Sierra andina de Ecuador (UNOCANC y 10 provincias serranas); complemento de fuente 2 para Perú/Bolivia. No extrapolar a Costa ni Amazonía.",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 11 Haba, secc. 3.1 y 3.1.1-3.1.3 (líneas 7588-7623 del txt)",
+     "dato": "pH 6 a 7,5; 2 000-3 600 msnm; 5-16 °C; 800-1 500 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 11, secc. 7.2 Cosecha",
+     "dato": "6 a 12 meses; verde ≥190 días; rendimiento verde 3 600-4 800 kg/ha, seco 1 000-1 590 kg/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 11, secc. 6.2 Cuadro 3",
+     "dato": "Plagas y enfermedades principales"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 11, secc. 8 Cuadros 4 y 5",
+     "dato": "Mano de obra USD 450 (verde) y 610 (seca) a USD 10/jornal; B/C 2,10 (verde) y 1,38 (seca)"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Capítulo papa, plagas (gorgojo de los Andes), plantas hospedadoras",
+     "dato": "Haba (Vicia faba) listada como planta hospedadora"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "Cuantificación de N fijado por haba",
+    "Si agota o no el suelo (la fuente solo dice poco exigente)",
+    "Duración del ciclo para variedades INIAP concretas (440 Quitumbe, 441 Serrana)",
+    "Textura/profundidad óptima numérica"
+   ]
+  },
+  "chocho": {
+   "id": "chocho",
+   "nombre": "Chocho o tarwi (Lupinus mutabilis)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Francos a franco-arenosos con humedad adecuada; gruesa tolerada (fuente 2). No resiste suelos pesados ni con exceso de humedad",
+    "profundidad": "Laderas de suelos delgados dan cosecha aceptable (fuente 1); aporte de N mayor en suelos profundos con buena materia orgánica (fuente 2)",
+    "ph_min": 5.5,
+    "ph_max": 7,
+    "drenaje": "Necesita buen drenaje; arcillas mal aireadas reducen la simbiosis con Rhizobium (fuente 2); Fusarium en campos mal drenados (fuente 1)",
+    "exigencia_fertilidad": "baja",
+    "notas": "Fuente 1: no necesita altos niveles de N, sí fósforo y potasio (500 kg/ha de roca fosfórica o ceniza). Fuente 2: clorosis en suelos alcalinos pH >7,0 con deficiencia de hierro. Se recomienda sembrarlo en suelos ya cultivados/en rotación.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2800,
+    "altitud_msnm_max": 3600,
+    "temperatura_c": "7 a 14 °C; planta adulta resistente a heladas, plántula y fase de eje floral susceptibles",
+    "lluvia_mm": "300 a 600 mm, sobre todo en secano; susceptible a sequía en floración y fructificación",
+    "notas": "Fuente 1 (Ecuador): 2 800-3 600 msnm. Fuente 2 (Perú/Bolivia): valles interandinos 2 200-3 500 msnm; Titicaca 3 800. Siembra dic-feb en sierra norte y central; sembrar tras acumular ≥100 mm de lluvia.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "No se encontró duración total del ciclo en fuentes 1 y 2. Fuente 2 solo da inicio de floración por raza: 55-140 días (cuadro 33, Bolivia); ecotipos ecuatoriales y de valle más tardíos."
+   },
+   "plagas": [
+    "Cortadores/trozador (Agrotis, Feltia, Copitarsia)",
+    "Barrenador (Melanagromyza/Agromyza) y barrenadores del tallo (Astylus, Apion)",
+    "Gusano de la vaina",
+    "Trips (Frankliniella)",
+    "Minadores (Liriomyza)",
+    "Cigarritas, loritos verdes, Diabrotica"
+   ],
+   "enfermedades": [
+    "Antracnosis (Colletotrichum gloeosporioides), la más importante, se transmite por semilla",
+    "Roya (Uromyces lupini)",
+    "Mancha anular (Ovularia lupinicola / Ascochyta-Phoma)",
+    "Rhizoctonia solani (plántulas con exceso de humedad)",
+    "Fusarium oxysporum (plantas adultas, mal drenaje)",
+    "Sclerotinia sclerotiorum"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Hongos de suelo Rhizoctonia, Fusarium, Sclerotinia y el inóculo de antracnosis en residuos (fuente 1 cuadro 3 recomienda rotación; fuente 2: el hongo sobrevive en suelo y residuos)"
+    ],
+    "rompe_ciclos_de": [
+     "Fuente 1: en rotación con papa se reducen poblaciones de pulguilla (Epitrix sp.) y huevos de gusanos, y la papa muestra mayor vigor que tras cebada o descanso"
+    ],
+    "notas": "Fuente 2: nódulos con Rhizobium aportan entre 40 y 80 kg N/ha; estimación 60-80 kg N/ha al cultivo siguiente en suelos profundos con buena materia orgánica (Franco, 1991, calculado con rendimientos de papa). Fuente 2 aclara que no hay resultados claros por la diversidad de suelos. Fuente 1: falta estudiar su efecto mejorador; la creencia popular de que «deja el suelo pobre» podría deberse a la extracción de fósforo. Sistemas en Ecuador: chocho seguido de cereales; en Imbabura seguido de maíz, cereales, leguminosas y papa. Sembrado como cerco repelente de insectos.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": 29,
+    "mecanizable": "parcial",
+    "nota": "Fuente 1, cuadro 4: mano de obra USD 290 a USD 10/jornal = 29 jornales/ha (abono 6, fitosanitarios 4, siembra 3, deshierba/aporque 5, cosecha y trilla 8, manipuleo 3), más 7 horas/tractor. Jornales deducidos del valor (tabla desordenada). Fuente 1: la trilla demanda mucha mano de obra y es pesada; fuente 2: trilla manual 14-16 jornales/ha, y hay variedades que facilitan la cosecha mecánica. Nivel 3 es inferencia.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Poco exigente en suelo y poco atacado por plagas salvo en veranillos, pero rendimiento medio bajo en Ecuador (317 kg/ha por plagas y semilla de baja calidad), antracnosis por semilla, heladas en plántula y debe desamargarse el grano (inferencia: nivel 3).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 97.5,
+    "unidad": "USD/qq (punto medio del rango 75-120 USD/qq; grano seco); semilla certificada USD 180/qq",
+    "fecha_dato": "2020",
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "Rango estacional 75-120 USD/qq segun El Comercio (articulo del periodo de la pandemia; fecha exacta no verificable por metadatos invalidos, aprox. 2020-2021). Plan de negocio (Guamote, 2015): venta directa hasta USD 120/qq. Chimborazo: unas 800 ha; cosecha nacional aprox. 1.725 t/anio, no cubre la demanda; se importa de Peru. Estudio de factibilidad USFQ (Montufar, Carchi) analiza rentabilidad pero no se leyeron cifras. Sin costos/ha ni B/C verificados.",
+    "nivel_1a5": 5,
+    "nivel_criterio": "(inferencia) Precio por kg el mas alto (aprox. 1,65-2,64 USD/kg), con demanda insatisfecha. Ingreso por ha no comparable por falta de rendimiento/costos; dato antiguo, nivel con baja base.",
+    "fuentes": [
+     {
+      "n": 27,
+      "url": "https://www.elcomercio.com/actualidad/ecuador/chocho-union-familias-chimborazo-comercializacion/",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Quintal fluctua entre USD 75 y 120 segun epoca; semilla certificada USD 180; Chimborazo 800 ha; 1.725 t/anio."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio con fecha reciente (2025-2026).",
+     "Costos/ha, rendimiento y B/C.",
+     "Fecha exacta del articulo (se asumio 2020-2021 por mencionar la pandemia)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Sierra andina de Ecuador (fuente 1: UNOCANC, Chimborazo, Cotopaxi, Pichincha, Imbabura); fuente 2 Perú/Bolivia para N fijado y razas. No extrapolar a Costa ni Amazonía.",
+   "fuentes": [
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 10 Chocho, secc. 3.1-3.2 (líneas 7044-7093)",
+     "dato": "pH 5,5-7,0; 2 800-3 600 msnm; 7-14 °C; 300-600 mm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 10, secc. 5.3.4 Rotaciones",
+     "dato": "Papa tras chocho mejora vigor; reduce Epitrix; rendimiento promedio 317 kg/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 10, secc. 6 Cuadros 2 y 3",
+     "dato": "Plagas y enfermedades"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 10, secc. 8 Cuadro 4",
+     "dato": "Mano de obra USD 290 a USD 10/jornal; B/C 1,81; 20 qq (909 kg) a USD 110/qq"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Granos andinos, tarwi: descripción botánica y suelos/fertilización (líneas 4879-5012)",
+     "dato": "40-80 kg N/ha en nódulos; 60-80 kg N/ha aporte estimado al cultivo siguiente"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Tarwi, cosecha (línea 5102)",
+     "dato": "Trilla manual 14-16 jornales/ha"
+    }
+   ],
+   "confianza": "alta",
+   "huecos": [
+    "Duración total del ciclo (meses) en Ecuador",
+    "Si agota el suelo (solo fósforo, sin cuantificar)",
+    "N fijado medido en Ecuador (la cifra es de Perú, estimada)",
+    "Profundidad óptima numérica del suelo"
+   ]
+  },
+  "arveja": {
+   "id": "arveja",
+   "nombre": "Arveja (Pisum sativum L.)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Óptimo franco arenoso; poco exigente, se adapta a casi cualquier tipo (Checa et al. 2022, citado en fuente 8)",
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": "Buen drenaje; la pudrición radical se presenta en suelos con mal drenaje (fuente 8)",
+    "exigencia_fertilidad": null,
+    "notas": "No se halló rango de pH en documentos leídos. Requerimiento hídrico 250 a 380 mm distribuidos en el ciclo.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 1700,
+    "altitud_msnm_max": 2800,
+    "temperatura_c": "13 a 20 °C óptimo (día 16-20 °C, noche 10-16 °C); daño por helada bajo -3 °C; crecimiento se detiene bajo 5-7 °C o sobre 35 °C",
+    "lluvia_mm": "250 a 380 mm en todo el ciclo",
+    "notas": "Fuente 2 (Perú/Bolivia) da rango altitudinal amplio 1 000-3 200 msnm para arveja andinizada. Fuente 8 cita a Galindo (2020) y Saavedra (2022) para temperatura y altitud.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 3.2,
+    "max": 4,
+    "nota": "INIAP-432 Lojanita (Peralta et al. 1997, citado en fuente 8): 95 días a cosecha en verde y 115-120 días en seco. Convertido a meses (÷30). Otras variedades no verificadas."
+   },
+   "plagas": [
+    "Mosca de las semillas (Delia platura)",
+    "Trips (Thrips palmi)",
+    "Barrenador del tallo (Melanagromyza lini)",
+    "Áfidos/pulgones (Myzus persicae, Macrosiphum pisi)",
+    "Trozadores (Agrotis, Spodoptera)",
+    "Mosca blanca (Trialeurodes vaporariorum)"
+   ],
+   "enfermedades": [
+    "Marchitez por Fusarium oxysporum f. sp. pisi (pérdidas 50-100 %)",
+    "Ascochyta pisi (tizón/añublo, con humedad relativa alta)",
+    "Mildiu polvoso (Peronospora pisi)",
+    "Pudrición radical (Pythium, Rhizoctonia, Fusarium)",
+    "Cenicilla (Erysiphe pisi; reduce producción 25-50 %)",
+    "Antracnosis (Colletotrichum pisi)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": null,
+    "hospedero_de": [
+     "Fusarium oxysporum y hongos radicales Pythium/Rhizoctonia (patógenos de suelo; inferencia: rotar para evitarlos)"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Fijación de N: es leguminosa (inferencia general; no hay cifra en las fuentes leídas). Fuente 1: propone alternar maíz con arveja a nivel comercial, y la ubica como leguminosa en rotación tras papa/cereales (cuadro 5, ciclo 4: leguminosas haba, arveja, vicia). Fuente 8 menciona la rotación como parte del manejo de malezas.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": null,
+    "mecanizable": null,
+    "nota": "Sin dato de jornales en las fuentes. Nivel 4 es inferencia (cosecha manual de vaina verde, similar a haba y fréjol, y a veces tutorado) (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Poco exigente en suelo (fuente 8) pero susceptible a muchas enfermedades fúngicas (Fusarium, Ascochyta, cenicilla con pérdidas hasta 50-100 %) y plagas chupadoras (inferencia: nivel 3).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 38.5,
+    "unidad": "USD/bulto aprox. 110 lb (arveja TIERNA en vaina, al productor)",
+    "fecha_dato": "2025-12",
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "Rango observado SIPA: 25,13 (dic-2024), 35,08 (ago-2024 col. previa), 32,23 (jul-2025), 18,93 (ago-2025), 31,33 (nov-2025), 38,50 (dic-2025); variacion de -41,27% en ago-2025 y +22,88% en dic-2025. Sin costos ni rendimiento. Arveja seca: sin dato.",
+    "nivel_1a5": 4,
+    "nivel_criterio": "(inferencia) Precio por kg de aprox. 0,77 USD/kg en vaina (el mas alto entre hortalizas/tuberculos con dato oficial), pero muy volatil y no es grano seco; ingreso/ha no comparable.",
+    "fuentes": [
+     {
+      "n": 20,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_diciembre_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Arveja tierna en vaina: 25,13 (dic-2024), 31,33 (nov-2025), 38,50 USD/bulto 110 lb (dic-2025)."
+     },
+     {
+      "n": 21,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_agosto_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Arveja tierna en vaina: 18,93 USD/bulto en ago-2025 (jul: 32,23), -41,27% mensual."
+     }
+    ],
+    "confianza": "media",
+    "huecos": [
+     "Arveja seca (grano): sin precio.",
+     "Costos de produccion y rendimiento."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Sierra andina de Ecuador (INIAP-432 Lojanita en Salache, Cotopaxi, 2 750 msnm; zonas Carchi, Imbabura, Pichincha, Chimborazo, Bolívar). Parte de los datos citados provienen de Colombia (Checa et al.). Fuente secundaria: tesis universitaria.",
+   "fuentes": [
+    {
+     "fuente": 8,
+     "ubicacion": "Marco teórico 7.2 Requerimientos edafoclimáticos",
+     "dato": "13-20 °C; 1 700-2 800 msnm; franco arenoso; 250-380 mm"
+    },
+    {
+     "fuente": 8,
+     "ubicacion": "Marco teórico 7.2.1 Tabla 3 (adaptado de Checa et al. 2022)",
+     "dato": "Plagas y enfermedades principales con pérdidas"
+    },
+    {
+     "fuente": 8,
+     "ubicacion": "Marco teórico 7.4 INIAP-432 Lojanita (Peralta et al. 1997)",
+     "dato": "95 días verde, 115-120 días seco; rendimientos 2 140 kg/ha seco, 5 038 kg/ha vaina verde"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro de cultivos andinizados (línea 1544)",
+     "dato": "Arveja 1 000-3 200 msnm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1 papa, cuadro 5 (líneas 890-897); Cap. 12 maíz (línea 8709)",
+     "dato": "Leguminosas (haba, arveja, vicia) en rotación; maíz alternado con arveja"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "pH requerido",
+    "Profundidad del suelo",
+    "Jornales/ha",
+    "Exigencia de fertilidad",
+    "N fijado cuantificado",
+    "Cuánto agota el suelo",
+    "Fuente primaria INIAP (divulgativo 161) no leída"
+   ]
+  },
+  "lenteja": {
+   "id": "lenteja",
+   "nombre": "Lenteja (Lens culinaris)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Óptimo pesado a medio; tolera ligeros (EcoCrop)",
+    "profundidad": "Óptimo medio (50-150 cm); tolera somero (20-50 cm)",
+    "ph_min": 5.5,
+    "ph_max": 7.5,
+    "drenaje": "Bien drenado; no tolera encharcamiento (EcoCrop: óptimo «well (dry spells)»)",
+    "exigencia_fertilidad": "media",
+    "notas": "EcoCrop: pH óptimo 5,5-7,5 (absoluto 4,5-8,2); fertilidad óptima moderada, absoluta baja; salinidad baja (<4 dS/m). Datos mundiales, no específicos de Ecuador.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 1000,
+    "altitud_msnm_max": 3000,
+    "temperatura_c": "Óptimo 15 a 29 °C; absoluto 5 a 32 °C (EcoCrop)",
+    "lluvia_mm": "Óptimo 600 a 1 000 mm/año; absoluto 250 a 2 500 (EcoCrop)",
+    "notas": "Altitud 1 000-3 000 msnm según fuente 2 (cuadro cultivos andinizados, Perú/Bolivia); EcoCrop da altitud absoluta máxima 3 800.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 2.3,
+    "max": 8,
+    "nota": "EcoCrop: ciclo 70 a 240 días (unidad no indicada en la página; se asumen días). Rango muy amplio por ser dato global; no hay ciclo de variedad ecuatoriana (INIAP) verificado."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": null,
+    "hospedero_de": [],
+    "rompe_ciclos_de": [],
+    "notas": "Fuente 1 (cap. papa/quinua/zanahoria, líneas 4979 y 7244): recomienda rotar con leguminosas (haba, lenteja, vicia-avena) para manejo de nutrientes y para minimizar plagas; en Imbabura el chocho va seguido de «lenteja pusa». EcoCrop incluye «soil improvement» entre los usos. Fijación de N por ser leguminosa (inferencia); no hay cifra.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 3,
+    "jornales_ha": null,
+    "mecanizable": null,
+    "nota": "Sin datos de jornales en fuentes (inferencia: nivel 3, cultivo de grano pequeño con cosecha y trilla manuales en Sierra).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": null,
+    "nota": "Sin evidencia suficiente. EcoCrop indica que tolera fertilidad baja y suelos secos pero no encharcamiento.",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": null,
+    "nivel_1a5": null,
+    "nivel_criterio": "Sin base de precio.",
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se hallo precio ni costos de lenteja en Ecuador (los resultados eran de Colombia)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Dato climático global (FAO EcoCrop) y altitud andina (fuente 2, Perú/Bolivia). Producción en Ecuador marginal (Imbabura, Bolívar); no hay fuente ecuatoriana de manejo leída.",
+   "fuentes": [
+    {
+     "fuente": 6,
+     "ubicacion": "FAO EcoCrop, Lens culinaris, dataSheet?id=7209",
+     "dato": "15-29 °C; 600-1 000 mm; pH 5,5-7,5; ciclo 70-240; altitud absoluta máx 3 800"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Cuadro de cultivos andinizados (línea 1546)",
+     "dato": "Lenteja 1 000-3 000 msnm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 8 quinua/zanahoria, rotaciones (línea 4979); cap. 10 chocho (línea 7244)",
+     "dato": "Rotar con leguminosas, entre ellas lenteja; lenteja pusa en rotaciones de Imbabura"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "Plagas y enfermedades (tesis UEB sobre lenteja orgánica en Guaranda localizada pero no descargable)",
+    "Ciclo de variedad INIAP 406 y de variedades de la Sierra",
+    "Jornales/ha",
+    "Facilidad de cultivo",
+    "N fijado cuantificado",
+    "Cuánto agota el suelo"
+   ]
+  },
+  "frejol": {
+   "id": "frejol",
+   "nombre": "Fréjol (Phaseolus vulgaris L.)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Texturas ligeras: franco-arcillosos y franco-arenosos; prefiere suelos sueltos de textura franca o franco-limosa (fuente 7)",
+    "profundidad": "Mínimo 60 cm según INIFAP (1994); puede prosperar en suelos delgados (FAO 1994)",
+    "ph_min": 5.3,
+    "ph_max": 7.5,
+    "drenaje": "Suelos aireados y bien drenados; no tolera alcalinidad ni sales (CE hasta 1 dS/m)",
+    "exigencia_fertilidad": "media",
+    "notas": "Fuente 7: óptimo pH 5,5-6,5; bajo 5,0 toxicidad Al/Mn; sobre 8,2 problemas de sales. Absorbe en promedio 134, 16, 117, 23, 64 y 21 kg/ha de N, P, K, S, Ca y Mg. Fuente 4: en Tumbaco se aplicaron 11 kg N/ha y 52 kg P2O5/ha según la ficha de INIAP 484 (citada).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 0,
+    "altitud_msnm_max": 2400,
+    "temperatura_c": "10 a 27 °C, óptimo 15 a 20 °C (germinación mín. 8, floración 15, maduración 17)",
+    "lluvia_mm": "1 000 a 1 500 mm/año; 350 a 400 mm durante el ciclo",
+    "notas": "Fuente 4 (Tumbaco, 2 465 msnm, 15 °C, 927 mm/año): variedad INIAP 484-Centenario se desarrolla bien entre 1 400 y 2 400 msnm. Lluvias fuertes provocaron enfermedades por hongos del suelo y bajaron el rendimiento (1 264 vs 2 684 kg/ha entre siembra directa y labranza convencional en el quinto ciclo).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 3,
+    "max": 4,
+    "nota": "Fuente 7 (Peralta et al. 2007): fréjol arbustivo en valles y estribaciones se cosecha tierno a 90 días y seco a 120; voluble tierno a 160 y seco a 180 días (5,3-6 meses). Fuente 4: INIAP 484 período vegetativo 110-120 días."
+   },
+   "plagas": [
+    "Mosca blanca (Bemisia tabaci)",
+    "Lorito verde (Empoasca kraemeri)",
+    "Caballada (Prodenia eridania)",
+    "Comedores de hoja (Diabrotica, Cerotoma)",
+    "Arañita roja (Tetranychus urticae)",
+    "Gusanos cortadores (Agrotis ipsilon)",
+    "Gusano perforador de vainas (Apion godmani)"
+   ],
+   "enfermedades": [
+    "Antracnosis (Colletotrichum lindemuthianum)",
+    "Roya (Uromyces appendiculatus)",
+    "Tizón común o bacteriosis (Xanthomonas)",
+    "Mancha angular (Isariopsis griseola)",
+    "Pudrición radicular (Rhizoctonia solani)",
+    "Hongos del suelo favorecidos por lluvias fuertes (fuente 4)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": "medio",
+    "hospedero_de": [
+     "Antracnosis, mancha angular y bacteriosis persisten en residuos de cosecha y semilla (fuente 7 recomienda rotación y eliminar residuos)",
+     "Fuente 1 (cuadro de chocho/maíz): asociación maíz-fréjol típica andina"
+    ],
+    "rompe_ciclos_de": [
+     "Alternar leguminosas y cereales mitiga malezas y plagas (fuente 4: rotación fréjol-maíz en Tumbaco)"
+    ],
+    "notas": "Fuente 7: la fijación biológica de N «no es eficiente», pero cubre parte de sus requerimientos de N con Rhizobium; mancha angular requiere rotación con plantas no hospedantes por al menos dos años. Agota_suelo = medio es inferencia a partir de la extracción de 134 kg N/ha.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": 65.5,
+    "mecanizable": "parcial",
+    "nota": "Fuente 4 (anexos 1 y 2, Tumbaco, quinto ciclo, jornal USD 20, parcelas de 1 000 m2 ×10): 65,5 jornales/ha en siembra directa y 69,0 en labranza convencional (suma de jornales de siembra, fertilización, deshierba, riego, pesticidas, cosecha, trillado, secado y empacado). Fuente 4 también dice que la siembra directa usa menos mano de obra y maquinaria. Nivel 4 es inferencia.",
+    "tipo_dato": "fuente"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Fuente 4: la rentabilidad del fréjol fue inconsistente entre ciclos y dependió del clima (B/C 0,88 a 2,01 en siembra directa; promedio 1,35 SD y 1,32 LC); varias enfermedades fúngicas y plagas (inferencia: nivel 3).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": "alta",
+    "ingreso_o_beneficio_costo": "SIPA mayorista: fréjol seco canario subio 12% en la primera quincena de junio de 2026 (boletin N. 316, solo variacion, sin precio legible). Segun resumenes de busqueda, tambien +17% mayorista (1a quincena jul-2025) y +18% productor (jul-2025): variaciones mensuales de 12-18% indican volatilidad alta. FAOSTAT via agregador: frejol seco 1.153,4 USD/t en 2017 (dato antiguo, baja fiabilidad). Fréjol tierno en vaina esta en el boletin de productor pero sin valor en los meses leidos ('-').",
+    "nivel_1a5": null,
+    "nivel_criterio": "No se asigna: sin precio actual legible.",
+    "fuentes": [
+     {
+      "n": 22,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/mayoristas/2026/precios_mayoristas_junio_2026.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Primera quincena jun-2026: fréjol seco canario +12%; IPM +0,66%. La tabla de precios es imagen, no legible."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio en USD/qq de fréjol seco (tablas SIPA son imagenes).",
+     "Costos/B-C: tesis sobre fréjol canario Panyatug (Cotopaxi, 2009) y fréjol-maiz en Tumbaco existen pero no se leyeron."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Valles interandinos de Ecuador (Tumbaco, Pichincha 2 465 msnm; Imbabura, Chaltura). Fuente 7 es tesis (UTN) con literatura de varios países. No extrapolar a Costa ni Amazonía. Hay datos de rendimiento nacional 350 kg/ha seco (fuente 4, citando Orellana 2022).",
+   "fuentes": [
+    {
+     "fuente": 7,
+     "ubicacion": "Cap. 2, tablas 3 y 4, secc. 2.7-2.8",
+     "dato": "0-2 400 msnm; 10-27 °C; pH 5,3-7,5 (óptimo 5,5-6,5); textura franco-arcillosa/arenosa"
+    },
+    {
+     "fuente": 7,
+     "ubicacion": "Tablas 5 y 6, secc. 2.9-2.10, 2.11",
+     "dato": "Plagas y enfermedades; ciclo arbustivo 90/120 días"
+    },
+    {
+     "fuente": 4,
+     "ubicacion": "Anexos 1 y 2 y Tabla 1",
+     "dato": "65,5 y 69,0 jornales/ha; rendimiento promedio 1 914,85 (SD) y 1 929,47 (LC) kg/ha; B/C 1,35 y 1,32"
+    },
+    {
+     "fuente": 4,
+     "ubicacion": "2.2 Variedades",
+     "dato": "INIAP 484-Centenario: 110-120 días, 1 400-2 400 msnm"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 10 (línea 7244), cap. 11 asociaciones",
+     "dato": "Fréjol en rotaciones tras chocho; asociación maíz-fréjol"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "N fijado cuantificado en Sierra",
+    "Fuente 7 es tesis (secundaria)",
+    "Rendimiento en tierno",
+    "Datos de fréjol voluble en Ecuador"
+   ]
+  },
+  "tomate": {
+   "id": "tomate",
+   "nombre": "Tomate riñón (Solanum lycopersicum / Lycopersicon esculentum)",
+   "familia": "Solanaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Óptimo medio y orgánico; tolera pesado y ligero (FAO EcoCrop)",
+    "profundidad": "Somero (20-50 cm) según EcoCrop",
+    "ph_min": 5.5,
+    "ph_max": 6.8,
+    "drenaje": "Bien drenado (EcoCrop: «well (dry spells)»)",
+    "exigencia_fertilidad": "alta",
+    "notas": "EcoCrop: pH óptimo 5,5-6,8 (absoluto 5-7,5); fertilidad óptima alta, absoluta moderada; salinidad baja (<4 dS/m). Datos globales.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": null,
+    "altitud_msnm_max": 2400,
+    "temperatura_c": "Óptimo 20 a 27 °C; absoluto 7 a 35 °C (EcoCrop)",
+    "lluvia_mm": "Óptimo 600 a 1 300 mm; absoluto 400 a 1 800 (EcoCrop)",
+    "notas": "Altitud absoluta máxima 2 400 (EcoCrop). La producción bajo invernadero en Ecuador comenzó hacia fines de 1998 (estudio de San Luis, citado en búsqueda; no leído directamente).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 2.3,
+    "max": 5,
+    "nota": "EcoCrop: 70 a 150 días; cultivares erectos se cosechan 70-130 días después del trasplante, otros 120-140 días (cropView EcoCrop)."
+   },
+   "plagas": [
+    "Negrita (Prodiplosis longifila), principal plaga del tomate en Ecuador según INIAP, pérdidas hasta 100 % (zonas tomateras de Manabí)",
+    "Polilla del tomate (Tuta absoluta)",
+    "Mosca blanca (Bemisia tabaci)"
+   ],
+   "enfermedades": [
+    "Virus: PVX, PVY, virus del mosaico del tabaco y de la mancha anular del tomate (estudio en Pimampiro, Imbabura)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "alto",
+    "hospedero_de": [
+     "Virus PVX y PVY compartidos con papa (según INIAP, Pimampiro)",
+     "Bemisia tabaci y Tuta absoluta (inferencia: también atacan otras solanáceas y hortalizas)"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Agota_suelo alto es inferencia a partir de la exigencia de fertilidad alta (EcoCrop). No fija N. Para rotación evitar solanáceas previas (papa, tomate de árbol) por virus y plagas compartidas (inferencia, sin fuente local).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 5,
+    "jornales_ha": null,
+    "mecanizable": "no",
+    "nota": "Sin dato de jornales en fuentes leídas. Nivel 5 es inferencia (tutorado, deshoje, cosecha escalonada manual) (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 2,
+    "nota": "Alta exigencia de fertilidad, plagas severas (negrita hasta 100 % de pérdida) y virus; manejo intensivo, a menudo bajo invernadero (inferencia: nivel 2).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": null,
+    "unidad": null,
+    "fecha_dato": null,
+    "volatilidad": null,
+    "nivel_1a5": null,
+    "fuentes": [],
+    "confianza": "baja",
+    "huecos": [
+     "No se buscó o no se encontró dato fiable."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Datos de clima/suelo globales (FAO EcoCrop). Datos de plagas de zonas tomateras de Manabí (Costa) y virus en Pimampiro (Sierra norte). Fuentes locales 1 y 2 casi no cubren tomate (la fuente 2 menciona tomatillo/tomate andino en asocios, no tomate riñón). No extrapolar entre regiones.",
+   "fuentes": [
+    {
+     "fuente": 6,
+     "ubicacion": "FAO EcoCrop, Lycopersicon esculentum, dataSheet?id=1379 y cropView?id=1379",
+     "dato": "20-27 °C; 600-1 300 mm; pH 5,5-6,8; altitud máx 2 400; ciclo 70-150; fertilidad alta; familia Solanaceae"
+    },
+    {
+     "fuente": 11,
+     "ubicacion": "INIAP repositorio (Prodiplosis longifila principal plaga de tomate en el Ecuador)",
+     "dato": "Negrita como principal plaga; Tuta absoluta y Bemisia tabaci secundarias; virus en Pimampiro (resumen de búsqueda, documentos no leídos completos)"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "Enfermedades fúngicas (tizón tardío, etc.) sin fuente verificada",
+    "Jornales/ha",
+    "Rendimiento y manejo en Sierra de Ecuador",
+    "Rotación recomendada con fuente",
+    "Manual INIAP de tomate riñón no localizado"
+   ]
+  },
+  "brocoli": {
+   "id": "brocoli",
+   "nombre": "Brócoli (Brassica oleracea var. italica)",
+   "familia": "Brassicaceae (Cruciferae)",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Óptimo medio y orgánico; tolera pesado y ligero (EcoCrop). Ensayo INIAP: franco arenoso",
+    "profundidad": "Media (50-150 cm) según EcoCrop",
+    "ph_min": 6,
+    "ph_max": 6.8,
+    "drenaje": "Bien drenado (EcoCrop)",
+    "exigencia_fertilidad": "alta",
+    "notas": "EcoCrop: pH óptimo 6-6,8 (absoluto 5,5-8,5); fertilidad óptima alta. Fuente 9 (INIAP, Cotopaxi): suelo franco arenoso, pH 7,2, MO 4,7 %. Dosis estudiadas hasta 300 kg N/ha; se sugieren 150-320 kg N/ha según autores citados; el modelo da 178 kg N/ha, 70 P y 25 K para rendimiento máximo de 26,35 t/ha.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": null,
+    "altitud_msnm_max": 2000,
+    "temperatura_c": "Óptimo 15 a 24 °C; absoluto 3 a 35 °C; letal -5 °C en reposo, -1 °C en crecimiento temprano (EcoCrop)",
+    "lluvia_mm": "Óptimo 900 a 1 500 mm; absoluto 350 a 2 000 (EcoCrop)",
+    "notas": "Discrepancia: EcoCrop da altitud absoluta máxima 2 000, pero el ensayo INIAP (fuente 9) se hizo a 2 913 msnm en Cotopaxi, principal provincia productora (7 697 ha). Se toma 2 000 como dato FAO y se anota la discrepancia.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 2.7,
+    "max": 4,
+    "nota": "EcoCrop: 80 a 120 días. Fuente 9: plántulas de 20 días al trasplante y fase R3 (pella) medida a 90 días después del trasplante."
+   },
+   "plagas": [
+    "Polilla de las crucíferas (Plutella xylostella)",
+    "Pulgón (Brevicoryne brassicae)",
+    "Gusano trozador y minadores (Liriomyza), mencionados en índices de tesis (no verificados en texto)"
+   ],
+   "enfermedades": [
+    "Mildiu velloso (Peronospora parasitica)",
+    "Mancha negra de la pella (citada en referencias de fuente 9; no verificada su descripción)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "alto",
+    "hospedero_de": [
+     "Plutella xylostella, Brevicoryne brassicae y mildiu comunes a crucíferas (inferencia)",
+     "Hernia de las crucíferas (Plasmodiplasmodiophora brassicae) no confirmada en fuentes leídas"
+    ],
+    "rompe_ciclos_de": [],
+    "notas": "Agota_suelo alto es inferencia (150-320 kg N/ha según literatura citada en fuente 9, fertilidad alta en EcoCrop). La fuente 2 (Perú/Bolivia) no trata brócoli. El INIAP (revisión de quinua) lista el brócoli como cultivo hospedero de varias plagas junto con col, tomate y fréjol (resumen de búsqueda).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 4,
+    "jornales_ha": null,
+    "mecanizable": "parcial",
+    "nota": "Sin dato de jornales. Inferencia: trasplante y cosecha manual de pellas, y alto uso de agroquímicos (Agrocalidad halló residuos en 43 % de 72 muestras) (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Alta exigencia de N y plagas con resistencia a insecticidas (Plutella) y residuos de plaguicidas frecuentes; cultivo comercial bien establecido en Cotopaxi (inferencia: nivel 3).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 0.32,
+    "unidad": "USD/kg (brocoli, al productor, seccion de productos de exportacion SIPA)",
+    "fecha_dato": "2025-12",
+    "volatilidad": "baja",
+    "ingreso_o_beneficio_costo": "0,32 USD/kg en dic-2024, nov-2025 y dic-2025 (variacion 0,00%); SIPA lo califica de estabilidad comercial. Un resumen de busqueda indica +22% de brocoli en julio de 2025 (variacion mensual, no verificada), asi que la estabilidad no es absoluta. Sin costos ni rendimiento.",
+    "nivel_1a5": 2,
+    "nivel_criterio": "(inferencia) Precio por kg el mas bajo con dato (0,32 USD/kg); rendimiento por ha de brocoli suele ser alto pero no hay dato en esta busqueda, asi que el ingreso/ha no es comparable.",
+    "fuentes": [
+     {
+      "n": 20,
+      "url": "https://sipa.agricultura.gob.ec/boletines/nacionales/productor/2025/boletin_precios_productor_diciembre_2025.pdf",
+      "fecha_consulta": "2026-11-14",
+      "dato": "Brocoli 0,32 USD/kg (dic-2024, nov-2025, dic-2025), variacion 0%."
+     }
+    ],
+    "confianza": "media",
+    "huecos": [
+     "Rendimiento y costos por ha.",
+     "Serie larga para validar la volatilidad baja (solo 3 puntos leidos)."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Sierra centro de Ecuador (Cotopaxi 2 913 msnm: ensayo INIAP; rendimiento nacional 19,24 t/ha y 8 725 ha cosechadas según ESPAC 2022 citada en fuente 9). Datos de clima de FAO EcoCrop globales.",
+   "fuentes": [
+    {
+     "fuente": 6,
+     "ubicacion": "FAO EcoCrop, Brassica oleracea var. italica, dataSheet?id=556",
+     "dato": "15-24 °C; 900-1 500 mm; pH 6-6,8; altitud máx 2 000; ciclo 80-120; fertilidad alta"
+    },
+    {
+     "fuente": 9,
+     "ubicacion": "Siembra 11(2) 2024, Cornejo et al. (INIAP), secc. 1 y 2",
+     "dato": "2 913 msnm; suelo franco arenoso pH 7,2; 150-320 kg N/ha; rendimiento máx 26,35 t/ha; R3 a 90 ddt; ESPAC 2022"
+    },
+    {
+     "fuente": 12,
+     "ubicacion": "Agrocalidad, Revista Ecuador es Calidad (residuos de plaguicidas en brócoli)",
+     "dato": "Plutella, Brevicoryne brassicae y Peronospora parasitica como problemas principales (resumen de búsqueda)"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "Jornales/ha",
+    "Hernia de las crucíferas en Ecuador",
+    "Rotación recomendada con fuente",
+    "Textura/profundidad óptima para Sierra",
+    "Fuentes locales 1 y 2 no tratan brócoli"
+   ]
+  },
+  "soya": {
+   "id": "soya",
+   "nombre": "Soya (Glycine max)",
+   "familia": "Fabaceae",
+   "tipo": "comercial",
+   "suelo": {
+    "textura": "Francos, bien drenados; no adecuados arenosos ni arcillosos (Agripac/INIAP). EcoCrop: óptimo medio y orgánico",
+    "profundidad": "Óptimo medio (50-150 cm) según EcoCrop",
+    "ph_min": 5.5,
+    "ph_max": 6.5,
+    "drenaje": "Bien drenado; suelos limosos y pesados impiden el desarrollo de raíces y bacterias",
+    "exigencia_fertilidad": "alta",
+    "notas": "EcoCrop: pH óptimo 5,5-6,5 (absoluto 4,5-8,4); fertilidad óptima alta, absoluta baja. Agripac: pH ideal 6 a 6,5.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": null,
+    "altitud_msnm_max": null,
+    "temperatura_c": "Óptimo 20 a 33 °C (EcoCrop); 20 a 30 °C, ideal cerca de 30 (Agripac); sin crecimiento bajo 4 °C; muy poco crecimiento cerca de 10 °C",
+    "lluvia_mm": "Discrepancia: 300 mm/ciclo (Agripac, riego/capacidad de campo) frente a 600-1 500 mm/año óptimo (EcoCrop)",
+    "notas": "EcoCrop altitud absoluta máxima 3 000, sin óptimo; en Ecuador el 99 % se cultiva en la Costa (Los Ríos 97 % de la producción nacional según Agripac 2014). Altitud máxima 1 200 msnm de un resumen de tesis no verificado; por eso se deja null.",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 3.5,
+    "max": 4,
+    "nota": "Variedades en Costa (Agripac/INIAP): Panorama 29, ciclo vegetativo 115-120 días; Soyica P-34, 105-110; INIAP 307, 112-115 días. EcoCrop: 75 a 180 días."
+   },
+   "plagas": [
+    "Gusano de la soya (no verificado directamente)",
+    "Mosca blanca (no verificado directamente)"
+   ],
+   "enfermedades": [
+    "Roya asiática (Phakopsora pachyrhizi), pérdidas 10-100 % según tesis citada en búsqueda; sin variedades resistentes en Ecuador (no verificado directamente)",
+    "Mancha ojo de rana (Cercospora sojina) (no verificado)",
+    "Mildiu (Peronospora manschurica) (no verificado)",
+    "Invierno: enfermedades y volcamiento por exceso de humedad (Agripac)"
+   ],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": null,
+    "hospedero_de": [],
+    "rompe_ciclos_de": [
+     "Agripac: «el cultivo se realiza como rotación para aprovechar humedad y romper ciclo de plagas, enfermedades y malezas»"
+    ],
+    "notas": "Fijación de N por nódulos (Agripac muestra 31-50 nódulos/planta según fecha de siembra, ensayo INIAP); EcoCrop: «soil improver». Sin cifra de N aportado. Rotación en Costa con arroz/maíz (inferencia, no leída).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 2,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "Sin dato de jornales. Inferencia: cultivo extensivo mecanizado en Costa (romplow, rastra, siembra a 0,45 m entre hileras, cosecha combinada) (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 3,
+    "nota": "Exige suelo franco bien drenado y control de roya asiática en invierno; rendimientos de 59-77 qq/ha en ensayos de Costa (inferencia: nivel 3).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "precio_referencia": 30,
+    "unidad": "USD/qq (precio minimo de sustentacion; 12% humedad, 1% impurezas)",
+    "fecha_dato": "2022-09",
+    "volatilidad": null,
+    "ingreso_o_beneficio_costo": "Precio minimo de sustentacion campana 2022-2023. No se hallo precio vigente 2026; el reporte quincenal URTF de ago-2026 no registra compras de soya en la 2a quincena de agosto y no da precio. FAOSTAT via agregador: 593 USD/t en 2016, 576,9 en 2018 (antiguo). Soya se cultiva sobre todo en costa, no en sierra.",
+    "nivel_1a5": 3,
+    "nivel_criterio": "(inferencia) Precio por kg aprox. 0,66 USD/kg, intermedio-alto; dato de 2022 y cultivo de costa, de baja relevancia para sierra.",
+    "fuentes": [
+     {
+      "n": 25,
+      "url": "https://www.expreso.ec/actualidad/economia/productores-e-industriales-fijan-30-precio-quintal-soya-135750.html",
+      "fecha_consulta": "2026-11-14",
+      "dato": "2022-09-13: precio minimo de sustentacion de soya USD 30/qq, campana 2022-2023."
+     }
+    ],
+    "confianza": "baja",
+    "huecos": [
+     "Precio vigente 2026.",
+     "Costos y rendimiento.",
+     "No es cultivo de sierra."
+    ],
+    "sin_mercado": false
+   },
+   "alcance_geografico": "Costa del Ecuador (Los Ríos, Guayas). NO hay respaldo para la Sierra: las fuentes locales 1 y 2 no tratan soya. Agripac es empresa comercial (fiabilidad baja).",
+   "fuentes": [
+    {
+     "fuente": 6,
+     "ubicacion": "FAO EcoCrop, Glycine max, dataSheet?id=1150",
+     "dato": "20-33 °C; 600-1 500 mm; pH 5,5-6,5; ciclo 75-180; altitud absoluta máx 3 000"
+    },
+    {
+     "fuente": 10,
+     "ubicacion": "Agripac, charla El cultivo de la soya en el Ecuador (2014), diapositivas de requerimientos y variedades",
+     "dato": "Suelo franco, pH 6-6,5, 20-30 °C, 300 mm/ciclo; ciclos 105-120 días; 99 % en Costa; rotación para romper plagas"
+    }
+   ],
+   "confianza": "baja",
+   "huecos": [
+    "Plagas y enfermedades sin documento fuente leído directamente",
+    "Jornales/ha",
+    "Aptitud para Sierra (probablemente nula, sin fuente)",
+    "N fijado cuantificado",
+    "Agota el suelo"
+   ]
+  },
+  "abono": {
+   "id": "abono",
+   "nombre": "Abono verde (vicia, tarwi, tréboles)",
+   "familia": "Fabaceae (leguminosas)",
+   "tipo": "no_comercial",
+   "suelo": {
+    "textura": "Debe adaptarse a suelos pobres (requisito del abono verde, fuente 2)",
+    "profundidad": null,
+    "ph_min": 5.5,
+    "ph_max": 7,
+    "drenaje": null,
+    "exigencia_fertilidad": "baja",
+    "notas": "pH 5,5-7,0 solo para tarwi/chocho (fuente 1). Requisitos generales (fuente 2): leguminosa, crecimiento rápido, follaje abundante y suculento, adaptada a suelos pobres, semilla barata.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": 2800,
+    "altitud_msnm_max": 3600,
+    "temperatura_c": "Para tarwi 7-14 °C (fuente 1); no hay rango por especie para vicia o tréboles",
+    "lluvia_mm": "Tarwi 300-600 mm (fuente 1)",
+    "notas": "Altitud 2 800-3 600 es la del tarwi en Ecuador (fuente 1). Fuente 2 (Perú/Bolivia) indica que tarwi, trébol de carretilla (Medicago hispida), trébol de flor amarilla (Medicago lupulina) y vicia (Vicia villosa) «se adaptan a las condiciones de los Andes».",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": null,
+    "max": null,
+    "nota": "Fuente 2: se corta al inicio de la floración e incorpora al suelo; sin duración en meses."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": "bajo",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [
+     "Fuente 1: rotar con leguminosas (haba, lenteja, vicia-avena) minimiza plagas, ácaros, nemátodos y patógenos"
+    ],
+    "notas": "Fuente 2: abonos verdes aportan N y materia orgánica y mejoran propiedades físicas. Tarwi: 40-80 kg N/ha en nódulos y 60-80 kg N/ha estimados al cultivo siguiente (fuente 2). Para vicia y tréboles no hay cifras en las fuentes locales. Fuente 1 (cuadro 5 papa): vicia entre las leguminosas del ciclo 4. Fuente 1 (cap. haba): al enterrar planta y vainas de haba, estas sirven de abono. Agota_suelo bajo es inferencia.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 1,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "Sin dato en fuentes. Inferencia: siembra y corte/incorporación al inicio de floración con arado, sin cosecha ni comercialización (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "Inferencia: especies rústicas de semilla barata que crecen en suelos pobres (fuente 2).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "sin_mercado": true,
+    "nota": "Cultivo no comercial: no genera ingreso directo.",
+    "nivel_1a5": null
+   },
+   "mercado_nota": "sin mercado",
+   "alcance_geografico": "Altos Andes (fuente 2: Perú y Bolivia; fuente 1: sierra de Ecuador para tarwi/haba). No extrapolar a Costa ni Amazonía.",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Anexo 1, Abonos verdes (líneas 9330-9345)",
+     "dato": "Requisitos y especies andinas: tarwi, trébol de carretilla, trébol amarillo, vicia"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Tarwi, suelos y fertilización (líneas 5003-5012)",
+     "dato": "60-80 kg N/ha"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 8 quinua (línea 4979); cap. 1 papa cuadro 5",
+     "dato": "Rotar con leguminosas vicia/haba/lenteja"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "N fijado por vicia y tréboles",
+    "Altitud y clima por especie (vicia, tréboles)",
+    "Duración del ciclo hasta corte",
+    "Dosis de semilla",
+    "Jornales/ha"
+   ]
+  },
+  "pasto": {
+   "id": "pasto",
+   "nombre": "Pasto o pradera (incluye alfalfa y trébol blanco con raigrás y dactilo)",
+   "familia": "Fabaceae y Poaceae (mezcla)",
+   "tipo": "no_comercial",
+   "suelo": {
+    "textura": "Alfalfa: óptimo medio y ligero (FAO EcoCrop)",
+    "profundidad": "Alfalfa: óptimo profundo (>150 cm), absoluto medio (50-150 cm) (EcoCrop)",
+    "ph_min": 6.5,
+    "ph_max": 7.5,
+    "drenaje": "Alfalfa: bien drenado (EcoCrop)",
+    "exigencia_fertilidad": "media",
+    "notas": "pH de alfalfa (EcoCrop): óptimo 6,5-7,5, absoluto 4,3-8,7; fertilidad óptima alta, absoluta baja. Para trébol blanco con raigrás y dactilo, las fuentes locales no dan suelo.",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": null,
+    "altitud_msnm_max": 4000,
+    "temperatura_c": "Alfalfa: óptimo 21-27 °C, absoluto 5-45 (EcoCrop)",
+    "lluvia_mm": "Alfalfa: óptimo 600-1 200 mm; absoluto 350-2 700 (EcoCrop)",
+    "notas": "Altitud absoluta máxima 4 000 para alfalfa (EcoCrop). En la puna andina hay pastos nativos y pastos cultivados en rotación (fuente 2, cuadro 4).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 36,
+    "max": 96,
+    "nota": "Fuente 2: trébol blanco + raigrás + dactilo cultivados por 3 a 5 años; alfalfa durante 6 a 8 años antes de rotar. Expresado en meses (36 a 96). Fuente 1 cuadro 5: «pasto, varios años» antes y después de la papa."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": true,
+    "agota_suelo": "bajo",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [
+     "Fuente 1 (cuadro 5): pasto como primer y último ciclo en rotación alrededor de papa (papa, cereales, leguminosas, pastos)"
+    ],
+    "notas": "Fuente 2: tras 6-8 años de alfalfa el suelo «queda muy enriquecido» y se sugiere rotar con un cultivo alimenticio para obtener rendimientos más altos; trébol blanco con raigrás y dactilo por 3-5 años dejan el suelo enriquecido en materia orgánica y N, y podrían usarse en los años de descanso de layme/aynoka. Fija N solo si incluye leguminosa (alfalfa, trébol). Cifra de N fijado no disponible en fuentes locales.",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 1,
+    "jornales_ha": null,
+    "mecanizable": "si",
+    "nota": "Sin dato en fuentes. Inferencia: tras la siembra, el manejo es bajo (cortes o pastoreo) comparado con cultivos anuales (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 4,
+    "nota": "Inferencia: cultivo perenne de bajo manejo; la alfalfa requiere suelo profundo y pH alto (EcoCrop).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "sin_mercado": true,
+    "nota": "Cultivo no comercial: no genera ingreso directo.",
+    "nivel_1a5": null
+   },
+   "mercado_nota": "sin mercado",
+   "alcance_geografico": "Altos Andes (fuente 2: Perú/Bolivia; alfalfa con líneas de aguaymanto en Cajamarca) y Sierra de Ecuador (fuente 1, rotación con papa). EcoCrop global para alfalfa.",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Anexo 1, Rotación de cultivos (líneas 9347-9354)",
+     "dato": "Alfalfa 6-8 años; trébol blanco+raigrás+dactilo 3-5 años enriquecen el suelo"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 1 papa, cuadro 5 (líneas 890-897)",
+     "dato": "Pasto varios años como primer y último ciclo"
+    },
+    {
+     "fuente": 6,
+     "ubicacion": "FAO EcoCrop, Medicago sativa, dataSheet?id=1428",
+     "dato": "21-27 °C; 600-1 200 mm; pH 6,5-7,5; altitud máx 4 000"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "N fijado cuantificado",
+    "Datos de trébol blanco, raigrás y dactilo para Ecuador",
+    "Plagas y enfermedades de pasturas",
+    "Jornales/ha"
+   ]
+  },
+  "barbecho": {
+   "id": "barbecho",
+   "nombre": "Barbecho (descanso)",
+   "familia": "no aplica",
+   "tipo": "no_comercial",
+   "suelo": {
+    "textura": null,
+    "profundidad": null,
+    "ph_min": null,
+    "ph_max": null,
+    "drenaje": null,
+    "exigencia_fertilidad": null,
+    "notas": "No aplica. El descanso permite recuperar la fertilidad cuando se acorta (fuente 2: períodos cortos tienen «efectos negativos por agotamiento de la fertilidad»).",
+    "drenaje_requerido": null,
+    "profundidad_min_cm": null
+   },
+   "clima": {
+    "altitud_msnm_min": null,
+    "altitud_msnm_max": null,
+    "temperatura_c": "no aplica",
+    "lluvia_mm": "no aplica",
+    "notas": "Practicado en los altos Andes de Perú y Bolivia (fuente 2).",
+    "requiere_riego": null
+   },
+   "ciclo_meses": {
+    "min": 36,
+    "max": 120,
+    "nota": "Fuente 2: descansos de 3 a 7 años en aynoqa/layme; hasta 10 años en muyuy de Cusco; 4 a 8 años en quinua de salares; 4 a 7 años en rotaciones de papa de altura; la maca exige hasta 10 años de descanso. En rotaciones de Puno (cuadro 4) el barbecho es 1 o 2 años al final. Convertido a meses (36 a 120)."
+   },
+   "plagas": [],
+   "enfermedades": [],
+   "efecto_rotacion": {
+    "fija_nitrogeno": false,
+    "agota_suelo": "bajo",
+    "hospedero_de": [],
+    "rompe_ciclos_de": [
+     "Rompe ciclos al no haber cultivo (inferencia); fuente 2: con descanso >5 años se reduce la cantidad de fertilizante o abono en papa"
+    ],
+    "notas": "Fuente 1 (haba): en terrenos en descanso (potrero viejo, barbecho) hay que incorporar la materia verde existente; la descomposición de residuos demora 3 a 4 meses según humedad. Fuente 1 (chocho): papa tras chocho tuvo más vigor que tras descanso o cebada. Agota_suelo bajo y no fija N son inferencias (no hay cultivo).",
+    "mejora_estructura": null
+   },
+   "mano_obra": {
+    "nivel_1a5": 1,
+    "jornales_ha": null,
+    "mecanizable": "no",
+    "nota": "Sin dato. Inferencia: sin labores salvo incorporar la vegetación al volver a cultivar (inferencia).",
+    "tipo_dato": "inferencia"
+   },
+   "facilidad_cultivo": {
+    "nivel_1a5": 5,
+    "nota": "Inferencia: no requiere cultivo; costo de oportunidad (no genera ingreso).",
+    "tipo_dato": "inferencia"
+   },
+   "mercado": {
+    "sin_mercado": true,
+    "nota": "Cultivo no comercial: no genera ingreso directo.",
+    "nivel_1a5": null
+   },
+   "mercado_nota": "sin mercado",
+   "alcance_geografico": "Altos Andes de Perú y Bolivia (fuente 2: aynoqa, layme, muyuy, sayana); referencia en Ecuador en fuente 1 para terrenos en descanso. No extrapolar a Costa ni Amazonía.",
+   "fuentes": [
+    {
+     "fuente": 2,
+     "ubicacion": "Sistemas agrícolas andinos, rotaciones (líneas 1298-1331) y cuadros 3 y 4",
+     "dato": "Descansos de 3 a 7 años, hasta 10 años; barbecho 1-2 años en rotación de Puno"
+    },
+    {
+     "fuente": 2,
+     "ubicacion": "Quinua (línea 3991) y maca (línea 3516)",
+     "dato": "4-8 años de descanso en quinua de salares; maca hasta 10 años"
+    },
+    {
+     "fuente": 1,
+     "ubicacion": "Cap. 11 haba, secc. 5.1.2 (línea 7712)",
+     "dato": "Incorporar materia verde en barbecho; descomposición 3-4 meses"
+    }
+   ],
+   "confianza": "media",
+   "huecos": [
+    "Años de descanso típicos en la Sierra ecuatoriana (los datos son de Perú/Bolivia)",
+    "Efecto medido sobre nutrientes",
+    "Jornales/ha"
+   ]
+  }
+ }
+}
