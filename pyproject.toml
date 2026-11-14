@@ -1,0 +1,31 @@
+[project]
+name = "crop-advisor-api"
+version = "0.1.0"
+description = "API REST de un agente que guía a agricultores en la elección de cultivo y rotación (RAG sobre SQLite)."
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "fastapi>=0.163.0",
+    "langchain>=1.5.0",
+    "langchain-classic>=1.0.8",
+    "langchain-community>=0.4.2",
+    "langchain-openai>=1.8.0",
+    "langchain-text-splitters>=1.1.3",
+    "langgraph>=1.2.22",
+    "loguru>=0.8.0",
+    "pydantic-settings>=2.16.3",
+    "pypdf>=7.1.0",
+    "rank-bm25>=0.2.2",
+    "sqlite-vec>=0.1.9",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
