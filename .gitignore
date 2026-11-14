@@ -1,9 +1,30 @@
+# Python (api-agent)
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+api-agent/data/*.db
+api-agent/data/*.db-*
+api-agent/local/
+
+# Node (frontend)
+node_modules/
+dist/
+dist-ssr/
+*.local
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Secretos y herramientas
 .env
-data/*.db
-data/*.db-*
-local/
 .engram/
+
+# Editor / SO
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.sw?

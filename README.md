@@ -1,19 +1,39 @@
-# Crop Advisor API
+# NASA Challenge
+
+Monorepo de servicios autocontenidos. Cada carpeta tiene sus propias dependencias y se ejecuta por separado; lo único compartido en la raíz es `.env` (copiar de `.env.example`), `.gitignore` y este README.
+
+| Servicio | Carpeta | Stack |
+|---|---|---|
+| Frontend (bio-orbit) | `frontend/` | React 19 + Vite + Leaflet |
+| API del agente (Crop Advisor) | `api-agent/` | FastAPI + LangChain + SQLite |
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## API del agente (Crop Advisor)
 
 API REST (FastAPI) de un agente que guía a agricultores con poca experiencia en la elección de cultivo y rotación (sierra andina del Ecuador).
 
 - **Agente:** LangChain `create_agent` + OpenAI (`gpt-5.4-mini`, razonamiento `low`, vía Responses API). Conversa, pregunta lo que falta y explica. **No calcula**: usa herramientas.
 - **Embeddings:** `text-embedding-3-small`.
 - **Logs:** loguru (herramientas usadas por turno, errores de OpenAI con traza).
-- **Motor de reglas:** `app/engine/`, versión en Python de `local/agente-rotacion/scripts/recomendar.mjs` (mismos resultados, verificado). Determinista, sin LLM.
+- **Motor de reglas:** `api-agent/app/engine/`, versión en Python de `api-agent/local/agente-rotacion/scripts/recomendar.mjs` (mismos resultados, verificado). Determinista, sin LLM.
 - **RAG sobre SQLite:** `BM25Retriever` + `SQLiteVec` (langchain-community) unidos con `EnsembleRetriever` (langchain-classic).
 - **Memoria:** solo de corto plazo, por sesión (`InMemorySaver`, TTL de 120 min). Nada entre sesiones.
 
-## Puesta en marcha
+### Puesta en marcha
 
 ```bash
+cd api-agent
 uv sync
-cp .env.example .env               # y poner OPENAI_API_KEY
+cp ../.env.example ../.env         # en la raíz del repo; poner OPENAI_API_KEY
 uv run python -m ingestion.build_db                # crea data/knowledge.db (con embeddings si hay clave)
 uv run uvicorn app.main:app --reload               # 1 worker: la memoria de sesión vive en el proceso
 ```
@@ -21,7 +41,7 @@ Documentación interactiva: http://127.0.0.1:8000/docs
 
 Sin `OPENAI_API_KEY` funcionan `/v1/recommend`, `/v1/crops` y la búsqueda BM25; `/v1/sessions` responde 503.
 
-## Endpoints
+### Endpoints
 
 | Método | Ruta | Para qué |
 |---|---|---|
@@ -32,7 +52,7 @@ Sin `OPENAI_API_KEY` funcionan `/v1/recommend`, `/v1/crops` y la búsqueda BM25;
 | GET | `/v1/crops`, `/v1/crops/{crop}` | Cultivos y fichas (acepta nombres comunes: tarwi, ataco, fréjol) |
 | GET | `/health` | Estado del servicio |
 
-## Estructura
+### Estructura (`api-agent/`)
 
 ```
 app/
@@ -57,19 +77,27 @@ ingestion/
 tests/                      # 47 pruebas; ninguna llama a OpenAI
 ```
 
-## Pruebas
+### Pruebas
 
 ```bash
+cd api-agent
 uv run pytest
 ```
 El agente se prueba con un modelo de chat guionado: `create_agent`, las herramientas, el checkpointer y el TTL son reales.
 
-## Modelos
-Configurables en `.env` (`CHAT_MODEL`, `CHAT_REASONING_EFFORT`, `EMBEDDING_MODEL`). Los modelos `gpt-5.4-*` no aceptan
+### Modelos
+Configurables en el `.env` de la raíz (`CHAT_MODEL`, `CHAT_REASONING_EFFORT`, `EMBEDDING_MODEL`). Los modelos `gpt-5.4-*` no aceptan
 herramientas junto con `reasoning_effort` en `/v1/chat/completions`; por eso `ChatOpenAI` usa `use_responses_api=True`.
 Si cambias `EMBEDDING_MODEL` o `EMBEDDING_DIMENSIONS`, vuelve a correr la ingesta.
 
-## Límites del MVP
+### Docker
+
+```bash
+docker build -t crop-advisor api-agent
+docker run --env-file .env -v ./api-agent/data:/app/data -p 8000:8000 crop-advisor
+```
+
+### Límites del MVP
 - `langchain-community` está archivado (sin mantenimiento desde junio de 2026). `SQLiteVec` y `BM25Retriever` no filtran por metadatos.
 - Sin embeddings, la búsqueda es solo por palabras clave y falla con preguntas parafraseadas.
 - `InMemorySaver` exige 1 worker y pierde las sesiones al reiniciar.

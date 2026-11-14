@@ -1,0 +1,128 @@
+.onb {
+  --onb-texto: #111827;
+  --onb-texto-suave: #6b7280;
+  --onb-borde: #d1d5db;
+  --onb-error: #b91c1c;
+  color: var(--onb-texto);
+}
+
+.onb-pantalla { flex: 1; display: flex; flex-direction: column; }
+.onb-adelante { animation: onb-desde-derecha 0.35s ease-out; }
+.onb-atras { animation: onb-desde-izquierda 0.35s ease-out; }
+@keyframes onb-desde-derecha { from { opacity: 0; transform: translateX(40px); } }
+@keyframes onb-desde-izquierda { from { opacity: 0; transform: translateX(-40px); } }
+
+.onb-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: max(20px, env(safe-area-inset-top)) 28px max(32px, env(safe-area-inset-bottom));
+}
+
+/* ---------- Barra superior ---------- */
+.onb-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; }
+.onb-top-hueco { width: 1px; }
+
+.onb-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 48px;
+  margin-left: -10px;
+  padding: 0 12px 0 6px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--onb-texto-suave);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.onb-volver:hover:not(:disabled) { background: #f3f4f6; color: var(--onb-texto); }
+
+.onb-progreso { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.onb-progreso-texto { font-size: 12px; font-weight: 500; color: var(--onb-texto-suave); }
+.onb-progreso-barra { display: flex; gap: 6px; }
+.onb-progreso-barra span { width: 28px; height: 4px; border-radius: 4px; background: #e5e7eb; transition: background 0.3s; }
+.onb-progreso-barra span.activo { background: var(--esmeralda); }
+
+/* ---------- Contenido ---------- */
+.onb-cuerpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.onb-avatar {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  margin-bottom: 28px;
+  border-radius: 50%;
+  background: var(--esmeralda-suave);
+  color: var(--esmeralda);
+  box-shadow: 0 0 0 10px rgba(4, 120, 87, 0.05);
+}
+
+.onb-saludo { margin: 0 0 6px; font-size: 14px; color: var(--esmeralda); font-weight: 500; }
+.onb-titulo { display: block; margin: 0 0 20px; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.onb-subtitulo { max-width: 300px; margin: -8px 0 0; font-size: 15px; line-height: 1.5; color: var(--onb-texto-suave); }
+
+.onb-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  border: 1.5px solid var(--onb-borde);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--onb-texto);
+  font: inherit;
+  font-size: 16px; /* 16px evita el zoom automático en iOS */
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.onb-input::placeholder { color: #9ca3af; }
+.onb-input:focus { border-color: var(--esmeralda); box-shadow: 0 0 0 4px rgba(4, 120, 87, 0.12); }
+.onb-input[aria-invalid='true'] { border-color: var(--onb-error); box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.1); }
+
+.onb-error { min-height: 20px; margin: 10px 0 0; font-size: 13px; line-height: 1.4; color: var(--onb-error); }
+
+/* ---------- Botones ---------- */
+.onb-acciones { display: flex; flex-direction: column; gap: 12px; }
+
+.onb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.onb-btn:active:not(:disabled) { transform: scale(0.98); }
+.onb-btn:disabled { opacity: 0.6; cursor: wait; }
+.onb-btn:focus-visible, .onb-volver:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+
+.onb-btn-primario { border: none; background: var(--esmeralda); color: #fff; box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25); }
+.onb-btn-primario:hover:not(:disabled) { background: var(--esmeralda-oscuro); }
+
+.onb-btn-secundario { border: 1.5px solid var(--esmeralda); background: transparent; color: var(--esmeralda); }
+.onb-btn-secundario:hover:not(:disabled) { background: var(--esmeralda-suave); }
+
+.onb-girando { animation: onb-girar 0.9s linear infinite; }
+@keyframes onb-girar { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .onb-adelante, .onb-atras { animation: none; }
+}

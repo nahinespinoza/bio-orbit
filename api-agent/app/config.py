@@ -1,15 +1,16 @@
-"""Configuración leída de variables de entorno o de `.env`."""
+"""Configuración leída de variables de entorno o de `.env` (en la raíz del repo)."""
 
 from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent  # api-agent/
+REPO_ROOT = PROJECT_ROOT.parent  # el .env vive en la raíz del monorepo
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", env_file_encoding="utf-8", extra="ignore")
 
     openai_api_key: str | None = None
     chat_model: str = "gpt-5.4-mini"
