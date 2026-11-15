@@ -1,0 +1,5 @@
+# Normaliza finales de línea en archivos de texto
+* text=auto
+
+# Los hooks de git siempre en LF (se ejecutan con sh)
+.githooks/* text eol=lf

@@ -15,6 +15,14 @@ npm install
 npm run dev
 ```
 
+## Git hooks
+
+`.githooks/commit-msg` quita los trailers `Co-Authored-By` que mencionan a Claude o Anthropic. Actívalo una vez por clon:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ---
 
 ## API del agente (Crop Advisor)
