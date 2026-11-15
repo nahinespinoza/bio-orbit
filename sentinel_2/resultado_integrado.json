@@ -1,0 +1,525 @@
+{
+  "input": {
+    "nasa_power": {
+      "fuente_datos": "NASA/POWER Source Native Resolution Daily Data",
+      "ubicacion": {
+        "zona": "Toacaso / Sigchos",
+        "longitud": -78.774,
+        "latitud": -0.749,
+        "altitud_msnm": 2501
+      },
+      "parametros_ejecucion": {
+        "fecha_corte_simulada": "2026-11-11",
+        "total_dias_validos_historico": 1824,
+        "rango_historico_json": {
+          "inicio": "2021-11-14",
+          "fin": "2026-11-11"
+        }
+      },
+      "ventana_7_dias_evaluada": [
+        {
+          "fecha": "2026-11-05",
+          "T2M_c": 14.85,
+          "T2M_MIN_c": 10.86,
+          "T2M_MAX_c": 19.84,
+          "PRECTOTCORR_mm": 16.54,
+          "EVPTRNS_mm": 3.19,
+          "GWETROOT_pct": 76.0,
+          "GWETTOP_pct": 78.0,
+          "RH2M_pct": 85.6
+        },
+        {
+          "fecha": "2026-11-06",
+          "T2M_c": 14.97,
+          "T2M_MIN_c": 12.09,
+          "T2M_MAX_c": 19.19,
+          "PRECTOTCORR_mm": 22.73,
+          "EVPTRNS_mm": 2.41,
+          "GWETROOT_pct": 76.0,
+          "GWETTOP_pct": 78.0,
+          "RH2M_pct": 88.1
+        },
+        {
+          "fecha": "2026-11-07",
+          "T2M_c": 14.66,
+          "T2M_MIN_c": 11.16,
+          "T2M_MAX_c": 19.48,
+          "PRECTOTCORR_mm": 17.43,
+          "EVPTRNS_mm": 2.49,
+          "GWETROOT_pct": 77.0,
+          "GWETTOP_pct": 78.0,
+          "RH2M_pct": 88.8
+        },
+        {
+          "fecha": "2026-11-08",
+          "T2M_c": 14.7,
+          "T2M_MIN_c": 9.1,
+          "T2M_MAX_c": 20.66,
+          "PRECTOTCORR_mm": 1.43,
+          "EVPTRNS_mm": 4.28,
+          "GWETROOT_pct": 76.0,
+          "GWETTOP_pct": 76.0,
+          "RH2M_pct": 83.3
+        },
+        {
+          "fecha": "2026-11-09",
+          "T2M_c": 14.22,
+          "T2M_MIN_c": 8.75,
+          "T2M_MAX_c": 20.35,
+          "PRECTOTCORR_mm": 3.0,
+          "EVPTRNS_mm": 3.95,
+          "GWETROOT_pct": 75.0,
+          "GWETTOP_pct": 73.0,
+          "RH2M_pct": 85.5
+        },
+        {
+          "fecha": "2026-11-10",
+          "T2M_c": 14.59,
+          "T2M_MIN_c": 8.63,
+          "T2M_MAX_c": 20.55,
+          "PRECTOTCORR_mm": 3.82,
+          "EVPTRNS_mm": 4.11,
+          "GWETROOT_pct": 74.0,
+          "GWETTOP_pct": 72.0,
+          "RH2M_pct": 84.6
+        },
+        {
+          "fecha": "2026-11-11",
+          "T2M_c": 15.24,
+          "T2M_MIN_c": 10.1,
+          "T2M_MAX_c": 20.77,
+          "PRECTOTCORR_mm": 4.58,
+          "EVPTRNS_mm": 4.15,
+          "GWETROOT_pct": 74.0,
+          "GWETTOP_pct": 72.0,
+          "RH2M_pct": 85.4
+        }
+      ],
+      "muestra_climatologica_mes_siguiente": {
+        "mes_evaluado": "Diciembre",
+        "anios_incluidos": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "total_dias_historicos_analizados": 155,
+        "promedios_diarios_base": {
+          "lluvia_diaria_hist_mm": 3.9,
+          "evap_diaria_hist_mm": 0.57,
+          "humedad_relativa_hist_pct": 83.9,
+          "temp_media_hist_c": 14.6,
+          "temp_min_hist_c": 10.5
+        }
+      }
+    },
+    "sentinel2": {
+      "fuente_datos": "Copernicus Sentinel-2 L2A (reflectancia de superficie), Earth Search / AWS",
+      "ubicacion": {
+        "zona": "Toacaso / Sigchos",
+        "longitud": -78.773999,
+        "latitud": -0.749029,
+        "area_ha": 1.17,
+        "poligono_geojson": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "id": "1",
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -78.7745,
+                      -0.749606
+                    ],
+                    [
+                      -78.774138,
+                      -0.750059
+                    ],
+                    [
+                      -78.773563,
+                      -0.748903
+                    ],
+                    [
+                      -78.77367,
+                      -0.748547
+                    ],
+                    [
+                      -78.773744,
+                      -0.748099
+                    ],
+                    [
+                      -78.773734,
+                      -0.747844
+                    ],
+                    [
+                      -78.773819,
+                      -0.747796
+                    ],
+                    [
+                      -78.7745,
+                      -0.749606
+                    ]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "parametros_ejecucion": {
+        "fecha_corte": "2026-11-15",
+        "rango_analizado": {
+          "inicio": "2026-05-15",
+          "fin": "2026-11-15"
+        },
+        "resolucion_m": 10,
+        "bandas": {
+          "NDVI": "B08, B04",
+          "NDRE": "B08, B05",
+          "NDMI": "B08, B11",
+          "mascara_nubes": "SCL"
+        },
+        "max_nubosidad_poligono_pct": 20.0,
+        "frecuencia_objetivo_dias": 15,
+        "total_recortes_descargados": 23,
+        "total_capturas_limpias": 17,
+        "total_capturas_seleccionadas": 9
+      },
+      "capturas_evaluadas": [
+        {
+          "fecha": "2026-05-25",
+          "escena": "S2B_17MQV_20260525_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-06-29",
+          "escena": "S2C_17MQV_20260629_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-07-14",
+          "escena": "S2B_17MQV_20260714_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-07-29",
+          "escena": "S2C_17MQV_20260729_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-08-10",
+          "escena": "S2A_17MQV_20260810_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-08-23",
+          "escena": "S2B_17MQV_20260823_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-09-17",
+          "escena": "S2C_17MQV_20260917_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-10-09",
+          "escena": "S2A_17MQV_20261009_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        },
+        {
+          "fecha": "2026-10-27",
+          "escena": "S2C_17MQV_20261027_0_L2A",
+          "nubosidad_poligono_pct": 0.0,
+          "pixeles_10m": 120
+        }
+      ]
+    }
+  },
+  "output": {
+    "zona": "Toacaso / Sigchos",
+    "clima_regional_nasa_power": {
+      "zona": "Toacaso / Sigchos",
+      "altitud": 2501,
+      "fecha_inicio": "05/11/2026",
+      "fecha_fin": "11/11/2026",
+      "estado_actual_7d": {
+        "lluvia_7d": 69.5,
+        "balance_hidrico_7d": 44.9,
+        "humedad_raiz_pct": 75.4,
+        "humedad_superficial_pct": 75.3,
+        "humedad_relativa_pct": 85.9,
+        "temp_min_semana": 8.6,
+        "temp_max_semana": 20.8
+      },
+      "semaforos": {
+        "estado_helada": {
+          "codigo": "VERDE",
+          "color": "verde",
+          "estado": "NORMAL - Sin Heladas",
+          "mensaje": "Temperaturas nocturnas seguras para el follaje de la papa."
+        },
+        "estado_riego": {
+          "codigo": "VERDE_OPTIMO",
+          "color": "verde",
+          "estado": "ÓPTIMO - Humedad Ideal",
+          "mensaje": "Humedad adecuada en zona de raíces. No se requiere riego adicional."
+        },
+        "estado_estres_calor": {
+          "codigo": "VERDE",
+          "color": "verde",
+          "estado": "NORMAL - Temperatura Diurna Ideal",
+          "mensaje": "Días frescos ideales para el engrosamiento del tubérculo."
+        }
+      },
+      "proyeccion_30d": {
+        "mes": "Diciembre",
+        "lluvia_esperada_proximo_mes": 117.1,
+        "evap_esperada_proximo_mes": 17.0,
+        "temp_min_esperada": 10.5,
+        "alertas_preventivas": [
+          {
+            "codigo": "PLAGAS_LANCHA",
+            "nivel": "ALTO",
+            "titulo": "Plagas y Hongos (Tizón tardío / Lancha)",
+            "mensaje": "Riesgo alto de Lancha (tizón tardío) para el próximo mes por alta humedad y lluvias esperadas. Revisa el envés de las hojas bajas y prepara control preventivo."
+          }
+        ]
+      },
+      "serie_7d": [
+        {
+          "dia": "05/11",
+          "tmin": 10.9,
+          "tmax": 19.8,
+          "lluvia": 16.5
+        },
+        {
+          "dia": "06/11",
+          "tmin": 12.1,
+          "tmax": 19.2,
+          "lluvia": 22.7
+        },
+        {
+          "dia": "07/11",
+          "tmin": 11.2,
+          "tmax": 19.5,
+          "lluvia": 17.4
+        },
+        {
+          "dia": "08/11",
+          "tmin": 9.1,
+          "tmax": 20.7,
+          "lluvia": 1.4
+        },
+        {
+          "dia": "09/11",
+          "tmin": 8.8,
+          "tmax": 20.4,
+          "lluvia": 3.0
+        },
+        {
+          "dia": "10/11",
+          "tmin": 8.6,
+          "tmax": 20.6,
+          "lluvia": 3.8
+        },
+        {
+          "dia": "11/11",
+          "tmin": 10.1,
+          "tmax": 20.8,
+          "lluvia": 4.6
+        }
+      ]
+    },
+    "parcela_sentinel2": {
+      "zona": "Toacaso / Sigchos",
+      "fecha_ultima_captura": "27/10/2026",
+      "dias_desde_ultima_foto": 19,
+      "estado_actual_lote": {
+        "ndvi_promedio": 0.4482,
+        "ndre_promedio": 0.2495,
+        "ndmi_promedio": -0.1811,
+        "variacion_ndvi_15d": 0.1444,
+        "fecha_comparacion": "2026-10-09",
+        "distribucion_parcela_pct": {
+          "sano": 16.7,
+          "alerta": 55.8,
+          "critico": 27.5,
+          "suelo_desnudo": 0.0,
+          "sin_dato": 0.0
+        },
+        "sector_mas_afectado": "oeste"
+      },
+      "semaforos": {
+        "estado_vigor": {
+          "codigo": "AMARILLO_NUTRICION",
+          "color": "amarillo",
+          "estado": "ALERTA - Nutrición",
+          "mensaje": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización."
+        },
+        "estado_humedad_parcela": {
+          "codigo": "ROJO_ESTRES_HIDRICO",
+          "color": "rojo",
+          "estado": "CRÍTICO - Estrés hídrico",
+          "mensaje": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego."
+        }
+      },
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 11.4,
+          "pct_estres": 100.0,
+          "ndvi": 0.4094,
+          "caida_ndvi": -0.1538
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 39.6,
+          "pct_estres": 62.5,
+          "ndvi": 0.5088,
+          "caida_ndvi": -0.1416
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 6.2,
+          "pct_estres": 87.5,
+          "ndvi": 0.4486,
+          "caida_ndvi": -0.1422
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 66.7,
+          "pct_estres": 100.0,
+          "ndvi": 0.3477,
+          "caida_ndvi": -0.1237
+        }
+      },
+      "capas_visuales": {
+        "recorte_ndvi_png": "datos_sentinel/salida_s2/png/recorte_ndvi_20261027.png",
+        "recorte_ndmi_png": "datos_sentinel/salida_s2/png/recorte_ndmi_20261027.png",
+        "bounds_latlon": [
+          [
+            -0.7519846701456966,
+            -78.77633454867261
+          ],
+          [
+            -0.7458347927194741,
+            -78.77166149113104
+          ]
+        ]
+      },
+      "serie_fenologica": [
+        {
+          "dia": "25/05",
+          "fecha": "2026-05-25",
+          "ndvi": 0.4121,
+          "ndre": 0.237,
+          "ndmi": -0.0926,
+          "vigor": "AMARILLO_NUTRICION",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "29/06",
+          "fecha": "2026-06-29",
+          "ndvi": 0.3011,
+          "ndre": 0.1911,
+          "ndmi": -0.2211,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "14/07",
+          "fecha": "2026-07-14",
+          "ndvi": 0.2969,
+          "ndre": 0.1924,
+          "ndmi": -0.254,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "29/07",
+          "fecha": "2026-07-29",
+          "ndvi": 0.3037,
+          "ndre": 0.195,
+          "ndmi": -0.25,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "10/08",
+          "fecha": "2026-08-10",
+          "ndvi": 0.2691,
+          "ndre": 0.1742,
+          "ndmi": -0.1864,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "23/08",
+          "fecha": "2026-08-23",
+          "ndvi": 0.2562,
+          "ndre": 0.1608,
+          "ndmi": -0.2689,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "17/09",
+          "fecha": "2026-09-17",
+          "ndvi": 0.202,
+          "ndre": 0.1314,
+          "ndmi": -0.3152,
+          "vigor": "GRIS_SUELO",
+          "humedad": "GRIS_NO_APLICA"
+        },
+        {
+          "dia": "09/10",
+          "fecha": "2026-10-09",
+          "ndvi": 0.3039,
+          "ndre": 0.1626,
+          "ndmi": -0.3193,
+          "vigor": "ROJO_ESTRES_SEVERO",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        },
+        {
+          "dia": "27/10",
+          "fecha": "2026-10-27",
+          "ndvi": 0.4482,
+          "ndre": 0.2495,
+          "ndmi": -0.1811,
+          "vigor": "AMARILLO_NUTRICION",
+          "humedad": "ROJO_ESTRES_HIDRICO"
+        }
+      ]
+    },
+    "alerta_cruzada_confirmada": null,
+    "cruces_evaluados": [
+      {
+        "codigo": "LANCHA_PREVENTIVA",
+        "nivel": "ALTO",
+        "confirmada": false,
+        "titulo": "Lancha: riesgo climático, sin daño visible aún",
+        "mensaje": "El clima favorece la Lancha, pero el satélite no detecta caída de vigor en la parcela. Mantén el control preventivo e inspecciona el sector oeste, que tiene más zonas en rojo."
+      },
+      {
+        "codigo": "HUMEDAD_DISCREPANTE",
+        "nivel": "MEDIO",
+        "confirmada": false,
+        "titulo": "Clima húmedo, pero la parcela se ve seca",
+        "mensaje": "La humedad regional del suelo es adecuada, pero el satélite ve poca agua en el follaje de la parcela. Revisa el lote en campo: puede ser estrés local, drenaje o poca cobertura del cultivo."
+      }
+    ]
+  }
+}

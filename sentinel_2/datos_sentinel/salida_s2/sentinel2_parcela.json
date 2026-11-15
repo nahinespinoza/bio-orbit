@@ -1,0 +1,795 @@
+{
+  "generado": "2026-11-15T00:23:32",
+  "parcela": {
+    "archivo": "papas_parcela.geojson",
+    "centro": [
+      -0.749029,
+      -78.773999
+    ]
+  },
+  "criterios": {
+    "coleccion": "sentinel-2-l2a (Earth Search / AWS)",
+    "max_nubosidad_poligono": 0.2,
+    "ventana_dias": 15,
+    "separacion_minima_dias": 12,
+    "ndvi": "(B08-B04)/(B08+B04)",
+    "ndre": "(B08-B05)/(B08+B05)",
+    "ndmi": "(B08-B11)/(B08+B11)",
+    "umbrales_vigor": {
+      "ndvi_gris": 0.25,
+      "ndvi_verde": 0.6,
+      "caida_verde": 0.08,
+      "ndvi_amarillo_min": 0.35,
+      "ndre_amarillo": 0.35,
+      "caida_rojo": 0.12,
+      "ndvi_rojo": 0.35
+    },
+    "umbrales_humedad": {
+      "rojo": 0.0,
+      "amarillo": 0.2,
+      "verde": 0.45
+    },
+    "ndmi_solo_con_cultivo": true
+  },
+  "ultima": {
+    "fecha": "2026-10-27",
+    "dias_desde_hoy": 19,
+    "estado_vigor": "amarillo",
+    "mensaje_vigor": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización.",
+    "estado_humedad": "rojo",
+    "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+    "pct_area_sana": 16.7,
+    "pct_area_estres": 83.3,
+    "caida_ndvi": -0.1444,
+    "sector_mas_afectado": "oeste"
+  },
+  "fechas": [
+    {
+      "fecha": "2026-05-25",
+      "escena": "S2B_17MQV_20260525_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": null,
+      "dias_desde_anterior": null,
+      "ndvi": 0.4121,
+      "ndre": 0.237,
+      "ndmi": -0.0926,
+      "caida_ndvi": null,
+      "estado_vigor": "amarillo",
+      "mensaje_vigor": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 15.0,
+        "verde": 0.0,
+        "amarillo": 70.8,
+        "rojo": 14.2,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 15.0,
+        "rojo": 51.7,
+        "amarillo": 33.3,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 0.0,
+      "pct_area_estres": 85.0,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 0.0,
+          "pct_estres": 100.0,
+          "ndvi": 0.4819,
+          "caida_ndvi": null
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 31.2,
+          "pct_estres": 64.6,
+          "ndvi": 0.3267,
+          "caida_ndvi": null
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 0.0,
+          "pct_estres": 100.0,
+          "ndvi": 0.464,
+          "caida_ndvi": null
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 16.7,
+          "pct_estres": 91.7,
+          "ndvi": 0.4283,
+          "caida_ndvi": null
+        }
+      },
+      "sector_mas_afectado": "sur",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260525.png",
+        "humedad": "salida_s2/png/humedad_20260525.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260525.png",
+        "ndre": "salida_s2/png/ndre_20260525.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260525.png",
+        "rgb": "salida_s2/png/rgb_20260525.png",
+        "tif": "salida_s2/tif/s2_20260525_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-06-29",
+      "escena": "S2C_17MQV_20260629_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-05-25",
+      "dias_desde_anterior": 35,
+      "ndvi": 0.3011,
+      "ndre": 0.1911,
+      "ndmi": -0.2211,
+      "caida_ndvi": 0.111,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 26.7,
+        "verde": 0.8,
+        "amarillo": 11.7,
+        "rojo": 60.8,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 26.7,
+        "rojo": 70.0,
+        "amarillo": 3.3,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 0.8,
+      "pct_area_estres": 72.5,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 95.5,
+          "pct_estres": 97.7,
+          "ndvi": 0.3185,
+          "caida_ndvi": 0.1634
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 27.1,
+          "pct_estres": 47.9,
+          "ndvi": 0.2893,
+          "caida_ndvi": 0.0374
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 43.8,
+          "pct_estres": 56.2,
+          "ndvi": 0.284,
+          "caida_ndvi": 0.18
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 91.7,
+          "pct_estres": 100.0,
+          "ndvi": 0.3074,
+          "caida_ndvi": 0.1209
+        }
+      },
+      "sector_mas_afectado": "norte",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260629.png",
+        "humedad": "salida_s2/png/humedad_20260629.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260629.png",
+        "ndre": "salida_s2/png/ndre_20260629.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260629.png",
+        "rgb": "salida_s2/png/rgb_20260629.png",
+        "tif": "salida_s2/tif/s2_20260629_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-07-14",
+      "escena": "S2B_17MQV_20260714_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-06-29",
+      "dias_desde_anterior": 15,
+      "ndvi": 0.2969,
+      "ndre": 0.1924,
+      "ndmi": -0.254,
+      "caida_ndvi": 0.0042,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 42.5,
+        "verde": 2.5,
+        "amarillo": 19.2,
+        "rojo": 35.8,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 42.5,
+        "rojo": 51.7,
+        "amarillo": 5.8,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 2.5,
+      "pct_area_estres": 55.0,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 70.5,
+          "pct_estres": 81.8,
+          "ndvi": 0.2925,
+          "caida_ndvi": 0.0261
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 8.3,
+          "pct_estres": 35.4,
+          "ndvi": 0.3146,
+          "caida_ndvi": -0.0254
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 43.8,
+          "pct_estres": 56.2,
+          "ndvi": 0.2612,
+          "caida_ndvi": 0.0228
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 8.3,
+          "pct_estres": 33.3,
+          "ndvi": 0.2902,
+          "caida_ndvi": 0.0172
+        }
+      },
+      "sector_mas_afectado": "norte",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260714.png",
+        "humedad": "salida_s2/png/humedad_20260714.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260714.png",
+        "ndre": "salida_s2/png/ndre_20260714.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260714.png",
+        "rgb": "salida_s2/png/rgb_20260714.png",
+        "tif": "salida_s2/tif/s2_20260714_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-07-29",
+      "escena": "S2C_17MQV_20260729_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-07-14",
+      "dias_desde_anterior": 15,
+      "ndvi": 0.3037,
+      "ndre": 0.195,
+      "ndmi": -0.25,
+      "caida_ndvi": -0.0067,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 50.0,
+        "verde": 9.2,
+        "amarillo": 13.3,
+        "rojo": 27.5,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 50.0,
+        "rojo": 39.2,
+        "amarillo": 10.8,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 9.2,
+      "pct_area_estres": 40.8,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 38.6,
+          "pct_estres": 47.7,
+          "ndvi": 0.2571,
+          "caida_ndvi": 0.0354
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 18.8,
+          "pct_estres": 37.5,
+          "ndvi": 0.3614,
+          "caida_ndvi": -0.0467
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 31.2,
+          "pct_estres": 43.8,
+          "ndvi": 0.2558,
+          "caida_ndvi": 0.0053
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 16.7,
+          "pct_estres": 25.0,
+          "ndvi": 0.3074,
+          "caida_ndvi": -0.0172
+        }
+      },
+      "sector_mas_afectado": "norte",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260729.png",
+        "humedad": "salida_s2/png/humedad_20260729.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260729.png",
+        "ndre": "salida_s2/png/ndre_20260729.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260729.png",
+        "rgb": "salida_s2/png/rgb_20260729.png",
+        "tif": "salida_s2/tif/s2_20260729_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-08-10",
+      "escena": "S2A_17MQV_20260810_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-07-29",
+      "dias_desde_anterior": 12,
+      "ndvi": 0.2691,
+      "ndre": 0.1742,
+      "ndmi": -0.1864,
+      "caida_ndvi": 0.0345,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 61.7,
+        "verde": 0.0,
+        "amarillo": 14.2,
+        "rojo": 24.2,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 61.7,
+        "rojo": 27.5,
+        "amarillo": 10.8,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 0.0,
+      "pct_area_estres": 38.4,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 13.6,
+          "pct_estres": 15.9,
+          "ndvi": 0.2201,
+          "caida_ndvi": 0.037
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 31.2,
+          "pct_estres": 58.3,
+          "ndvi": 0.3265,
+          "caida_ndvi": 0.0349
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 37.5,
+          "pct_estres": 37.5,
+          "ndvi": 0.2249,
+          "caida_ndvi": 0.031
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 16.7,
+          "pct_estres": 41.7,
+          "ndvi": 0.2788,
+          "caida_ndvi": 0.0286
+        }
+      },
+      "sector_mas_afectado": "este",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260810.png",
+        "humedad": "salida_s2/png/humedad_20260810.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260810.png",
+        "ndre": "salida_s2/png/ndre_20260810.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260810.png",
+        "rgb": "salida_s2/png/rgb_20260810.png",
+        "tif": "salida_s2/tif/s2_20260810_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-08-23",
+      "escena": "S2B_17MQV_20260823_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-08-10",
+      "dias_desde_anterior": 13,
+      "ndvi": 0.2562,
+      "ndre": 0.1608,
+      "ndmi": -0.2689,
+      "caida_ndvi": 0.0129,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 56.7,
+        "verde": 0.0,
+        "amarillo": 12.5,
+        "rojo": 30.8,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 56.7,
+        "rojo": 42.5,
+        "amarillo": 0.8,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 0.0,
+      "pct_area_estres": 43.3,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 29.5,
+          "pct_estres": 34.1,
+          "ndvi": 0.22,
+          "caida_ndvi": 0.0001
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 39.6,
+          "pct_estres": 58.3,
+          "ndvi": 0.3,
+          "caida_ndvi": 0.0264
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 18.8,
+          "pct_estres": 25.0,
+          "ndvi": 0.2215,
+          "caida_ndvi": 0.0034
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 16.7,
+          "pct_estres": 41.7,
+          "ndvi": 0.2598,
+          "caida_ndvi": 0.019
+        }
+      },
+      "sector_mas_afectado": "sur",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260823.png",
+        "humedad": "salida_s2/png/humedad_20260823.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260823.png",
+        "ndre": "salida_s2/png/ndre_20260823.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260823.png",
+        "rgb": "salida_s2/png/rgb_20260823.png",
+        "tif": "salida_s2/tif/s2_20260823_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-09-17",
+      "escena": "S2C_17MQV_20260917_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-08-23",
+      "dias_desde_anterior": 25,
+      "ndvi": 0.202,
+      "ndre": 0.1314,
+      "ndmi": -0.3152,
+      "caida_ndvi": 0.0542,
+      "estado_vigor": "gris",
+      "mensaje_vigor": "Suelo desnudo, emergencia inicial o parcela recién cosechada.",
+      "estado_humedad": "no aplica",
+      "mensaje_humedad": "Suelo desnudo: el NDMI no refleja el agua del cultivo.",
+      "pct_area_vigor": {
+        "gris": 75.8,
+        "verde": 0.0,
+        "amarillo": 3.3,
+        "rojo": 20.8,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 75.8,
+        "rojo": 24.2,
+        "amarillo": 0.0,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 0.0,
+      "pct_area_estres": 24.1,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 11.4,
+          "pct_estres": 11.4,
+          "ndvi": 0.1856,
+          "caida_ndvi": 0.0344
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 33.3,
+          "pct_estres": 39.6,
+          "ndvi": 0.2218,
+          "caida_ndvi": 0.0782
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 25.0,
+          "pct_estres": 31.2,
+          "ndvi": 0.2156,
+          "caida_ndvi": 0.0059
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 0.0,
+          "pct_estres": 0.0,
+          "ndvi": 0.1646,
+          "caida_ndvi": 0.0952
+        }
+      },
+      "sector_mas_afectado": "sur",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20260917.png",
+        "humedad": "salida_s2/png/humedad_20260917.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20260917.png",
+        "ndre": "salida_s2/png/ndre_20260917.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20260917.png",
+        "rgb": "salida_s2/png/rgb_20260917.png",
+        "tif": "salida_s2/tif/s2_20260917_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-10-09",
+      "escena": "S2A_17MQV_20261009_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-09-17",
+      "dias_desde_anterior": 22,
+      "ndvi": 0.3039,
+      "ndre": 0.1626,
+      "ndmi": -0.3193,
+      "caida_ndvi": -0.1019,
+      "estado_vigor": "rojo",
+      "mensaje_vigor": "Alerta de estrés severo o ataque de plagas/lancha en focos específicos. Inspecciona las zonas rojas del mapa.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 55.8,
+        "verde": 5.0,
+        "amarillo": 21.7,
+        "rojo": 17.5,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 55.8,
+        "rojo": 44.2,
+        "amarillo": 0.0,
+        "verde": 0.0,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 5.0,
+      "pct_area_estres": 39.2,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 22.7,
+          "pct_estres": 34.1,
+          "ndvi": 0.2556,
+          "caida_ndvi": -0.07
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 6.2,
+          "pct_estres": 39.6,
+          "ndvi": 0.3672,
+          "caida_ndvi": -0.1454
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 25.0,
+          "pct_estres": 56.2,
+          "ndvi": 0.3064,
+          "caida_ndvi": -0.0908
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 33.3,
+          "pct_estres": 33.3,
+          "ndvi": 0.224,
+          "caida_ndvi": -0.0594
+        }
+      },
+      "sector_mas_afectado": "oeste",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20261009.png",
+        "humedad": "salida_s2/png/humedad_20261009.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20261009.png",
+        "ndre": "salida_s2/png/ndre_20261009.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20261009.png",
+        "rgb": "salida_s2/png/rgb_20261009.png",
+        "tif": "salida_s2/tif/s2_20261009_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha": "2026-10-27",
+      "escena": "S2C_17MQV_20261027_0_L2A",
+      "nubosidad_poligono_pct": 0.0,
+      "pixeles_parcela": 120,
+      "fecha_anterior": "2026-10-09",
+      "dias_desde_anterior": 18,
+      "ndvi": 0.4482,
+      "ndre": 0.2495,
+      "ndmi": -0.1811,
+      "caida_ndvi": -0.1444,
+      "estado_vigor": "amarillo",
+      "mensaje_vigor": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización.",
+      "estado_humedad": "rojo",
+      "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+      "pct_area_vigor": {
+        "gris": 0.0,
+        "verde": 16.7,
+        "amarillo": 55.8,
+        "rojo": 27.5,
+        "sin dato": 0.0
+      },
+      "pct_area_humedad": {
+        "no aplica": 0.0,
+        "rojo": 81.7,
+        "amarillo": 17.5,
+        "verde": 0.8,
+        "azul": 0.0,
+        "sin dato": 0.0
+      },
+      "pct_area_sana": 16.7,
+      "pct_area_estres": 83.3,
+      "sectores": {
+        "norte": {
+          "pixeles": 44,
+          "pct_rojo": 11.4,
+          "pct_estres": 100.0,
+          "ndvi": 0.4094,
+          "caida_ndvi": -0.1538
+        },
+        "sur": {
+          "pixeles": 48,
+          "pct_rojo": 39.6,
+          "pct_estres": 62.5,
+          "ndvi": 0.5088,
+          "caida_ndvi": -0.1416
+        },
+        "este": {
+          "pixeles": 16,
+          "pct_rojo": 6.2,
+          "pct_estres": 87.5,
+          "ndvi": 0.4486,
+          "caida_ndvi": -0.1422
+        },
+        "oeste": {
+          "pixeles": 12,
+          "pct_rojo": 66.7,
+          "pct_estres": 100.0,
+          "ndvi": 0.3477,
+          "caida_ndvi": -0.1237
+        }
+      },
+      "sector_mas_afectado": "oeste",
+      "imagenes": {
+        "vigor": "salida_s2/png/vigor_20261027.png",
+        "humedad": "salida_s2/png/humedad_20261027.png",
+        "ndvi": "salida_s2/png/recorte_ndvi_20261027.png",
+        "ndre": "salida_s2/png/ndre_20261027.png",
+        "ndmi": "salida_s2/png/recorte_ndmi_20261027.png",
+        "rgb": "salida_s2/png/rgb_20261027.png",
+        "tif": "salida_s2/tif/s2_20261027_indices.tif"
+      },
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    }
+  ]
+}

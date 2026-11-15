@@ -1,0 +1,210 @@
+{
+  "modulo": "sentinel2_parcela_10m",
+  "generado": "2026-11-15T00:23:32",
+  "parcela": {
+    "centro_lat_lon": [
+      -0.749029,
+      -78.773999
+    ],
+    "archivo": "papas_parcela.geojson"
+  },
+  "A_capas_visuales": {
+    "fecha_captura": "2026-10-27",
+    "recorte_ndvi_png": "png/recorte_ndvi_20261027.png",
+    "recorte_ndmi_png": "png/recorte_ndmi_20261027.png",
+    "bounds_latlon": [
+      [
+        -0.7519846701456966,
+        -78.77633454867261
+      ],
+      [
+        -0.7458347927194741,
+        -78.77166149113104
+      ]
+    ],
+    "nota": "PNG RGBA transparente fuera del polígono. bounds_latlon = [[sur, oeste], [norte, este]] en EPSG:4326, listo para L.imageOverlay / folium.ImageOverlay. NDVI: rojo->amarillo->verde (0 a 0.9). NDMI: naranja->celeste->azul (-0.3 a 0.6)."
+  },
+  "B_serie_fenologica": [
+    {
+      "fecha_captura": "2026-05-25",
+      "ndvi_promedio": 0.4121,
+      "ndre_promedio": 0.237,
+      "ndmi_promedio": -0.0926,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260525.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260525.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-06-29",
+      "ndvi_promedio": 0.3011,
+      "ndre_promedio": 0.1911,
+      "ndmi_promedio": -0.2211,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260629.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260629.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-07-14",
+      "ndvi_promedio": 0.2969,
+      "ndre_promedio": 0.1924,
+      "ndmi_promedio": -0.254,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260714.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260714.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-07-29",
+      "ndvi_promedio": 0.3037,
+      "ndre_promedio": 0.195,
+      "ndmi_promedio": -0.25,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260729.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260729.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-08-10",
+      "ndvi_promedio": 0.2691,
+      "ndre_promedio": 0.1742,
+      "ndmi_promedio": -0.1864,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260810.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260810.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-08-23",
+      "ndvi_promedio": 0.2562,
+      "ndre_promedio": 0.1608,
+      "ndmi_promedio": -0.2689,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260823.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260823.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-09-17",
+      "ndvi_promedio": 0.202,
+      "ndre_promedio": 0.1314,
+      "ndmi_promedio": -0.3152,
+      "recorte_ndvi_png": "png/recorte_ndvi_20260917.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20260917.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-10-09",
+      "ndvi_promedio": 0.3039,
+      "ndre_promedio": 0.1626,
+      "ndmi_promedio": -0.3193,
+      "recorte_ndvi_png": "png/recorte_ndvi_20261009.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20261009.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    {
+      "fecha_captura": "2026-10-27",
+      "ndvi_promedio": 0.4482,
+      "ndre_promedio": 0.2495,
+      "ndmi_promedio": -0.1811,
+      "recorte_ndvi_png": "png/recorte_ndvi_20261027.png",
+      "recorte_ndmi_png": "png/recorte_ndmi_20261027.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    }
+  ],
+  "C_diagnostico_ultima_captura": {
+    "fecha_captura": "2026-10-27",
+    "dias_desde_ultima_foto": 19,
+    "variacion_ndvi_15d": 0.1444,
+    "fecha_comparacion": "2026-10-09",
+    "dias_entre_fotos": 18,
+    "estado_vigor_lote": "AMARILLO_NUTRICION",
+    "estado_humedad_lote": "ROJO_ESTRES_HIDRICO",
+    "mensaje_vigor": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización.",
+    "mensaje_humedad": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.",
+    "distribucion_parcela_pct": {
+      "sano": 16.7,
+      "alerta": 55.8,
+      "critico": 27.5,
+      "suelo_desnudo": 0.0,
+      "sin_dato": 0.0
+    },
+    "sector_mas_afectado": "oeste"
+  }
+}

@@ -1,0 +1,296 @@
+{
+  "input": {
+    "fuente_datos": "Copernicus Sentinel-2 L2A (reflectancia de superficie), Earth Search / AWS",
+    "ubicacion": {
+      "zona": "Toacaso / Sigchos",
+      "longitud": -78.773999,
+      "latitud": -0.749029,
+      "area_ha": 1.17,
+      "poligono_geojson": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "id": "1",
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -78.7745,
+                    -0.749606
+                  ],
+                  [
+                    -78.774138,
+                    -0.750059
+                  ],
+                  [
+                    -78.773563,
+                    -0.748903
+                  ],
+                  [
+                    -78.77367,
+                    -0.748547
+                  ],
+                  [
+                    -78.773744,
+                    -0.748099
+                  ],
+                  [
+                    -78.773734,
+                    -0.747844
+                  ],
+                  [
+                    -78.773819,
+                    -0.747796
+                  ],
+                  [
+                    -78.7745,
+                    -0.749606
+                  ]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "parametros_ejecucion": {
+      "fecha_corte": "2026-11-15",
+      "rango_analizado": {
+        "inicio": "2026-05-15",
+        "fin": "2026-11-15"
+      },
+      "resolucion_m": 10,
+      "bandas": {
+        "NDVI": "B08, B04",
+        "NDRE": "B08, B05",
+        "NDMI": "B08, B11",
+        "mascara_nubes": "SCL"
+      },
+      "max_nubosidad_poligono_pct": 20.0,
+      "frecuencia_objetivo_dias": 15,
+      "total_recortes_descargados": 23,
+      "total_capturas_limpias": 17,
+      "total_capturas_seleccionadas": 9
+    },
+    "capturas_evaluadas": [
+      {
+        "fecha": "2026-05-25",
+        "escena": "S2B_17MQV_20260525_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-06-29",
+        "escena": "S2C_17MQV_20260629_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-07-14",
+        "escena": "S2B_17MQV_20260714_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-07-29",
+        "escena": "S2C_17MQV_20260729_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-08-10",
+        "escena": "S2A_17MQV_20260810_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-08-23",
+        "escena": "S2B_17MQV_20260823_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-09-17",
+        "escena": "S2C_17MQV_20260917_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-10-09",
+        "escena": "S2A_17MQV_20261009_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      },
+      {
+        "fecha": "2026-10-27",
+        "escena": "S2C_17MQV_20261027_0_L2A",
+        "nubosidad_poligono_pct": 0.0,
+        "pixeles_10m": 120
+      }
+    ]
+  },
+  "output": {
+    "zona": "Toacaso / Sigchos",
+    "fecha_ultima_captura": "27/10/2026",
+    "dias_desde_ultima_foto": 19,
+    "estado_actual_lote": {
+      "ndvi_promedio": 0.4482,
+      "ndre_promedio": 0.2495,
+      "ndmi_promedio": -0.1811,
+      "variacion_ndvi_15d": 0.1444,
+      "fecha_comparacion": "2026-10-09",
+      "distribucion_parcela_pct": {
+        "sano": 16.7,
+        "alerta": 55.8,
+        "critico": 27.5,
+        "suelo_desnudo": 0.0,
+        "sin_dato": 0.0
+      },
+      "sector_mas_afectado": "oeste"
+    },
+    "semaforos": {
+      "estado_vigor": {
+        "codigo": "AMARILLO_NUTRICION",
+        "color": "amarillo",
+        "estado": "ALERTA - Nutrición",
+        "mensaje": "Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización."
+      },
+      "estado_humedad_parcela": {
+        "codigo": "ROJO_ESTRES_HIDRICO",
+        "color": "rojo",
+        "estado": "CRÍTICO - Estrés hídrico",
+        "mensaje": "Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego."
+      }
+    },
+    "sectores": {
+      "norte": {
+        "pixeles": 44,
+        "pct_rojo": 11.4,
+        "pct_estres": 100.0,
+        "ndvi": 0.4094,
+        "caida_ndvi": -0.1538
+      },
+      "sur": {
+        "pixeles": 48,
+        "pct_rojo": 39.6,
+        "pct_estres": 62.5,
+        "ndvi": 0.5088,
+        "caida_ndvi": -0.1416
+      },
+      "este": {
+        "pixeles": 16,
+        "pct_rojo": 6.2,
+        "pct_estres": 87.5,
+        "ndvi": 0.4486,
+        "caida_ndvi": -0.1422
+      },
+      "oeste": {
+        "pixeles": 12,
+        "pct_rojo": 66.7,
+        "pct_estres": 100.0,
+        "ndvi": 0.3477,
+        "caida_ndvi": -0.1237
+      }
+    },
+    "capas_visuales": {
+      "recorte_ndvi_png": "datos_sentinel/salida_s2/png/recorte_ndvi_20261027.png",
+      "recorte_ndmi_png": "datos_sentinel/salida_s2/png/recorte_ndmi_20261027.png",
+      "bounds_latlon": [
+        [
+          -0.7519846701456966,
+          -78.77633454867261
+        ],
+        [
+          -0.7458347927194741,
+          -78.77166149113104
+        ]
+      ]
+    },
+    "serie_fenologica": [
+      {
+        "dia": "25/05",
+        "fecha": "2026-05-25",
+        "ndvi": 0.4121,
+        "ndre": 0.237,
+        "ndmi": -0.0926,
+        "vigor": "AMARILLO_NUTRICION",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "29/06",
+        "fecha": "2026-06-29",
+        "ndvi": 0.3011,
+        "ndre": 0.1911,
+        "ndmi": -0.2211,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "14/07",
+        "fecha": "2026-07-14",
+        "ndvi": 0.2969,
+        "ndre": 0.1924,
+        "ndmi": -0.254,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "29/07",
+        "fecha": "2026-07-29",
+        "ndvi": 0.3037,
+        "ndre": 0.195,
+        "ndmi": -0.25,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "10/08",
+        "fecha": "2026-08-10",
+        "ndvi": 0.2691,
+        "ndre": 0.1742,
+        "ndmi": -0.1864,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "23/08",
+        "fecha": "2026-08-23",
+        "ndvi": 0.2562,
+        "ndre": 0.1608,
+        "ndmi": -0.2689,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "17/09",
+        "fecha": "2026-09-17",
+        "ndvi": 0.202,
+        "ndre": 0.1314,
+        "ndmi": -0.3152,
+        "vigor": "GRIS_SUELO",
+        "humedad": "GRIS_NO_APLICA"
+      },
+      {
+        "dia": "09/10",
+        "fecha": "2026-10-09",
+        "ndvi": 0.3039,
+        "ndre": 0.1626,
+        "ndmi": -0.3193,
+        "vigor": "ROJO_ESTRES_SEVERO",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      },
+      {
+        "dia": "27/10",
+        "fecha": "2026-10-27",
+        "ndvi": 0.4482,
+        "ndre": 0.2495,
+        "ndmi": -0.1811,
+        "vigor": "AMARILLO_NUTRICION",
+        "humedad": "ROJO_ESTRES_HIDRICO"
+      }
+    ]
+  }
+}
