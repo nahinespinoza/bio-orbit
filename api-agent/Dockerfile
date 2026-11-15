@@ -14,11 +14,12 @@ COPY --from=build /app/.venv /app/.venv
 COPY app ./app
 COPY ingestion ./ingestion
 COPY knowledge ./knowledge
-# data/ es un volumen: ahí vive knowledge.db (se genera una vez con ingestion.build_db)
+# data/ es un volumen: ahí vive knowledge.db. Si no existe, el arranque lo genera (con embeddings si hay OPENAI_API_KEY);
+# si ya existe se reutiliza. Para regenerarla tras cambiar la base de conocimiento: docker compose --profile ingest run --rm ingest
 RUN mkdir -p /app/data && chown app:app /app/data
 USER app
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
   CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=4).status==200 else 1)"
 # 1 worker: la memoria de sesión (InMemorySaver) vive en el proceso
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["sh", "-c", "[ -f \"${DB_PATH:-data/knowledge.db}\" ] || python -m ingestion.build_db; exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1"]
