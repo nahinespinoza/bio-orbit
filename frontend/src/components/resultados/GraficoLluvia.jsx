@@ -7,12 +7,12 @@ const M = { arriba: 22, abajo: 26, izq: 34, der: 4 }
 
 // Rótulos de mes: uno sí y uno no (más el seleccionado) para que no se encimen
 // en pantallas angostas; el recuadro superior nombra el mes tocado.
-// Barras: lluvia normal (mediana) de cada mes. Bigote: rango en el que cayó
-// 6 de cada 10 años (percentiles 20–80). Datos GPM IMERG vía NASA POWER.
+// Barras: lluvia normal (mediana) de cada mes, sin rangos ni bigotes: el que lo lee es un
+// agricultor. El mes tocado muestra su valor encima. Datos de NASA POWER.
 export default function GraficoLluvia({ lluvia, mesActual }) {
   const [sel, setSel] = useState(mesActual)
   const { meses } = lluvia
-  const tope = Math.max(50, Math.ceil(Math.max(0, ...meses.map((m) => m.p80 ?? 0)) / 50) * 50)
+  const tope = Math.max(50, Math.ceil(Math.max(0, ...meses.map((m) => m.mediana ?? 0)) / 50) * 50)
   const alto = ALTO - M.arriba - M.abajo
   const y = (v) => M.arriba + alto - (v / tope) * alto
   const paso = (ANCHO - M.izq - M.der) / 12
@@ -21,19 +21,17 @@ export default function GraficoLluvia({ lluvia, mesActual }) {
   const { promedioMes } = lluvia
   const m = meses[sel]
   const nombreSel = MESES_LARGOS[sel].replace(/^./, (c) => c.toUpperCase())
+  const esSeco = (d) => d.mediana != null && promedioMes != null && d.mediana < promedioMes * 0.6
 
   return (
     <div className="rs-grafico">
       <div className="rs-grafico-info" aria-live="polite">
         <strong>{nombreSel}{sel === mesActual ? ' (este mes)' : ''}</strong>
         {m.mediana == null ? (
-          <span>
-            {m.n ? `Solo hay datos de ${m.n} de ${lluvia.años} años: no alcanza para saber qué es lo normal.` : 'Sin datos de lluvia para este mes.'}
-          </span>
+          <span>Sin datos de lluvia para este mes.</span>
         ) : (
           <span>
-            Lo normal: <b>{m.mediana} mm</b>. En 6 de cada 10 años cayeron entre {m.p20} y {m.p80} mm
-            {m.n < lluvia.años ? ` (hay datos de ${m.n} de ${lluvia.años} años)` : ''}.
+            Normalmente llueven <b>{m.mediana} mm</b>.{esSeco(m) ? ' Es un mes seco.' : ''}
           </span>
         )}
       </div>
@@ -51,7 +49,7 @@ export default function GraficoLluvia({ lluvia, mesActual }) {
           const x = M.izq + i * paso + 4
           const cx = x + anchoBarra / 2
           const vacio = d.mediana == null
-          const seco = !vacio && promedioMes != null && d.mediana < promedioMes * 0.6
+          const seco = esSeco(d)
           const altura = vacio ? 0 : Math.max(2, y(0) - y(d.mediana))
           const r = Math.min(4, anchoBarra / 2, altura)
           const top = y(0) - altura
@@ -65,9 +63,9 @@ export default function GraficoLluvia({ lluvia, mesActual }) {
                     className="rs-barra"
                     d={`M${x},${y(0)} V${top + r} Q${x},${top} ${x + r},${top} H${x + anchoBarra - r} Q${x + anchoBarra},${top} ${x + anchoBarra},${top + r} V${y(0)} Z`}
                   />
-                  <line className="rs-bigote" x1={cx} x2={cx} y1={y(d.p80)} y2={y(d.p20)} />
-                  <line className="rs-bigote" x1={cx - 3} x2={cx + 3} y1={y(d.p80)} y2={y(d.p80)} />
-                  <line className="rs-bigote" x1={cx - 3} x2={cx + 3} y1={y(d.p20)} y2={y(d.p20)} />
+                  {i === sel && (
+                    <text x={cx} y={top - 5} textAnchor="middle" className="rs-valor-barra">{d.mediana}</text>
+                  )}
                 </>
               )}
               {(i === sel || (i % 2 === 0 && Math.abs(i - sel) !== 1)) && (
@@ -95,8 +93,7 @@ export default function GraficoLluvia({ lluvia, mesActual }) {
       </svg>
 
       <div className="rs-grafico-leyenda">
-        <span><i className="rs-muestra-barra" /> Lluvia normal</span>
-        <span><i className="rs-muestra-bigote" /> Años secos y lluviosos</span>
+        <span><i className="rs-muestra-barra" /> Meses con lluvia</span>
         <span><i className="rs-muestra-seca" /> Meses secos</span>
       </div>
 
@@ -104,21 +101,13 @@ export default function GraficoLluvia({ lluvia, mesActual }) {
         <summary>Ver los números</summary>
         <table>
           <thead>
-            <tr><th>Mes</th><th>Normal</th><th>Rango (6 de 10 años)</th><th>Mín – Máx</th></tr>
+            <tr><th>Mes</th><th>Lluvia normal</th></tr>
           </thead>
           <tbody>
             {meses.map((d, i) => (
               <tr key={i}>
                 <td>{MESES[i]}</td>
-                {d.mediana == null ? (
-                  <td colSpan={3}>Sin datos</td>
-                ) : (
-                  <>
-                    <td>{d.mediana} mm</td>
-                    <td>{d.p20}–{d.p80} mm</td>
-                    <td>{d.min}–{d.max} mm</td>
-                  </>
-                )}
+                <td>{d.mediana == null ? 'Sin datos' : `${d.mediana} mm${esSeco(d) ? ' (seco)' : ''}`}</td>
               </tr>
             ))}
           </tbody>

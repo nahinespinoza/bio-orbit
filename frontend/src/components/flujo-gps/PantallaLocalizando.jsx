@@ -64,10 +64,13 @@ function CirculoPrecision({ centro, radioFinal }) {
 const SIN_GPS = typeof navigator === 'undefined' || !('geolocation' in navigator)
 const MENSAJE_SIN_GPS = 'Tu dispositivo no tiene GPS disponible. Dibuja tu finca en el mapa.'
 
-export default function PantallaLocalizando({ onUbicada, onCancelar, onManual }) {
-  const [estado, setEstado] = useState(SIN_GPS ? 'error' : 'buscando') // buscando | fijada | error
+// `ubicacionFija`: no se usa el GPS del celular; tras la animación se "detecta" esta ubicación
+// (hoy, la parcela de Toacaso del remote-sensing).
+export default function PantallaLocalizando({ onUbicada, onCancelar, onManual, ubicacionFija = null }) {
+  const sinGps = SIN_GPS && !ubicacionFija
+  const [estado, setEstado] = useState(sinGps ? 'error' : 'buscando') // buscando | fijada | error
   const [ubicacion, setUbicacion] = useState(null)
-  const [error, setError] = useState(SIN_GPS ? MENSAJE_SIN_GPS : '')
+  const [error, setError] = useState(sinGps ? MENSAJE_SIN_GPS : '')
   const [paso, setPaso] = useState(0)
   const [intento, setIntento] = useState(0)
   const [vueloListo, setVueloListo] = useState(false)
@@ -93,6 +96,17 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
     let activo = true
     let espera
     const inicio = performance.now()
+    if (ubicacionFija) {
+      espera = setTimeout(() => {
+        if (!activo) return
+        setUbicacion({ ...ubicacionFija, fija: true })
+        setEstado('fijada')
+      }, DURACION_MINIMA)
+      return () => {
+        activo = false
+        clearTimeout(espera)
+      }
+    }
     if (SIN_GPS) return
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -116,6 +130,8 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
       activo = false
       clearTimeout(espera)
     }
+    // La ubicación fija no cambia mientras la pantalla está abierta
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intento])
 
   const alTerminarVuelo = useCallback(() => setVueloListo(true), [])
@@ -127,7 +143,7 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
   }, [vueloListo, ubicacion])
 
   const reintentar = () => {
-    if (SIN_GPS) return
+    if (sinGps) return
     setError('')
     setPaso(0)
     setEstado('buscando')
@@ -135,7 +151,7 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
   }
 
   const centro = ubicacion ? [ubicacion.lat, ubicacion.lng] : null
-  const precisionTexto = ubicacion ? `±${Math.round(ubicacion.precision)} m` : '—'
+  const precisionTexto = ubicacion?.precision != null ? `±${Math.round(ubicacion.precision)} m` : '—'
 
   return (
     <div className="fg-pantalla">

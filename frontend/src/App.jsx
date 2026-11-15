@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Onboarding from './components/onboarding/Onboarding.jsx'
+import PantallaBienvenida from './components/onboarding/PantallaBienvenida.jsx'
 import VistaMapaMovil from './components/mapa-movil/VistaMapaMovil.jsx'
 import FlujoGps from './components/flujo-gps/FlujoGps.jsx'
 import { FINCAS_EJEMPLO, PARCELA, UBICACION } from './lib/parcelaMonitoreada.js'
@@ -8,6 +9,8 @@ import { RS_PARCELA1 } from './lib/remoteSensingParcela1.js'
 // En /prueba no se pide la ubicación: tras el nombre se entra al inicio con la
 // parcela monitoreada por el remote-sensing (Toacaso / Sigchos).
 const ES_PRUEBA = window.location.pathname.replace(/\/+$/, '') === '/prueba'
+// En /prueba no se pide el nombre: una pantalla de bienvenida saluda a este agricultor
+const NOMBRE_PRUEBA = 'Maximiliano'
 
 export default function App() {
   // null mientras el usuario está en el onboarding
@@ -39,6 +42,10 @@ export default function App() {
     setSesion({ nombre, modo: 'finca', ubicacion: UBICACION, parcela: PARCELA })
   }
 
+  if (!sesion && ES_PRUEBA) {
+    return <PantallaBienvenida nombre={NOMBRE_PRUEBA} onFin={() => onNombreListo({ nombre: NOMBRE_PRUEBA })} />
+  }
+
   if (!sesion) {
     return (
       <Onboarding
@@ -46,7 +53,6 @@ export default function App() {
         pasoInicial={ultimoNombre && !ES_PRUEBA ? 2 : 1}
         onNombreListo={ES_PRUEBA ? onNombreListo : undefined}
         onUseCurrentLocation={onUseCurrentLocation}
-        onSelectManually={onSelectManually}
       />
     )
   }

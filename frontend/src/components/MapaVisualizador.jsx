@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { LayersControl, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { X } from 'lucide-react'
 import '../lib/leaflet.js'
+import { CENTRO_DEMO } from '../lib/ubicacionDemo.js'
 import HerramientasDibujo from './HerramientasDibujo.jsx'
 
-const CENTRO_INICIAL = [-17.3895, -66.1568]
+const CENTRO_INICIAL = CENTRO_DEMO // ubicación por defecto del flujo "/"
 
 export default function MapaVisualizador({ ubicacion, modo, onFigurasChange, onEvento }) {
   const [verAyuda, setVerAyuda] = useState(true)

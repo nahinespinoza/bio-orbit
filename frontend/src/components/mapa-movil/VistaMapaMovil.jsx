@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { CircleMarker, LayersControl, MapContainer, Polygon, Polyline, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { Check, ChevronLeft, Hand, Pencil, RotateCcw, Undo2 } from 'lucide-react'
 import '../../lib/leaflet.js'
+import { CENTRO_DEMO } from '../../lib/ubicacionDemo.js'
 import { TILE_SATELITE, areaHa, formatoNumero, perimetroM } from '../flujo-gps/geo.js'
 import './mapa-movil.css'
 
-const CENTRO_INICIAL = [-17.3895, -66.1568]
+const CENTRO_INICIAL = CENTRO_DEMO // ubicación por defecto del flujo "/"
 const AREA_MINIMA = 0.02 // ha; menos que esto suele ser un toque por error
 const hectareas = (ha) => formatoNumero(ha, ha < 1 ? 2 : 1)
 
@@ -74,7 +75,7 @@ export default function VistaMapaMovil({ sesion, onVolver, onParcelaLista }) {
         </header>
 
         <div className={`vm-mapa ${estado === 'dibujando' ? 'dibujando' : ''}`}>
-          <MapContainer center={CENTRO_INICIAL} zoom={13} className="map" zoomControl={false}>
+          <MapContainer center={CENTRO_INICIAL} zoom={16} className="map" zoomControl={false}>
             <LayersControl position="topright">
               <LayersControl.BaseLayer checked name="Satélite">
                 <TileLayer url={TILE_SATELITE.url} attribution={TILE_SATELITE.attribution} maxZoom={19} />

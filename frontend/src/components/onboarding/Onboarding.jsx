@@ -4,11 +4,11 @@ import PasoUbicacion from './PasoUbicacion.jsx'
 import './onboarding.css'
 
 // Flujo de 2 pasos: nombre → ubicación de la finca.
-// `onUseCurrentLocation({ nombre })` y `onSelectManually({ nombre })`
+// `onUseCurrentLocation({ nombre })`
 // conectan con la siguiente vista.
 // Con `onNombreListo({ nombre })` (ruta /prueba) solo se pide el nombre.
 export default function Onboarding({
-  onUseCurrentLocation, onSelectManually, onNombreListo, nombreInicial = '', pasoInicial = 1,
+  onUseCurrentLocation, onNombreListo, nombreInicial = '', pasoInicial = 1,
 }) {
   const [paso, setPaso] = useState(pasoInicial)
   const [direccion, setDireccion] = useState(pasoInicial > 1 ? 'atras' : 'adelante')
@@ -36,7 +36,6 @@ export default function Onboarding({
               nombre={nombre}
               onVolver={() => irA(1)}
               onUseCurrentLocation={() => onUseCurrentLocation?.({ nombre })}
-              onSelectManually={() => onSelectManually?.({ nombre })}
             />
           )}
         </div>

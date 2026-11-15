@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Check, ChevronLeft, CloudRain, Droplets, Layers, LoaderCircle, RefreshCw, Satellite, Sprout, WifiOff, Zap,
+  Check, ChevronLeft, CloudRain, Droplets, LoaderCircle, RefreshCw, Satellite, Sprout, WifiOff,
 } from 'lucide-react'
 import { PERIODO, obtenerDatosNasa } from '../../lib/nasa.js'
 import {
-  MESES_LARGOS, analizarFinca, formato, zonasRemoteSensing,
+  MESES_LARGOS, analizarFinca, formato, textoZona,
+  zonasRemoteSensing,
 } from './analisis.js'
 import MapaSalud from './MapaSalud.jsx'
 import GraficoLluvia from './GraficoLluvia.jsx'
 import RecomendacionesIA, { AccesoPitagoras } from './RecomendacionesIA.jsx'
 import Widget from '../ui/Widget.jsx'
-import FilaAnalisis from '../ui/FilaAnalisis.jsx'
 import { IlustracionClima } from '../ui/Ilustraciones.jsx'
 import AlertaPrincipal from './AlertaPrincipal.jsx'
 import AnalisisCard from './AnalisisCard.jsx'
@@ -18,14 +18,13 @@ import EstadoParcelaCard from './EstadoParcelaCard.jsx'
 import TarjetaResumenSemana from './TarjetaResumenSemana.jsx'
 import SelectorFinca from '../flujo-gps/SelectorFinca.jsx'
 import CarruselInsights from '../reporte/CarruselInsights.jsx'
-import ResumenSemanaCompacto from '../reporte/ResumenSemanaCompacto.jsx'
 import './resultados.css'
 
-const PASOS = {
-  Rápido: ['Descargando 10 años de lluvia (NASA GPM)', 'Leyendo la humedad del suelo', 'Revisando el verdor de tu parcela', 'Preparando tus consejos'],
-  Profundo: ['Descargando 10 años de lluvia (NASA GPM)', 'Leyendo la humedad del suelo', 'Revisando el verdor de tu parcela', 'Comparando rotaciones de cultivo', 'Preparando tus consejos'],
-}
-const DURACION_MIN = { Rápido: 2200, Profundo: 3200 }
+const PASOS = [
+  'Descargando 10 años de lluvia (NASA GPM)', 'Leyendo la humedad del suelo', 'Revisando el verdor de tu parcela',
+  'Preparando tus consejos',
+]
+const DURACION_MIN = 2200 // para que se vea el progreso aunque los datos lleguen al instante
 
 const TITULOS = {
   verdor: 'Salud del cultivo',
@@ -42,6 +41,7 @@ const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1)
 const RS_MIN_AÑOS = 4
 const fechaCorta = (iso) => iso.split('-').reverse().join('/')
 const pct = (v) => `${Math.round(v)}%`
+const haceDias = (d) => (d === 0 ? 'hoy' : d === 1 ? 'hace 1 día' : `hace ${d} días`)
 
 // Nombre corto de cada alerta para las etiquetas de riesgo de las tarjetas
 const CORTO = { NUTRICION_PROBABLE: 'Nitrógeno', NUTRIENTES: 'Nutrientes', PLAGAS_LANCHA: 'Lancha', HELADAS: 'Heladas' }
@@ -81,8 +81,8 @@ function aguaRS({ agua }) {
   return { fila: `Suelo de la zona con ${pct(agua.regionalPct)} de humedad`, titulo: null, texto: null }
 }
 
-function Cargando({ modo, paso }) {
-  const pasos = PASOS[modo]
+function Cargando({ paso }) {
+  const pasos = PASOS
   const progreso = Math.round((paso / pasos.length) * 100)
   return (
     <div className="rs-cargando">
@@ -121,21 +121,23 @@ function estacionDelMes(mediana, promedio) {
 // no se descarga nada: el clima sale de NASA POWER de la parcela y el mapa de salud de Sentinel-2.
 // `finca` ({ nombre, parcelas }) + `reporte` (lib/reporte.js): tarjeta "Resumen de la semana".
 // `selector` ({ fincas, activaId, onElegir, onNueva }): con varias fincas, la cabecera cambia de finca sin volver.
+// `datosPrecargados` ({ lluvia, humedad, temperatura } mensuales): los datos ya están procesados
+// (ruta /prueba), así que se muestran al instante, sin la pantalla de "Analizando tu finca…".
 export default function PantallaResultados({
-  ubicacion, parcela, modo, remoteSensing: rs, finca, reporte, selector, onVolver, onAnalisis,
+  ubicacion, parcela, remoteSensing: rs, datosPrecargados, finca, reporte, selector, onVolver, onAnalisis,
 }) {
-  const [datos, setDatos] = useState(null)
+  const [datos, setDatos] = useState(() => (datosPrecargados ? { ...datosPrecargados, simulado: false } : null))
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
   const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia | siembra
-  const [presentacion, setPresentacion] = useState(null) // null | 'interactivo' | 'resumido'
+  const [verResumen, setVerResumen] = useState(false) // carrusel "Resumen de la semana"
   const contenidoRef = useRef(null)
-  const profundo = modo === 'Profundo'
 
   // Descarga de datos NASA con una duración mínima para que el usuario vea el progreso.
   useEffect(() => {
+    if (datosPrecargados) return
     const control = new AbortController()
-    const minimo = DURACION_MIN[modo]
+    const minimo = DURACION_MIN
     const inicio = performance.now()
     const fuente = rs
       ? Promise.resolve({ lluvia: rs.mensual.lluvia, humedad: rs.mensual.humedad, temperatura: rs.mensual.temperatura, simulado: false })
@@ -145,16 +147,15 @@ export default function PantallaResultados({
       .then((d) => !control.signal.aborted && setDatos(d))
       .catch(() => {})
     return () => control.abort()
-    // El modo solo afecta a la primera carga; pasar a "Profundo" no vuelve a descargar.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ubicacion, intento])
 
   useEffect(() => {
     if (datos) return
-    const total = PASOS[modo].length
-    const id = setInterval(() => setPaso((p) => Math.min(total - 1, p + 1)), DURACION_MIN[modo] / total)
+    const total = PASOS.length
+    const id = setInterval(() => setPaso((p) => Math.min(total - 1, p + 1)), DURACION_MIN / total)
     return () => clearInterval(id)
-  }, [datos, modo])
+  }, [datos])
 
   const analisis = useMemo(
     () =>
@@ -164,10 +165,11 @@ export default function PantallaResultados({
             parcela,
             ubicacion,
             zonas: rs ? zonasRemoteSensing(rs, parcela) : undefined,
-            minAños: rs ? RS_MIN_AÑOS : undefined,
+            // La serie del remote-sensing (también la precargada) cubre 5 años
+            minAños: rs || datosPrecargados ? RS_MIN_AÑOS : undefined,
           })
         : null,
-    [datos, parcela, ubicacion, rs],
+    [datos, parcela, ubicacion, rs, datosPrecargados],
   )
 
   const onAnalisisRef = useRef(onAnalisis)
@@ -210,27 +212,19 @@ export default function PantallaResultados({
       ) : (
         <h1>{detalle ? TITULOS[detalle] : 'Resultados'}</h1>
       )}
-      {!detalle && (
-        <span className={`rs-modo ${profundo ? 'profundo' : ''}`}>
-          {profundo ? <Layers size={14} /> : <Zap size={14} />} {modo}
-        </span>
-      )}
     </header>
   )
 
-  if (presentacion && reporte && finca) {
-    const salir = () => setPresentacion(null)
-    return presentacion === 'interactivo'
-      ? <CarruselInsights finca={finca} reporte={reporte} onSalir={salir} />
-      : <ResumenSemanaCompacto finca={finca} reporte={reporte} onSalir={salir} />
+  // La pantalla de resultados sigue montada mientras se ve el carrusel: al salir no se recarga
+  if (verResumen && reporte && finca) {
+    return <CarruselInsights finca={finca} reporte={reporte} onSalir={() => setVerResumen(false)} />
   }
 
   const tarjetaResumen = reporte && finca && (
     <TarjetaResumenSemana
       periodo={reporte.periodoClima}
       ejemplo={reporte.ejemplo}
-      onInteractivo={() => setPresentacion('interactivo')}
-      onResumido={() => setPresentacion('resumido')}
+      onAbrir={() => setVerResumen(true)}
     />
   )
 
@@ -238,7 +232,7 @@ export default function PantallaResultados({
     return (
       <div className="fg-pantalla rs">
         {cabecera}
-        <Cargando modo={modo} paso={paso} />
+        <Cargando paso={paso} />
       </div>
     )
   }
@@ -261,6 +255,19 @@ export default function PantallaResultados({
     humedad: agua.titulo && { titulo: agua.titulo, texto: agua.texto },
   }
 
+
+  // Una sola vista para todas las parcelas: clima → estado de la parcela → alertas → análisis.
+  // Con remote-sensing (Parcela 1 de Toacaso) sale del resumen; sin él, de NASA y de la simulación.
+  const alertas = r ? alertasRS(rs) : []
+  const dist = Object.fromEntries(zonas.verdor.distribucion.map((d) => [d.estado, d.porcentaje]))
+  const salud = r?.salud ?? { sana: dist.bien, alerta: dist.atencion, critico: dist.problema + dist.grave }
+  const accionSalud = r?.salud
+    ? <><strong>{r.salud.mensaje}</strong>{r.salud.sectorMasAfectado && <> · revisa {textoZona(r.salud.sectorMasAfectado)}</>}</>
+    : zonas.verdor.afectadas && <>Revisa <strong>{textoZona(zonas.verdor.afectadas.zona)}</strong> de tu parcela</>
+  const metaSalud = r?.salud
+    ? `Sentinel-2 · ${fechaCorta(r.salud.fecha)}${r.salud.diasDesdeFoto != null ? ` · ${haceDias(r.salud.diasDesdeFoto)}` : ''}`
+    : (zonas.fuente ?? 'Mapa de salud por zonas')
+
   const lista = (
     <>
       {ejemplo && (
@@ -273,74 +280,7 @@ export default function PantallaResultados({
         </div>
       )}
 
-      <Widget
-        tono="azul"
-        ilustracion={<IlustracionClima tipo={estacion.tipo} />}
-        valor={analisis.temperatura == null ? '—' : formato(analisis.temperatura)}
-        unidad="°C"
-        insignia={ejemplo ? 'Datos de ejemplo' : undefined}
-        detalle={[
-          `Lo normal en ${nombreMes}`,
-          mesAhora.mediana == null ? 'Lluvia: sin datos' : `Lluvia: ${mesAhora.mediana} mm al mes`,
-        ]}
-        etiqueta={estacion.texto}
-        accion={{ texto: 'Ver lluvia', onClick: () => setDetalle('lluvia') }}
-      />
-
-      {tarjetaResumen}
-
-      <section>
-        <h2 className="rs-titulo">Análisis de tu parcela</h2>
-        <ul className="ui-lista">
-          <li>
-            <FilaAnalisis
-              tono="morado"
-              Icono={Sprout}
-              titulo="Salud del cultivo"
-              texto={`${Math.round(zonas.verdor.normal)}% de tu parcela se ve sana`}
-              nota={zonas.simulado ? 'Simulado' : undefined}
-              notaTipo="simulado"
-              onClick={() => setDetalle('verdor')}
-            />
-          </li>
-          <li>
-            <FilaAnalisis
-              tono="azul"
-              Icono={Droplets}
-              titulo="Agua en el suelo"
-              texto={`${Math.round(zonas.humedad.normal)}% del suelo tiene buena humedad`}
-              nota={zonas.simulado ? 'Simulado' : undefined}
-              notaTipo="simulado"
-              onClick={() => setDetalle('humedad')}
-            />
-          </li>
-          <li>
-            <FilaAnalisis
-              tono="turquesa"
-              Icono={CloudRain}
-              titulo="Lluvia"
-              texto={consejoLluvia?.titulo ?? 'Lluvia de los últimos 10 años'}
-              nota={ejemplo ? 'Datos de ejemplo' : `NASA GPM · ${PERIODO.inicio}–${PERIODO.fin}`}
-              notaTipo={ejemplo ? 'simulado' : undefined}
-              onClick={() => setDetalle('lluvia')}
-            />
-          </li>
-        </ul>
-      </section>
-
-      <AccesoPitagoras onClick={() => setDetalle('siembra')} />
-
-      <p className="rs-fuentes-linea">
-        <Satellite size={14} /> Datos de la NASA: GPM IMERG y POWER
-      </p>
-    </>
-  )
-
-  // Parcela 1 (remote-sensing): clima → estado de la parcela → alertas → análisis
-  const listaRS = r && (() => {
-    const alertas = alertasRS(rs)
-    return (
-      <>
+      {r ? (
         <Widget
           tono="azul"
           ilustracion={<IlustracionClima tipo={r.clima.lluvia7dMm >= 40 ? 'lluvia' : 'nubes'} />}
@@ -354,56 +294,77 @@ export default function PantallaResultados({
           etiqueta="Clima en tu parcela"
           accion={{ texto: 'Ver lluvia', onClick: () => setDetalle('lluvia') }}
         />
+      ) : (
+        <Widget
+          tono="azul"
+          ilustracion={<IlustracionClima tipo={estacion.tipo} />}
+          valor={analisis.temperatura == null ? '—' : formato(analisis.temperatura)}
+          unidad="°C"
+          insignia={ejemplo ? 'Datos de ejemplo' : `Lo normal en ${nombreMes}`}
+          detalle={[mesAhora.mediana == null ? 'Lluvia: sin datos' : `Lluvia: ${mesAhora.mediana} mm al mes`]}
+          etiqueta={estacion.texto}
+          accion={{ texto: 'Ver lluvia', onClick: () => setDetalle('lluvia') }}
+        />
+      )}
 
-        <EstadoParcelaCard parcela={parcela} zonas={zonas} salud={r.salud} onAbrir={() => setDetalle('verdor')} />
+      <EstadoParcelaCard
+        parcela={parcela}
+        zonas={zonas}
+        salud={salud}
+        accion={accionSalud}
+        meta={metaSalud}
+        onAbrir={() => setDetalle('verdor')}
+      />
 
-        <AlertaPrincipal alertas={alertas} />
+      <AlertaPrincipal alertas={alertas} />
 
-        {tarjetaResumen}
+      {tarjetaResumen}
 
-        <section>
-          <h2 className="rs-titulo">Análisis de tu parcela</h2>
-          <ul className="ui-lista">
-            {/* La salud del cultivo se abre desde "Estado de tu parcela" (arriba) */}
-            <li>
-              <AnalisisCard
-                tono="azul"
-                Icono={Droplets}
-                titulo="Agua"
-                nota="NASA POWER + Sentinel-2"
-                onClick={() => setDetalle('humedad')}
-              >
-                {agua.fila}
-              </AnalisisCard>
-            </li>
-            <li>
-              <AnalisisCard
-                tono="turquesa"
-                Icono={CloudRain}
-                titulo="Lluvia"
-                riesgo={riesgoDe(alertas, 'PLAGAS_LANCHA')}
-                nota={r.lluvia?.fuente}
-                onClick={() => setDetalle('lluvia')}
-              >
-                {r.lluvia?.diciembreMm != null
+      <section>
+        <h2 className="rs-titulo">Análisis de tu parcela</h2>
+        <ul className="ui-lista">
+          {/* La salud del cultivo se abre desde "Estado de tu parcela" (arriba) */}
+          <li>
+            <AnalisisCard
+              tono="azul"
+              Icono={Droplets}
+              titulo="Agua"
+              nota={r ? 'NASA POWER + Sentinel-2' : undefined}
+              onClick={() => setDetalle('humedad')}
+            >
+              {r ? agua.fila : `${Math.round(zonas.humedad.normal)}% del suelo tiene buena humedad`}
+            </AnalisisCard>
+          </li>
+          <li>
+            <AnalisisCard
+              tono="turquesa"
+              Icono={CloudRain}
+              titulo="Lluvia"
+              riesgo={riesgoDe(alertas, 'PLAGAS_LANCHA')}
+              nota={r ? r.lluvia?.fuente : ejemplo ? 'Datos de ejemplo' : `NASA GPM · ${PERIODO.inicio}–${PERIODO.fin}`}
+              notaTipo={!r && ejemplo ? 'simulado' : undefined}
+              onClick={() => setDetalle('lluvia')}
+            >
+              {r
+                ? (r.lluvia?.diciembreMm != null
                   ? `Diciembre: unos ${formato(r.lluvia.diciembreMm, 0)} mm (promedio histórico)`
-                  : 'Sin datos de lluvia para el próximo mes.'}
-              </AnalisisCard>
-            </li>
-          </ul>
-        </section>
+                  : 'Sin datos de lluvia para el próximo mes.')
+                : (consejoLluvia?.titulo ?? 'Lluvia de los últimos 10 años')}
+            </AnalisisCard>
+          </li>
+        </ul>
+      </section>
 
-        <AccesoPitagoras onClick={() => setDetalle('siembra')} />
+      <AccesoPitagoras onClick={() => setDetalle('siembra')} />
 
-        {r.confianza && (
-          <p className="rs-fuentes-linea">
-            <Satellite size={14} /> {r.confianza.capturasUsadas} de {r.confianza.capturasTotales} fotos Sentinel-2
-            usadas · {formato(r.confianza.areaHa, 2)} ha
-          </p>
-        )}
-      </>
-    )
-  })()
+      <p className="rs-fuentes-linea">
+        <Satellite size={14} />{' '}
+        {r?.confianza
+          ? `${r.confianza.capturasUsadas} de ${r.confianza.capturasTotales} fotos Sentinel-2 usadas · ${formato(r.confianza.areaHa, 2)} ha`
+          : 'Datos de la NASA: GPM IMERG y POWER'}
+      </p>
+    </>
+  )
 
   const vistaLluvia = (
     <>
@@ -443,7 +404,7 @@ export default function PantallaResultados({
       {cabecera}
       <div className="rs-contenido" ref={contenidoRef}>
         <div key={detalle ?? 'lista'} className="rs-vista">
-          {detalle === null && (listaRS || lista)}
+          {detalle === null && lista}
           {(detalle === 'verdor' || detalle === 'humedad') && (
             <>
               {consejoRS?.[detalle] && (

@@ -51,7 +51,6 @@ export default function MapaSalud({ parcela, zonas, capa, resaltar }) {
           <Polygon positions={parcela.poligono} interactive={false} pathOptions={{ color: '#fff', weight: 2.5, fill: false }} />
           {resaltar && resumen.afectadas && <Marker position={resumen.afectadas.centro} icon={ICONO_FOCO} interactive={false} />}
         </MapContainer>
-        {sim && <span className="rs-insignia-demo">Simulación · no es tu parcela real</span>}
         {!sim && zonas.fuente && <span className="rs-insignia-demo">{zonas.fuente}</span>}
       </div>
 

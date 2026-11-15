@@ -1,9 +1,0 @@
-/* Resumen de la semana, versión resumida: una sola pantalla que se desplaza */
-.rp-compacto { height: 100%; overflow-y: auto; }
-.rp-compacto .rp-compacto-hoja { height: auto; min-height: 100%; overflow: visible; }
-.rp-compacto-subtitulo { margin: 10px 0 0; font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #bfdbfe; }
-.rp-compacto-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0 0; }
-.rp-compacto-datos div { padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); }
-.rp-compacto-datos dt { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
-.rp-compacto-datos dd { margin: 4px 0 0; font-size: 20px; font-weight: 600; }
-.rp-compacto-datos dd small { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.7); }

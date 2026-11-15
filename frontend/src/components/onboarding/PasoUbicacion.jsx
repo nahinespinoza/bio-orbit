@@ -1,7 +1,8 @@
 import { ChevronLeft, LocateFixed, Map as MapIcon } from 'lucide-react'
 import Progreso from './Progreso.jsx'
 
-export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation, onSelectManually }) {
+// Solo GPS: la opción de dibujar la finca en el mapa se quitó de este paso.
+export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation }) {
   return (
     <div className="onb-form">
       <div className="onb-top">
@@ -17,15 +18,12 @@ export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation, 
         </div>
         <p className="onb-saludo">Hola, {nombre.split(' ')[0]}</p>
         <h1 className="onb-titulo">¿Dónde está tu finca?</h1>
-        <p className="onb-subtitulo">Si estás ahora en tu finca, usa el GPS del celular. Si no, búscala y dibújala en el mapa.</p>
+        <p className="onb-subtitulo">Si estás ahora en tu finca, usa el GPS del celular para encontrarla.</p>
       </div>
 
       <div className="onb-acciones">
         <button type="button" className="onb-btn onb-btn-primario" onClick={onUseCurrentLocation}>
           <LocateFixed size={20} /> Estoy en mi finca (usar GPS)
-        </button>
-        <button type="button" className="onb-btn onb-btn-secundario" onClick={onSelectManually}>
-          <MapIcon size={20} /> Dibujarla en el mapa
         </button>
       </div>
     </div>

@@ -1,10 +1,10 @@
-import { ListChecks, Presentation } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
-// Tarjeta "Resumen de la semana" dentro de los resultados de cada finca.
-// Abre el resumen interactivo (carrusel, una pantalla por dato) o el resumido (todo en una pantalla).
-export default function TarjetaResumenSemana({ periodo, ejemplo, onInteractivo, onResumido }) {
+// Fila "Resumen de la semana" dentro de los resultados de cada finca: abre el carrusel
+// (una pantalla por dato, se desliza hacia arriba).
+export default function TarjetaResumenSemana({ periodo, ejemplo, onAbrir }) {
   return (
-    <section className="fg-fila-resumen rs-resumen-semana" aria-label="Resumen de la semana">
+    <button type="button" className="fg-fila-resumen" onClick={onAbrir}>
       <span className="fg-fila-resumen-texto">
         <strong>Resumen de la semana</strong>
         <span>
@@ -12,14 +12,7 @@ export default function TarjetaResumenSemana({ periodo, ejemplo, onInteractivo, 
           {ejemplo && ' · Datos de ejemplo'}
         </span>
       </span>
-      <div className="rs-resumen-semana-botones">
-        <button type="button" className="principal" onClick={onInteractivo}>
-          <Presentation size={16} aria-hidden="true" /> Interactivo
-        </button>
-        <button type="button" onClick={onResumido}>
-          <ListChecks size={16} aria-hidden="true" /> Resumido
-        </button>
-      </div>
-    </section>
+      <ChevronRight size={20} aria-hidden="true" />
+    </button>
   )
 }
