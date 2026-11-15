@@ -9,6 +9,7 @@ import {
 } from './analisis.js'
 import MapaSalud from './MapaSalud.jsx'
 import GraficoLluvia from './GraficoLluvia.jsx'
+import RecomendacionesIA, { AccesoPitagoras } from './RecomendacionesIA.jsx'
 import Widget from '../ui/Widget.jsx'
 import { IlustracionClima } from '../ui/Ilustraciones.jsx'
 import AlertaPrincipal from './AlertaPrincipal.jsx'
@@ -29,6 +30,7 @@ const TITULOS = {
   verdor: 'Salud del cultivo',
   humedad: 'Agua en el suelo',
   lluvia: 'Lluvia en tu zona',
+  siembra: 'Recomendaciones',
 }
 
 const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1)
@@ -127,7 +129,7 @@ export default function PantallaResultados({
   const [datos, setDatos] = useState(() => (datosPrecargados ? { ...datosPrecargados, simulado: false } : null))
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
-  const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia
+  const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia | siembra
   const [verResumen, setVerResumen] = useState(false) // carrusel "Resumen de la semana"
   const contenidoRef = useRef(null)
 
@@ -353,6 +355,8 @@ export default function PantallaResultados({
         </ul>
       </section>
 
+      <AccesoPitagoras onClick={() => setDetalle('siembra')} />
+
       <p className="rs-fuentes-linea">
         <Satellite size={14} />{' '}
         {r?.confianza
@@ -416,6 +420,9 @@ export default function PantallaResultados({
             </>
           )}
           {detalle === 'lluvia' && vistaLluvia}
+          {detalle === 'siembra' && (
+            <RecomendacionesIA finca={finca} ubicacion={ubicacion} monitoreada={Boolean(rs)} />
+          )}
         </div>
       </div>
     </div>
