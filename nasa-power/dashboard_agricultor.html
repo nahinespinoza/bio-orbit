@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroAlerta Papa - Prototipo</title>
+<style>
+  :root {
+    --bg: #f3f5f2;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #616e7c;
+    --rojo: #d64545; --rojo-bg: #ffe3e3;
+    --amarillo: #d9822b; --amarillo-bg: #fff3c4;
+    --verde: #2f855a; --verde-bg: #def7ec;
+    --azul: #2b6cb0; --azul-bg: #ebf8ff;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1e293b;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .phone-frame {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    border: 6px solid #0f172a;
+  }
+  .header {
+    background: linear-gradient(135deg, #1b4332, #2d6a4f);
+    color: white;
+    padding: 22px 20px;
+  }
+  .header h1 { margin: 0; font-size: 1.25rem; }
+  .header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.9; }
+  .badge-date {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    margin-top: 10px;
+  }
+  .content { padding: 16px; }
+  .section-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 16px 0 8px;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .kpi {
+    background: var(--card);
+    padding: 11px 6px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .kpi .val { font-size: 1.08rem; font-weight: 800; color: var(--text); }
+  .kpi .lbl { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .status-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-left: 6px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .status-card.rojo { border-left-color: var(--rojo); }
+  .status-card.amarillo { border-left-color: var(--amarillo); }
+  .status-card.verde { border-left-color: var(--verde); }
+  .status-card.azul { border-left-color: var(--azul); }
+  .pill {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  .rojo .pill { background: var(--rojo-bg); color: var(--rojo); }
+  .amarillo .pill { background: var(--amarillo-bg); color: var(--amarillo); }
+  .verde .pill { background: var(--verde-bg); color: var(--verde); }
+  .azul .pill { background: var(--azul-bg); color: var(--azul); }
+  .status-msg { font-size: 0.88rem; color: var(--text); line-height: 1.4; }
+  .proy-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: #e6fffa;
+    border: 1px solid #b2f5ea;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .proy-summary .pval { font-weight: 800; font-size: 0.95rem; color: #234e52; }
+  .proy-summary .plbl { font-size: 0.68rem; color: #285e61; }
+  .alert-box {
+    background: #fff8f1;
+    border: 1px solid #fbd38d;
+    border-radius: 14px;
+    padding: 13px;
+    margin-bottom: 10px;
+  }
+  .alert-box.ok { background: #f0fff4; border-color: #9ae6b4; }
+  .alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+  .alert-title { font-weight: 700; font-size: 0.88rem; color: #9c4221; }
+  .alert-box.ok .alert-title { color: #276749; }
+  .lvl-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .lvl-alto { background: #fed7d7; color: #9b2c2c; }
+  .lvl-medio { background: #fefcbf; color: #975a16; }
+  .alert-desc { font-size: 0.84rem; color: var(--text); line-height: 1.4; }
+  .days-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .day-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f4f8;
+  }
+  .day-row:last-child { border-bottom: none; }
+  .day-label { font-weight: 700; color: var(--text); }
+  .day-temp { color: var(--muted); }
+  .day-rain { font-weight: 600; color: #2b6cb0; }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="header">
+      <h1>🥔 Monitor Agroclimático Papa</h1>
+      <p>Toacaso / Sigchos • 2501 m s.n.m.</p>
+      <div class="badge-date">Corte semanal: 05/11/2026 al 11/11/2026</div>
+    </div>
+
+    <div class="content">
+      <div class="section-title">Resumen Últimos 7 Días</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="val">69.5 mm</div><div class="lbl">Lluvia 7d</div></div>
+        <div class="kpi"><div class="val">75.4%</div><div class="lbl">Humedad Raíz</div></div>
+        <div class="kpi"><div class="val">8.6°C</div><div class="lbl">Mínima Sem.</div></div>
+      </div>
+
+      <div class="section-title">Diagnóstico y Acción Inmediata</div>
+      <div class="status-card verde">
+        <div class="pill">HELADAS • NORMAL - Sin Heladas</div>
+        <div class="status-msg">Temperaturas nocturnas seguras para el follaje de la papa.</div>
+      </div>
+
+      <div class="status-card verde">
+        <div class="pill">RIEGO Y SUELO • ÓPTIMO - Humedad Ideal</div>
+        <div class="status-msg">Humedad adecuada en zona de raíces. No se requiere riego adicional.</div>
+      </div>
+
+      <div class="status-card verde">
+        <div class="pill">ESTRÉS TÉRMICO • NORMAL - Temperatura Diurna Ideal</div>
+        <div class="status-msg">Días frescos ideales para el engrosamiento del tubérculo.</div>
+      </div>
+
+      <div class="section-title">Proyección Preventiva 30 Días (Diciembre)</div>
+      <div class="proy-summary">
+        <div><div class="pval">117.1 mm</div><div class="plbl">Lluvia Esp.</div></div>
+        <div><div class="pval">17.0 mm</div><div class="plbl">Evap. Esp.</div></div>
+        <div><div class="pval">10.5°C</div><div class="plbl">Mín. Nocturna</div></div>
+      </div>
+      
+            <div class="alert-box">
+                <div class="alert-header">
+                    <span class="alert-title">⚠️ Plagas y Hongos (Tizón tardío / Lancha)</span>
+                    <span class="lvl-badge lvl-alto">RIESGO ALTO</span>
+                </div>
+                <div class="alert-desc">Riesgo alto de Lancha (tizón tardío) para el próximo mes por alta humedad y lluvias esperadas. Revisa el envés de las hojas bajas y prepara control preventivo.</div>
+            </div>
+            
+
+      <div class="section-title">Registro Diario de la Semana</div>
+      <div class="days-card">
+        <div class="day-row">
+            <span class="day-label">05/11</span>
+            <span class="day-temp">❄️ 10.9°C / ☀️ 19.8°C</span>
+            <span class="day-rain">💧 16.5 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">06/11</span>
+            <span class="day-temp">❄️ 12.1°C / ☀️ 19.2°C</span>
+            <span class="day-rain">💧 22.7 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">07/11</span>
+            <span class="day-temp">❄️ 11.2°C / ☀️ 19.5°C</span>
+            <span class="day-rain">💧 17.4 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">08/11</span>
+            <span class="day-temp">❄️ 9.1°C / ☀️ 20.7°C</span>
+            <span class="day-rain">💧 1.4 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">09/11</span>
+            <span class="day-temp">❄️ 8.8°C / ☀️ 20.4°C</span>
+            <span class="day-rain">💧 3.0 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">10/11</span>
+            <span class="day-temp">❄️ 8.6°C / ☀️ 20.6°C</span>
+            <span class="day-rain">💧 3.8 mm</span>
+        </div>
+        
+        <div class="day-row">
+            <span class="day-label">11/11</span>
+            <span class="day-temp">❄️ 10.1°C / ☀️ 20.8°C</span>
+            <span class="day-rain">💧 4.6 mm</span>
+        </div>
+        </div>
+    </div>
+  </div>
+</body>
+</html>
