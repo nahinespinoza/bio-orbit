@@ -6,25 +6,39 @@ import PantallaHectareas from './PantallaHectareas.jsx'
 import PantallaUbicarParcela from './PantallaUbicarParcela.jsx'
 import PantallaHome from './PantallaHome.jsx'
 import PantallaResultados from '../resultados/PantallaResultados.jsx'
+import PantallaAnalizando from '../reporte/PantallaAnalizando.jsx'
+import CarruselInsights from '../reporte/CarruselInsights.jsx'
+import PanelIndicador from '../reporte/PanelIndicador.jsx'
+import PanelMapa from '../reporte/PanelMapa.jsx'
+import { DefsReporte } from '../reporte/IlustracionesReporte.jsx'
+import { detalleDe } from '../../lib/reporte.js'
 import { formatoNumero } from './geo.js'
 import '../onboarding/onboarding.css'
 import '../mapa-movil/mapa-movil.css'
+import '../reporte/reporte.css'
 import './flujo-gps.css'
 
+// El orden de los números decide hacia dónde se anima el cambio de pantalla
 const PANTALLA = {
-  LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, INFO_UBICAR: 5, UBICAR_PARCELA: 6, HOME: 7, RESULTADOS: 8,
+  LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, INFO_UBICAR: 5, UBICAR_PARCELA: 6,
+  ANALIZANDO: 7, CARRUSEL: 8, HOME: 9, PANEL: 10, MAPA: 11, RESULTADOS: 12,
 }
 
 // Flujo que sigue a "Estoy en mi finca":
-// localizar → ✓ ubicación → hectáreas → ✓ superficie → "ahora ubica tu parcela" → mapa → home → resultados
+// localizar → ✓ ubicación → hectáreas → ✓ superficie → "ahora ubica tu parcela" → mapa →
+// analizando → resumen (carrusel) → inicio → panel de un dato / mapa / plan de siembra
 // Las pantallas ✓ e informativas avanzan solas.
 // Trabaja sobre una finca (`finca`); los cambios se guardan en App con `onCambiar`.
-// Si la finca ya tiene parcelas (registrada antes o dibujada a mano), empieza en el inicio.
+// Una finca con parcelas y sin reporte (recién dibujada a mano) empieza analizando;
+// con reporte, en el inicio. Como el flujo se vuelve a montar al cambiar de finca,
+// el resumen solo sale la primera vez.
 export default function FlujoGps({
   nombre, finca, fincas, onCambiar, onElegirFinca, onNuevaFinca, onCancelar, onManual,
 }) {
-  const { ubicacion, parcelas, analisis } = finca
-  const [pantalla, setPantalla] = useState(parcelas.length ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
+  const { ubicacion, parcelas, reporte } = finca
+  const [pantalla, setPantalla] = useState(
+    !parcelas.length ? PANTALLA.LOCALIZANDO : reporte ? PANTALLA.HOME : PANTALLA.ANALIZANDO,
+  )
   const [direccion, setDireccion] = useState('adelante')
   const [hectareas, setHectareas] = useState(parcelas[0]?.area ?? null)
   // La finca puede tener varias parcelas; la primera es la que usan los análisis.
@@ -32,9 +46,15 @@ export default function FlujoGps({
   const [agregando, setAgregando] = useState(false)
   const [haNueva, setHaNueva] = useState(null)
   const [modoAnalisis, setModoAnalisis] = useState('Rápido')
+  // Dato que muestra el panel especializado (indicador o alerta del mes)
+  const [indicadorId, setIndicadorId] = useState(null)
+  // A dónde vuelven el mapa grande y el resumen
+  const [origenMapa, setOrigenMapa] = useState(PANTALLA.HOME)
+  const [resumenDesdeInicio, setResumenDesdeInicio] = useState(false)
 
-  const irA = (destino) => {
-    setDireccion(destino > pantalla ? 'adelante' : 'atras')
+  // `dir` fuerza la animación cuando el orden de los números no sirve
+  const irA = (destino, dir) => {
+    setDireccion(dir ?? (destino > pantalla ? 'adelante' : 'atras'))
     setPantalla(destino)
   }
 
@@ -58,7 +78,7 @@ export default function FlujoGps({
       irA(PANTALLA.HECTAREAS)
     } else {
       setAgregando(false)
-      irA(PANTALLA.HOME)
+      irA(reporte ? PANTALLA.HOME : PANTALLA.ANALIZANDO)
     }
   }
 
@@ -74,9 +94,9 @@ export default function FlujoGps({
     irA(PANTALLA.HOME)
   }
 
-  const analizar = (modo) => {
-    setModoAnalisis(modo)
-    irA(PANTALLA.RESULTADOS)
+  const verMapa = (desde) => {
+    setOrigenMapa(desde)
+    irA(PANTALLA.MAPA)
   }
 
   const poligonosGuardados = useMemo(() => parcelas.map((p) => p.poligono), [parcelas])
@@ -143,12 +163,55 @@ export default function FlujoGps({
             onVolver={() => irA(PANTALLA.HECTAREAS)}
           />
         )
+      case PANTALLA.ANALIZANDO:
+        return (
+          <PantallaAnalizando
+            finca={finca}
+            onListo={(r) => {
+              onCambiar({ reporte: r })
+              setResumenDesdeInicio(false)
+              irA(PANTALLA.CARRUSEL)
+            }}
+          />
+        )
+      case PANTALLA.CARRUSEL:
+        if (!reporte) return null
+        return (
+          <CarruselInsights
+            finca={finca}
+            reporte={reporte}
+            onSalir={() => irA(PANTALLA.HOME, resumenDesdeInicio ? 'atras' : 'adelante')}
+          />
+        )
+      case PANTALLA.PANEL: {
+        const detalle = detalleDe(reporte, indicadorId)
+        if (!detalle) return null
+        return (
+          <PanelIndicador
+            indicador={detalle}
+            reporte={reporte}
+            onVolver={() => irA(PANTALLA.HOME)}
+            onVerMapa={() => verMapa(PANTALLA.PANEL)}
+          />
+        )
+      }
+      case PANTALLA.MAPA:
+        if (!reporte) return null
+        return (
+          <PanelMapa
+            finca={finca}
+            reporte={reporte}
+            capaInicial={origenMapa === PANTALLA.PANEL ? indicadorId : undefined}
+            onVolver={() => irA(origenMapa)}
+          />
+        )
       case PANTALLA.RESULTADOS:
         return (
           <PantallaResultados
             ubicacion={ubicacion}
             parcela={parcela}
             modo={modoAnalisis}
+            detalleInicial="siembra"
             onVolver={() => irA(PANTALLA.HOME)}
             onProfundo={() => setModoAnalisis('Profundo')}
             onAnalisis={(a) => onCambiar({ analisis: a })}
@@ -160,11 +223,23 @@ export default function FlujoGps({
             nombre={nombre}
             finca={finca}
             fincas={fincas}
+            reporte={reporte}
             onElegirFinca={onElegirFinca}
             onNuevaFinca={onNuevaFinca}
-            onProceso={analizar}
             onAgregarParcela={empezarNuevaParcela}
-            onVerResultados={() => (analisis ? irA(PANTALLA.RESULTADOS) : analizar('Rápido'))}
+            onVerResumen={() => {
+              setResumenDesdeInicio(true)
+              irA(PANTALLA.CARRUSEL, 'adelante')
+            }}
+            onVerIndicador={(id) => {
+              setIndicadorId(id)
+              irA(PANTALLA.PANEL)
+            }}
+            onVerMapa={() => verMapa(PANTALLA.HOME)}
+            onPlanSiembra={() => {
+              setModoAnalisis('Profundo')
+              irA(PANTALLA.RESULTADOS)
+            }}
           />
         )
     }
@@ -173,6 +248,7 @@ export default function FlujoGps({
   return (
     <div className="marco onb">
       <div className="marco-tarjeta fg">
+        <DefsReporte />
         <div key={pantalla} className={`fg-transicion onb-${direccion}`}>
           {contenido()}
         </div>

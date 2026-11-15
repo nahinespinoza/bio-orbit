@@ -2,17 +2,19 @@ import { useState } from 'react'
 import Onboarding from './components/onboarding/Onboarding.jsx'
 import VistaMapaMovil from './components/mapa-movil/VistaMapaMovil.jsx'
 import FlujoGps from './components/flujo-gps/FlujoGps.jsx'
+import { fincaPreanalizada } from './lib/reporte.js'
 
 let ultimoId = 0
 const fincaNueva = (nombre = '') => ({
-  id: `finca-${++ultimoId}`, nombre, ubicacion: null, parcelas: [], analisis: null,
+  id: `finca-${++ultimoId}`, nombre, ubicacion: null, parcelas: [], analisis: null, reporte: null,
 })
 
 // Las fincas viven solo mientras la app está abierta: al recargar se vuelve al onboarding.
 export default function App() {
   const [agricultor, setAgricultor] = useState('')
-  // Fincas registradas (con al menos una parcela) y la que se ve en el inicio
-  const [fincas, setFincas] = useState([])
+  // Fincas registradas (con al menos una parcela) y la que se ve en el inicio.
+  // La de Toacaso viene ya analizada (datos reales del equipo) y aparece en el selector.
+  const [fincas, setFincas] = useState(() => [fincaPreanalizada()])
   const [activaId, setActivaId] = useState(null)
   // Finca que se está registrando: pasa a `fincas` al guardar su primera parcela.
   // La primera se llama "Mi finca"; las demás piden nombre.
@@ -22,7 +24,8 @@ export default function App() {
   const [etapa, setEtapa] = useState('datos')
   const [pasoDatos, setPasoDatos] = useState(1)
 
-  const primeraVez = fincas.length === 0
+  // Hasta registrar su propia finca el usuario pasa por el onboarding completo
+  const primeraVez = !fincas.some((f) => !f.preanalizada)
   const finca = borrador ?? fincas.find((f) => f.id === activaId)
 
   // Aplica `cambios` (objeto o función de la finca) a una finca

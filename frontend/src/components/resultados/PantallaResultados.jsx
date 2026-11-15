@@ -63,11 +63,12 @@ function estacionDelMes(mediana, promedio) {
   return { tipo: 'nubes', texto: 'Lluvia moderada' }
 }
 
-export default function PantallaResultados({ ubicacion, parcela, modo, onVolver, onProfundo, onAnalisis }) {
+// `detalleInicial` (opcional): abre directo en un detalle; volver desde ahí regresa a `onVolver`.
+export default function PantallaResultados({ ubicacion, parcela, modo, detalleInicial = null, onVolver, onProfundo, onAnalisis }) {
   const [datos, setDatos] = useState(null)
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
-  const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia | siembra
+  const [detalle, setDetalle] = useState(detalleInicial) // null = lista | verdor | humedad | lluvia | siembra
   const [prefs, setPrefs] = useState(PREFERENCIAS_INICIALES)
   const contenidoRef = useRef(null)
   const profundo = modo === 'Profundo'
@@ -123,12 +124,14 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
     setIntento((n) => n + 1)
   }
 
+  // Desde el detalle con que se abrió, volver regresa a quien abrió la pantalla
+  const aLista = detalle !== null && detalle !== detalleInicial
   const cabecera = (
     <header className="rs-cabecera">
       <button
         className="rs-volver"
-        onClick={detalle ? () => setDetalle(null) : onVolver}
-        aria-label={detalle ? 'Volver a resultados' : 'Volver al inicio'}
+        onClick={aLista ? () => setDetalle(null) : onVolver}
+        aria-label={aLista ? 'Volver a resultados' : 'Volver al inicio'}
       >
         <ChevronLeft size={24} />
       </button>

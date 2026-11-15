@@ -497,6 +497,85 @@
 
 .fg-seccion-titulo { margin: 0 0 10px; font-size: 16px; font-weight: 600; }
 
+/* El mini-mapa entero es un botón que abre el mapa grande */
+.fg-mini-mapa { isolation: isolate; }
+.fg-mini-mapa-boton {
+  position: absolute;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.fg-mini-mapa-boton:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.6); outline-offset: -3px; }
+.fg-ver-mapa {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Reporte de la semana */
+.fg-alerta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 16px;
+  background: #fde68a;
+  color: #422006;
+  font: inherit;
+  text-align: left;
+}
+button.fg-alerta { cursor: pointer; }
+button.fg-alerta:hover { filter: brightness(0.97); }
+.fg-alerta:focus-visible { outline: 3px solid rgba(180, 83, 9, 0.45); outline-offset: 2px; }
+.fg-alerta > svg:first-child { flex-shrink: 0; color: #b45309; }
+.fg-alerta-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fg-alerta-texto strong { font-size: 16px; font-weight: 700; }
+.fg-alerta-texto small { font-size: 13px; font-weight: 500; color: #713f12; }
+.fg-fila-resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 16px;
+  background: #0b1533;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fg-fila-resumen:hover { background: #142048; }
+.fg-fila-resumen:focus-visible { outline: 3px solid rgba(11, 21, 51, 0.35); outline-offset: 2px; }
+.fg-fila-resumen-texto { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.fg-fila-resumen-texto strong { font-size: 15px; font-weight: 600; }
+.fg-fila-resumen-texto span { font-size: 13px; color: #bfdbfe; }
+.fg-seccion { display: flex; flex-direction: column; gap: 12px; }
+.fg-seccion-cabeza { display: flex; flex-direction: column; gap: 2px; margin: 4px 2px 0; }
+.fg-seccion-cabeza .fg-seccion-titulo { margin: 0; font-size: 18px; font-weight: 700; }
+.fg-seccion-cabeza span { font-size: 13.5px; color: #5b6472; }
+/* En las alertas del mes el valor es una palabra, no un número */
+.fg-alertas-mes .ui-widget-valor strong { font-size: 34px; line-height: 1.1; overflow-wrap: anywhere; }
+.fg-fuente { display: flex; align-items: center; gap: 6px; margin: 0 4px; font-size: 12px; line-height: 1.5; color: #5b6472; }
+.fg-fuente svg { flex-shrink: 0; }
+
 /* Botones de análisis con descripción */
 .fg-analisis { display: flex; flex-direction: column; gap: 10px; }
 .fg-analisis-btn {
