@@ -3,7 +3,7 @@
 Documento temporal para RAG. Cada sección `##` es un fragmento autocontenido: repite el contexto para que se pueda recuperar sola.
 
 - **Cultivo:** papa. **Zona:** Toacaso / Sigchos. **Parcela:** 1,17 ha, 3 588 msnm, centro -0,749029 / -78,773999.
-- **Fuente de los valores:** `backend/src/data/resultado_match.json`, generado por `backend/src/match_nasa_sentinel.py` (copia del script de `remote-sensing/`: solo cambian las rutas, la lógica es la misma). El JSON es un reporte de ventanas de 7 días (la semana de cada foto Sentinel-2 y la semana más reciente), no un agregado mensual. `remote-sensing/resultado_match.json` es idéntico. Datos hasta 2026-11-11 (NASA) y 2026-10-27 (Sentinel-2).
+- **Fuente de los valores:** `remote-sensing/resultado_match.json`, generado por `remote-sensing/match_nasa_sentinel.py`. El JSON es un reporte de ventanas de 7 días (la semana de cada foto Sentinel-2 y la semana más reciente), no un agregado mensual. El agente lee una copia idéntica en `knowledge/structured/remote_sensing.json`. Datos hasta 2026-11-11 (NASA) y 2026-10-27 (Sentinel-2).
 - **Dos ventanas de NASA POWER:** la **semana de la última foto limpia** (21-27/10/2026) y la **semana más reciente** (05-11/11/2026). Cada valor dice cuál es.
 - **Categorías:** SUELO, VEGETACIÓN (follaje), CLIMA, DERIVADO (alerta o cruce).
 - **Límites generales:** NASA POWER es una celda de ~50 km ubicada a 2 501 m (la parcela está a 3 588 m). La humedad de suelo no se corrige por altura. Sentinel-2 tiene un valor por foto limpia (~1 cada 15 días) y la última tiene 19 días de antigüedad al 2026-11-15.
