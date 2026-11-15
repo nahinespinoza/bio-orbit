@@ -192,9 +192,20 @@ def test_search_sources_unrecognized_crop_suggests(make_client, scripted):
 
 
 def test_search_sources_untagged_crop_does_not_claim_absence(make_client, scripted):
-    # olluco está en el pool, pero la ingesta no etiqueta sus fragmentos: no se puede filtrar, y no hay que decir que no hay pasajes
+    # cultivo del pool sin fragmentos etiquetados (se simula quitándolos): no se puede filtrar y no hay que decir que no hay pasajes
     model = scripted(tool_call("search_sources", {"query": "plagas", "crop": "olluco"}, "c1"), AIMessage(content="Ok."))
-    send(make_client(model), SID, "¿Plagas del olluco?")
+    client = make_client(model)
+    sources = client.app.state.services.agent_context.sources
+    sources._docs = [d for d in sources._docs if "olluco" not in d.metadata.get("crops", [])]
+    sources._cache.clear()
+    send(client, SID, "¿Plagas del olluco?")
     content = _tool_content(model)
     assert content.startswith("No pude filtrar los pasajes por «olluco»; resultados generales.")
     assert "No hay pasajes" not in content
+
+
+def test_search_sources_research_makes_olluco_filterable(make_client, scripted):
+    # la investigación de las fichas entra al RAG con crops=[olluco]: ahora sí se filtra
+    model = scripted(tool_call("search_sources", {"query": "plagas", "crop": "olluco"}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Plagas del olluco?")
+    assert not _tool_content(model).startswith("No pude filtrar")

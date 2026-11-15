@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from app.engine.advisories import read_signals
+from app.engine.conditions import plot_conditions
 from app.engine.models import Crop, KnowledgeBase, Transition, norm
 
 STRUCTURED_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "structured"
@@ -40,12 +41,13 @@ def _crop(row: sqlite3.Row) -> Crop:
     )
 
 
-def load_advisory_data(structured_dir: Path = STRUCTURED_DIR) -> tuple[dict, dict]:
-    """(sensibilidades por cultivo, alertas vigentes del remote-sensing). Archivo ausente = sin advertencias (no es un error)."""
+def load_advisory_data(structured_dir: Path = STRUCTURED_DIR) -> tuple[dict, dict, dict]:
+    """(sensibilidades por cultivo, alertas vigentes del remote-sensing, condiciones de la parcela).
+    Archivo ausente = sin advertencias ni condiciones (no es un error)."""
     sens_file, rs_file = structured_dir / "sensibilidades.json", structured_dir / "remote_sensing.json"
     sens = json.loads(sens_file.read_text(encoding="utf-8"))["cultivos"] if sens_file.exists() else {}
-    signals = read_signals(json.loads(rs_file.read_text(encoding="utf-8"))) if rs_file.exists() else {}
-    return sens, signals
+    rs = json.loads(rs_file.read_text(encoding="utf-8")) if rs_file.exists() else None
+    return sens, (read_signals(rs) if rs else {}), (plot_conditions(rs) if rs else {})
 
 
 def load_knowledge_base(conn: sqlite3.Connection, structured_dir: Path = STRUCTURED_DIR) -> KnowledgeBase:
@@ -53,8 +55,8 @@ def load_knowledge_base(conn: sqlite3.Connection, structured_dir: Path = STRUCTU
     edges: dict[str, list[Transition]] = {}
     for r in conn.execute("SELECT * FROM transitions ORDER BY rowid"):
         edges.setdefault(r["from_crop"], []).append(Transition(r["from_crop"], r["to_crop"], r["kind"], r["source_note"]))
-    sensitivities, signals = load_advisory_data(structured_dir)
-    return KnowledgeBase(crops=crops, edges=edges, sensitivities=sensitivities, signals=signals)
+    sensitivities, signals, conditions = load_advisory_data(structured_dir)
+    return KnowledgeBase(crops=crops, edges=edges, sensitivities=sensitivities, signals=signals, conditions=conditions)
 
 
 def list_crops(conn: sqlite3.Connection) -> list[dict]:

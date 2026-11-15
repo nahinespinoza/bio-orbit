@@ -8,6 +8,7 @@ from fastapi import Request
 from langchain_core.language_models import BaseChatModel
 from langgraph.checkpoint.memory import InMemorySaver
 
+from app.advisor.scoring import Scorer, llm_scorer
 from app.agent.factory import build_agent, build_chat_model
 from app.config import Settings
 from app.engine.models import KnowledgeBase
@@ -29,9 +30,11 @@ class Services:
     registry: SessionRegistry
     agent: object | None          # None si no hay OPENAI_API_KEY ni modelo inyectado
     agent_context: AgentContext
+    scorer: Scorer | None = None   # POST /v1/recommendations (None sin modelo)
 
 
-def build_services(settings: Settings, chat_model: BaseChatModel | None = None, clock: Clock = utc_now) -> Services:
+def build_services(settings: Settings, chat_model: BaseChatModel | None = None, clock: Clock = utc_now,
+                   scorer: Scorer | None = None) -> Services:
     db_path = settings.resolve(settings.db_path)
     if not db_path.exists():
         raise RuntimeError(f"No existe {db_path}. Ejecuta: uv run python -m ingestion.build_db")
@@ -42,8 +45,9 @@ def build_services(settings: Settings, chat_model: BaseChatModel | None = None, 
     registry = SessionRegistry(checkpointer, timedelta(minutes=settings.session_ttl_minutes), clock)
     model = chat_model if chat_model is not None else (build_chat_model(settings) if settings.llm_enabled else None)
     agent = build_agent(model, checkpointer, settings.max_conversation_turns) if model is not None else None
+    scorer = scorer if scorer is not None else (llm_scorer(model) if model is not None else None)
     return Services(settings, conn, kb, sources, sources.mode, checkpointer, registry, agent,
-                    AgentContext(kb=kb, conn=conn, sources=sources))
+                    AgentContext(kb=kb, conn=conn, sources=sources), scorer)
 
 
 def get_services(request: Request) -> Services:

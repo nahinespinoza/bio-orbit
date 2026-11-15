@@ -20,6 +20,7 @@ from app.config import Settings, get_settings
 from app.rag.db import VECTOR_TABLE, connect
 from ingestion.documents import default_sources, load_all
 from ingestion.load_structured import load_structured
+from ingestion.research import research_documents
 
 SCHEMA = Path(__file__).with_name("schema.sql")
 
@@ -28,6 +29,8 @@ def build(settings: Settings, db_path: Path, with_embeddings: bool) -> dict:
     sources = default_sources(settings.resolve(settings.pdf_dir), settings.resolve(settings.web_dir),
                               settings.resolve(settings.project_docs_dir))
     chunks = load_all(sources)
+    crops_doc = json.loads((settings.resolve(settings.structured_data_dir) / "cultivos.json").read_text(encoding="utf-8"))
+    chunks += research_documents(crops_doc)   # investigación de las fichas: un fragmento por cultivo × clave
 
     tmp = db_path.with_suffix(".building.db")
     tmp.unlink(missing_ok=True)

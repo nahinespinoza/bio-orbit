@@ -201,7 +201,7 @@ def test_every_typed_value_has_ecuador_or_andes_source():
 
 
 def test_missing_files_mean_no_advisories(tmp_path):
-    assert load_advisory_data(tmp_path) == ({}, {})
+    assert load_advisory_data(tmp_path) == ({}, {}, {})
 
 
 def test_engine_attaches_advisories_to_proposed_crops(kb):

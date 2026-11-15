@@ -101,6 +101,7 @@ class KnowledgeBase:
     edges: dict[str, list[Transition]] = field(default_factory=dict)
     sensitivities: dict[str, dict] = field(default_factory=dict)   # crop_id → campo → {valor, origen, fiabilidad, fuente}
     signals: dict[str, dict] = field(default_factory=dict)         # alertas vigentes del remote-sensing (ver advisories.py)
+    conditions: dict = field(default_factory=dict)                 # resumen de la parcela (ver conditions.py)
 
     def edge(self, from_crop: str | None, to_crop: str) -> Transition | None:
         if from_crop is None:

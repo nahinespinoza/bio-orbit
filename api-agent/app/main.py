@@ -12,8 +12,9 @@ from fastapi import Depends, FastAPI
 from langchain_core.language_models import BaseChatModel
 from loguru import logger
 
+from app.advisor.scoring import Scorer
 from app.api.deps import Services, build_services, get_services
-from app.api.routes import crops, recommend, sessions
+from app.api.routes import crops, recommend, recommendations, sessions
 from app.config import Settings, get_settings
 from app.memory.sessions import Clock, utc_now
 from app.rag.db import meta
@@ -27,12 +28,13 @@ async def _purge_loop(services: Services) -> None:
             logger.info("Sesiones vencidas eliminadas: {}", len(expired))
 
 
-def create_app(settings: Settings | None = None, chat_model: BaseChatModel | None = None, clock: Clock = utc_now) -> FastAPI:
+def create_app(settings: Settings | None = None, chat_model: BaseChatModel | None = None, clock: Clock = utc_now,
+               scorer: Scorer | None = None) -> FastAPI:
     settings = settings or get_settings()
 
     @contextlib.asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        services = build_services(settings, chat_model, clock)
+        services = build_services(settings, chat_model, clock, scorer)
         app.state.services = services
         logger.info("API lista · LLM: {} · búsqueda: {} · cultivos: {}",
                     settings.chat_model if services.agent else "desactivado", services.retrieval_mode, len(services.kb.crops))
@@ -47,6 +49,7 @@ def create_app(settings: Settings | None = None, chat_model: BaseChatModel | Non
                   description="Agente que guía al agricultor en la elección de cultivo y rotación (sierra andina).")
     app.include_router(sessions.router)
     app.include_router(recommend.router)
+    app.include_router(recommendations.router)
     app.include_router(crops.router)
 
     @app.get("/health", tags=["health"])

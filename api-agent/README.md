@@ -105,10 +105,45 @@ Los modelos `gpt-5.4-*` no aceptan herramientas junto con `reasoning_effort` en 
 | `POST` | `/v1/sessions/{session_id}/messages` | Envía un mensaje al agente. El cliente genera `session_id` (UUID v4) y el primer mensaje crea la sesión |
 | `GET` | `/v1/sessions/{session_id}` | Estado de la sesión: datos del lote, datos faltantes, última recomendación, turnos y vencimiento |
 | `DELETE` | `/v1/sessions/{session_id}` | Borra la sesión de inmediato (`204`) |
+| `POST` | `/v1/recommendations` | Recomendación de una sola llamada con evidencia (remote-sensing + investigación de las fichas). Solo JSON |
 | `POST` | `/v1/recommend` | Llama al motor directamente, sin LLM y sin estado. Con `?include_explanation=true` agrega una explicación en español |
 | `GET` | `/v1/crops` | Lista de cultivos con familia, tipo, tags y confianza |
 | `GET` | `/v1/crops/{crop}` | Ficha de un cultivo. Acepta nombres comunes (tarwi, ataco, ulluco…) |
 | `GET` | `/health` | Estado: LLM activo, modo de búsqueda, número de cultivos, sesiones activas y fecha de la base |
+
+### Recomendación con evidencia (una sola llamada)
+
+`POST /v1/recommendations` recibe las respuestas de la pantalla de opciones y devuelve solo JSON (sin texto conversacional):
+
+```bash
+curl -X POST localhost:8000/v1/recommendations -H "Content-Type: application/json"   -d '{"previous_crop": "cebada", "priority": "low_labor", "irrigation": "rain_only", "waterlogging": "long"}'
+```
+
+- **Entrada:**
+  - `previous_crop`: un cultivo del pool, o `new_land`.
+  - `priority`: una de `market_value` | `speed` | `fewer_pests` | `low_labor`.
+  - `irrigation`: `rain_only` | `pump` | `canal` | `sprinkler_drip` | `manual`. `rain_only` es sin riego.
+  - `waterlogging`: `no` | `briefly` | `long`. Se traduce a drenaje bueno, regular o malo.
+  - `remote_sensing`: se acepta, pero en el MVP **se ignora y no se valida**: siempre se usa la copia del servidor, `knowledge/structured/remote_sensing.json`. La altitud sale de esa copia.
+- **Cómo decide:**
+  1. El motor aplica los filtros duros y la rotación, y entrega los **5 mejores por aptitud agronómica**, sin prioridades. Aquí no se aplica la regla de no comerciales: barbecho, pasto y abono verde también son candidatos.
+  2. El modelo (una llamada con salida estructurada) califica cada candidato de 0 a 100 en:
+     - **prioridad**, con el dato de la ficha;
+     - **riesgo de la parcela**: compara las condiciones del remote-sensing con la investigación del cultivo, que se lee del RAG por cultivo y tema.
+  3. El código combina: **afinidad = 0,30 · prioridad + 0,40 · riesgo + 0,30 · aptitud**, y 100 es el mejor cultivo.
+- **Reglas fijas del código:**
+  - sin dato de la prioridad → 30;
+  - advertencia ALTO del motor → riesgo ≤ 40; MEDIO → riesgo ≤ 70;
+  - evidencia solo de otra región o sin verificar → riesgo ≥ 50;
+  - sin investigación de los temas activos → riesgo 60;
+  - riesgo < 40 → afinidad ≤ 40 (riesgo primero).
+- **Salida:**
+  - `recommendation` y `alternatives` (hasta 4), cada una con `affinity`, `confidence` (alta, media o baja), `summary`, `why` (prioridad, riesgo y rotación, con su nota, su motivo y sus referencias), `rotation` y `advisories`;
+  - además: `how_to_compare`, `sources` (`F<n>` = fuente de la ficha, `I<n>` = fragmento de investigación), `missing_data`, `discarded`, `plot_conditions` y `flags`.
+- **Errores:**
+  - `422` con `{"errors": [...]}` (cultivo desconocido o entrada inválida);
+  - `503` sin `OPENAI_API_KEY`;
+  - `502` si el modelo falla.
 
 ### Conversación con el agente
 
