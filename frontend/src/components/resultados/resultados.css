@@ -93,6 +93,9 @@
   color: color-mix(in srgb, var(--c) 80%, #000);
 }
 .rs-consejo.nivel-atencion { --c: #b45309; }
+.rs-consejo.nivel-problema { --c: #b91c1c; }
+.rs-consejo.nivel-bien { --c: #047857; }
+.rs-consejo small { font-size: 12px; font-weight: 600; color: var(--c); text-transform: uppercase; letter-spacing: 0.02em; }
 .rs-consejo svg { flex-shrink: 0; margin-top: 2px; }
 .rs-consejo div { display: flex; flex-direction: column; gap: 2px; }
 .rs-consejo strong { font-size: 15px; font-weight: 600; color: #111827; }
@@ -381,4 +384,115 @@
 @media (prefers-reduced-motion: reduce) {
   .rs-vista, .rs-orbita, .rs-foco span, .rs-recomendacion { animation: none !important; }
   .rs-contenido { scroll-behavior: auto; }
+}
+
+/* ======================================================================
+   Resultados con remote-sensing (Parcela 1, ruta /prueba)
+   Colores de texto con contraste ≥ 4,5:1 sobre blanco; el nivel siempre va con texto e ícono.
+   ====================================================================== */
+.rs { --rs-alto: #b91c1c; --rs-medio: #b45309; --rs-bajo: #0e7490; --rs-ok: #047857; }
+
+/* ---------- Estado de tu parcela (tarjeta principal) ---------- */
+.rs-estado {
+  overflow: hidden;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.rs-estado:hover { border-color: #a7d7c3; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+.rs-estado:active { transform: scale(0.99); }
+.rs-estado:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+.rs-estado-cabecera { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+.rs-estado-cabecera h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.rs-estado-icono { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(160deg, #7c63c2, #5b3fa6); color: #fff; }
+.rs-estado-mapa { height: 170px; margin: 0 16px; overflow: hidden; border-radius: 14px; }
+.rs-estado-mapa .map { width: 100%; height: 100%; pointer-events: none; }
+.rs-estado-cuerpo { display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 6px; }
+.rs-estado-accion { margin: 0; font-size: 15px; line-height: 1.4; color: #374151; }
+.rs-estado-accion strong { color: var(--rs-tinta); font-weight: 600; }
+.rs-estado-meta { display: flex; align-items: center; gap: 6px; min-height: 44px; margin: 0; font-size: 13px; color: var(--rs-suave); }
+.rs-estado-ver { display: inline-flex; align-items: center; margin-left: auto; color: var(--rs-ok); font-weight: 600; white-space: nowrap; }
+.rs-estado-vacio { margin: 0; padding: 14px 16px 18px; font-size: 14px; color: var(--rs-suave); }
+
+/* ---------- Barra de salud (tarjeta y detalle) ---------- */
+.rs-barra-segmentos { display: flex; gap: 2px; height: 12px; }
+.rs-barra-segmentos span { min-width: 6px; border-radius: 4px; }
+.rs-barra-leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 13px; color: #374151; }
+.rs-barra-leyenda li { display: inline-flex; align-items: center; gap: 5px; }
+.rs-barra-leyenda strong { color: var(--rs-tinta); font-weight: 600; font-variant-numeric: tabular-nums; }
+.rs-barra-salud.compacta .rs-barra-segmentos { height: 10px; }
+.rs-barra-salud.compacta .rs-barra-leyenda { gap: 2px 10px; font-size: 12px; }
+.rs-barra-vacia { margin: 0; font-size: 13px; color: var(--rs-suave); }
+.rs-mapa-tarjeta .rs-barra-salud { margin: 14px 4px 4px; }
+
+/* ---------- Chips (nivel de riesgo, certeza) ---------- */
+.rs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.rs-chip.confirmada { color: var(--rs-ok); }
+.rs-chip.preventiva { color: #4b5563; border-style: dashed; }
+.rs-chip.nivel-alto { color: var(--rs-alto); }
+.rs-chip.nivel-medio { color: var(--rs-medio); }
+.rs-chip.nivel-bajo { color: var(--rs-bajo); }
+
+/* ---------- Franja de alertas (acordeón) ---------- */
+.rs-alertas { overflow: hidden; border: 1.5px solid #e5e7eb; border-radius: 16px; background: #fff; }
+.rs-alertas.vacio { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; font-size: 14px; color: var(--rs-ok); }
+.rs-alertas-lista { margin: 0; padding: 0; list-style: none; }
+.rs-alerta { display: grid; grid-template-columns: 24px 1fr; gap: 10px; min-height: 44px; padding: 12px 14px; }
+.rs-alerta + .rs-alerta { border-top: 1px solid var(--rs-linea); }
+.rs-alerta-icono { margin-top: 1px; }
+.rs-alerta.nivel-alto { --c: var(--rs-alto); }
+.rs-alerta.nivel-medio { --c: var(--rs-medio); }
+.rs-alerta.nivel-bajo { --c: var(--rs-bajo); }
+.rs-alerta-icono { color: var(--c); }
+.rs-alerta.nivel-alto { box-shadow: inset 4px 0 0 var(--rs-alto); }
+.rs-alerta-texto { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.rs-alerta-texto strong { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.rs-alerta-etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-alerta-etiquetas .rs-chip.nivel { color: var(--c); }
+.rs-alerta-texto p { margin: 0; font-size: 14px; line-height: 1.4; color: #374151; }
+.rs-alerta-texto p.recortado { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rs-alertas-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-top: 1px solid var(--rs-linea);
+  background: #fafafa;
+  color: var(--rs-ok);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rs-alertas-toggle:hover { background: #f0fdf4; }
+.rs-alertas-toggle:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: -3px; }
+.rs-alertas-toggle svg { transition: transform 0.2s; }
+.rs-alertas-toggle svg.girado { transform: rotate(180deg); }
+
+/* ---------- Tarjetas de análisis con riesgo ---------- */
+.rs-analisis .ui-fila-texto { gap: 6px; }
+.rs-analisis-titulo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.rs-analisis-cuerpo { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.35; color: #374151; }
+.rs-analisis-cuerpo .rs-ventana { font-weight: 600; color: var(--rs-tinta); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-estado, .rs-alertas-toggle svg { transition: none; }
 }

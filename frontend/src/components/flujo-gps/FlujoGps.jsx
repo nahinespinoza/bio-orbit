@@ -6,13 +6,15 @@ import PantallaHectareas from './PantallaHectareas.jsx'
 import PantallaUbicarParcela from './PantallaUbicarParcela.jsx'
 import PantallaHome from './PantallaHome.jsx'
 import PantallaResultados from '../resultados/PantallaResultados.jsx'
-import { formatoNumero } from './geo.js'
+import { centroide, formatoNumero } from './geo.js'
 import '../onboarding/onboarding.css'
 import '../mapa-movil/mapa-movil.css'
 import './flujo-gps.css'
 
 const PANTALLA = {
   LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, INFO_UBICAR: 5, UBICAR_PARCELA: 6, HOME: 7, RESULTADOS: 8,
+  // Editar una finca: por cada parcela, animación → cuadro sobre la parcela; al final, ✓
+  EDITAR_INFO: 9, EDITAR_PARCELA: 10, EDITAR_OK: 11,
 }
 
 // Flujo que sigue a "Estoy en mi finca":
@@ -20,7 +22,7 @@ const PANTALLA = {
 // Las pantallas ✓ e informativas avanzan solas.
 // Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio.
 export default function FlujoGps({
-  nombre, ubicacionInicial = null, parcelaInicial = null, onCancelar, onManual,
+  nombre, ubicacionInicial = null, parcelaInicial = null, fincasExtra, remoteSensingPrincipal, onCancelar, onManual,
 }) {
   const [pantalla, setPantalla] = useState(parcelaInicial ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
   const [direccion, setDireccion] = useState('adelante')
@@ -32,11 +34,57 @@ export default function FlujoGps({
   const [agregando, setAgregando] = useState(false)
   const [haNueva, setHaNueva] = useState(null)
   const [modoAnalisis, setModoAnalisis] = useState('Rápido')
-  const [analisis, setAnalisis] = useState(null)
+  // Otras fincas (ruta /prueba) y la edición en curso:
+  // { finca: 'principal' | índice en `fincas`, indice: parcela actual, nuevas: parcelas ya re-ubicadas }
+  const [fincas, setFincas] = useState(fincasExtra ?? [])
+  const [edicion, setEdicion] = useState(null)
 
-  const irA = (destino) => {
-    setDireccion(destino > pantalla ? 'adelante' : 'atras')
+  const irA = (destino, sentido) => {
+    setDireccion(sentido ?? (destino > pantalla ? 'adelante' : 'atras'))
     setPantalla(destino)
+  }
+
+  const parcelasDe = (finca) => (finca === 'principal' ? parcelas : fincas[finca].parcelas)
+  const nombreDe = (finca) => (finca === 'principal' ? (fincas.length ? 'Parcela 1 Papa' : 'Mi finca') : fincas[finca].nombre)
+
+  const editarFinca = (finca) => {
+    setEdicion({ finca, indice: 0, nuevas: parcelasDe(finca) })
+    irA(PANTALLA.EDITAR_INFO)
+  }
+
+  const alAceptarEdicion = ({ automatico: _automatico, ...resultado }) => {
+    const nuevas = edicion.nuevas.map((p, i) => (i === edicion.indice ? resultado : p))
+    if (edicion.indice + 1 < nuevas.length) {
+      setEdicion({ ...edicion, indice: edicion.indice + 1, nuevas })
+      irA(PANTALLA.EDITAR_INFO, 'adelante')
+      return
+    }
+    if (edicion.finca === 'principal') {
+      setParcelas(nuevas)
+    } else {
+      setFincas((prev) => prev.map((f, i) => (i === edicion.finca ? { ...f, parcelas: nuevas } : f)))
+    }
+    setEdicion({ ...edicion, nuevas })
+    irA(PANTALLA.EDITAR_OK)
+  }
+
+  // Tocar una tarjeta abre el análisis de esa finca (su primera parcela).
+  const [seleccion, setSeleccion] = useState(null) // null = finca principal
+  const verFinca = (finca) => {
+    if (finca === 'principal') {
+      setSeleccion(null)
+    } else {
+      const parcelaFinca = fincas[finca].parcelas[0]
+      const [lat, lng] = centroide(parcelaFinca.poligono)
+      setSeleccion({ ubicacion: { lat, lng, precision: null }, parcela: parcelaFinca })
+    }
+    setModoAnalisis('Rápido')
+    irA(PANTALLA.RESULTADOS)
+  }
+
+  const cancelarEdicion = () => {
+    setEdicion(null)
+    irA(PANTALLA.HOME)
   }
 
   const alUbicar = (u) => {
@@ -52,7 +100,15 @@ export default function FlujoGps({
   // `otra`: el usuario eligió "Guardar y agregar otra parcela"
   // (`automatico` solo indica si se ajustó a los bordes; no se guarda en la parcela)
   const alAceptarParcela = ({ automatico: _automatico, ...resultado }, { otra = false } = {}) => {
-    setParcelas((prev) => (agregando ? [...prev, resultado] : [resultado]))
+    if (agregando && fincasExtra) {
+      // Ruta /prueba: cada parcela nueva es otra tarjeta ("Parcela N Papa", N sigue a las existentes)
+      setFincas((prev) => [
+        ...prev,
+        { id: `nueva-${Date.now()}`, nombre: `Parcela ${prev.length + 2} Papa`, zona: ubicacion?.zona ?? '', parcelas: [resultado] },
+      ])
+    } else {
+      setParcelas((prev) => (agregando ? [...prev, resultado] : [resultado]))
+    }
     if (otra) {
       setAgregando(true)
       setHaNueva(null)
@@ -73,11 +129,6 @@ export default function FlujoGps({
   const cancelarNuevaParcela = () => {
     setAgregando(false)
     irA(PANTALLA.HOME)
-  }
-
-  const analizar = (modo) => {
-    setModoAnalisis(modo)
-    irA(PANTALLA.RESULTADOS)
   }
 
   const poligonosGuardados = useMemo(() => parcelas.map((p) => p.poligono), [parcelas])
@@ -144,15 +195,62 @@ export default function FlujoGps({
             onVolver={() => irA(PANTALLA.HECTAREAS)}
           />
         )
+      case PANTALLA.EDITAR_INFO: {
+        const total = edicion.nuevas.length
+        return (
+          <PantallaInformativa
+            ilustracion={<IlustracionUbicar />}
+            titulo={total > 1 ? `Ubica la parcela ${edicion.indice + 1} de ${total}` : 'Ahora ubica tu parcela'}
+            mensaje={`${nombreDe(edicion.finca)}: mueve el cuadro hasta que quede encima del terreno.`}
+            duracion={3400}
+            onFin={() => irA(PANTALLA.EDITAR_PARCELA)}
+          />
+        )
+      }
+      case PANTALLA.EDITAR_PARCELA: {
+        const actual = edicion.nuevas[edicion.indice]
+        const [lat, lng] = centroide(actual.poligono)
+        const total = edicion.nuevas.length
+        return (
+          <PantallaUbicarParcela
+            ubicacion={{ lat, lng }}
+            centroInicial={{ lat, lng }}
+            hectareas={Math.round(actual.area * 100) / 100}
+            otrasParcelas={edicion.nuevas.filter((_, i) => i !== edicion.indice).map((p) => p.poligono)}
+            titulo={total > 1 ? `Parcela ${edicion.indice + 1} de ${total}: pon el cuadro encima` : undefined}
+            edicion
+            onAceptar={alAceptarEdicion}
+            onVolver={cancelarEdicion}
+          />
+        )
+      }
+      case PANTALLA.EDITAR_OK: {
+        const area = edicion.nuevas.reduce((s, p) => s + p.area, 0)
+        const n = edicion.nuevas.length
+        return (
+          <PantallaInformativa
+            titulo="¡Finca actualizada!"
+            mensaje={`${nombreDe(edicion.finca)}: ${n} ${n > 1 ? 'parcelas' : 'parcela'} · ${formatoNumero(area, 1)} ha.`}
+            onFin={() => {
+              setEdicion(null)
+              irA(PANTALLA.HOME)
+            }}
+          />
+        )
+      }
       case PANTALLA.RESULTADOS:
         return (
           <PantallaResultados
-            ubicacion={ubicacion}
-            parcela={parcela}
+            ubicacion={seleccion?.ubicacion ?? ubicacion}
+            parcela={seleccion?.parcela ?? parcela}
             modo={modoAnalisis}
-            onVolver={() => irA(PANTALLA.HOME)}
+            // Ruta /prueba: la finca principal (Parcela 1) usa los datos quemados del remote-sensing
+            remoteSensing={seleccion ? undefined : remoteSensingPrincipal}
+            onVolver={() => {
+              setSeleccion(null)
+              irA(PANTALLA.HOME)
+            }}
             onProfundo={() => setModoAnalisis('Profundo')}
-            onAnalisis={setAnalisis}
           />
         )
       default:
@@ -161,10 +259,10 @@ export default function FlujoGps({
             nombre={nombre}
             ubicacion={ubicacion}
             parcelas={parcelas}
-            analisis={analisis}
-            onProceso={analizar}
+            fincasExtra={fincas}
+            onEditarFinca={editarFinca}
+            onVerFinca={verFinca}
             onAgregarParcela={empezarNuevaParcela}
-            onVerResultados={() => (analisis ? irA(PANTALLA.RESULTADOS) : analizar('Rápido'))}
           />
         )
     }

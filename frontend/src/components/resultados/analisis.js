@@ -98,13 +98,13 @@ function rangoMeses(indices) {
 // Lluvia (GPM IMERG)
 // ---------------------------------------------------------------------------
 
-export function resumenLluvia(lluvia) {
+export function resumenLluvia(lluvia, minAños = MIN_AÑOS) {
   const años = Object.keys(lluvia).sort()
   const meses = MESES.map((_, m) => {
     const valores = años.map((a) => lluvia[a][m]).filter((v) => v != null)
     const ord = [...valores].sort((a, b) => a - b)
     // Un mes sin suficientes años válidos queda en null ("sin datos"), nunca en 0 mm.
-    const suficiente = ord.length >= MIN_AÑOS
+    const suficiente = ord.length >= minAños
     const redondo = (q) => (suficiente ? Math.round(cuantil(ord, q)) : null)
     return {
       mes: m,
@@ -235,6 +235,78 @@ export function zonasParcela(parcela, ubicacion, humedadMes) {
 
   // `simulado` se apaga cuando las celdas vengan de imágenes reales (HLS / Sentinel-2).
   return { simulado: true, celdas, tamCelda: Math.round(tam), verdor: resumir('verdor'), humedad: resumir('humedad') }
+}
+
+// ---------------------------------------------------------------------------
+// Mapa de salud por zonas con datos REALES del remote-sensing (Sentinel-2, 10 m)
+// ---------------------------------------------------------------------------
+
+// Clases de precision_s2.py → estados de la app. El reparto oficial (% de la parcela) sale de
+// sentinel2_parcela.json; las celdas (píxeles de 10 m) solo dibujan el mapa.
+const PCT_A_ESTADOS = (pct) => ({
+  bien: pct.verde ?? 0,
+  atencion: (pct.amarillo ?? 0) + (pct.azul ?? 0),
+  problema: 0,
+  grave: pct.rojo ?? 0,
+})
+
+export function zonasRemoteSensing(rs, parcela) {
+  const { celdas: crudas, pct_humedad: pctHumedad, estado } = rs.sentinel
+  // El reparto de salud que se presenta es el del resumen (sana / alerta / crítica)
+  const pctVigor = rs.resumen
+    ? { verde: rs.resumen.salud.sana, amarillo: rs.resumen.salud.alerta, rojo: rs.resumen.salud.critico }
+    : rs.sentinel.pct_vigor
+  const area = parcela.area
+  const lats = parcela.poligono.map((p) => p[0])
+  const lngs = parcela.poligono.map((p) => p[1])
+  const [s, n, o, e] = [Math.min(...lats), Math.max(...lats), Math.min(...lngs), Math.max(...lngs)]
+
+  const celdas = crudas.map((c) => {
+    const lat = (c.limites[0][0] + c.limites[1][0]) / 2
+    const lng = (c.limites[0][1] + c.limites[1][1]) / 2
+    return {
+      limites: c.limites,
+      x: ((lng - o) / (e - o)) * 2 - 1,
+      y: ((lat - s) / (n - s)) * 2 - 1,
+      estado: { verdor: c.verdor, humedad: c.humedad }, // null = sin dato en esa capa (no se dibuja)
+    }
+  })
+
+  const resumir = (capa, pct, sectorOficial) => {
+    const p = PCT_A_ESTADOS(pct)
+    const total = ORDEN_ESTADOS.reduce((acc, k) => acc + p[k], 0) || 100
+    const distribucion = ORDEN_ESTADOS.map((k) => ({
+      estado: k,
+      porcentaje: (p[k] / total) * 100,
+      hectareas: (p[k] / total) * area,
+    }))
+    const malas = celdas.filter((c) => c.estado[capa] === 'problema' || c.estado[capa] === 'grave')
+    const media = (f) => malas.reduce((acc, c) => acc + f(c), 0) / (malas.length || 1)
+    const pctMalo = distribucion[2].porcentaje + distribucion[3].porcentaje
+    return {
+      distribucion,
+      puntaje: Math.round(distribucion.reduce((acc, d) => acc + (d.porcentaje / 100) * ESTADOS[d.estado].peso, 0)),
+      normal: distribucion[0].porcentaje,
+      afectadas: malas.length ? {
+        hectareas: (pctMalo / 100) * area,
+        porcentaje: pctMalo,
+        zona: sectorOficial ?? direccion(media((c) => c.x), media((c) => c.y)),
+        centro: [
+          media((c) => (c.limites[0][0] + c.limites[1][0]) / 2),
+          media((c) => (c.limites[0][1] + c.limites[1][1]) / 2),
+        ],
+      } : null,
+    }
+  }
+
+  return {
+    simulado: false,
+    fuente: `Sentinel-2 · ${rs.fuente.fecha_foto.split('-').reverse().join('/')}`,
+    celdas,
+    tamCelda: 10,
+    verdor: resumir('verdor', pctVigor, estado.sector_mas_afectado),
+    humedad: resumir('humedad', pctHumedad),
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -370,11 +442,13 @@ export function compararRotaciones(lluviaResumen, prefs) {
 // Resultado completo + recomendaciones
 // ---------------------------------------------------------------------------
 
-export function analizarFinca({ datos, parcela, ubicacion, fecha = new Date() }) {
+// `zonas` (opcional): mapa de salud ya calculado (p. ej. Sentinel-2 real); si no, se simula.
+// `minAños`: años con dato que necesita un mes para tener "lo normal" (la serie del remote-sensing tiene 5).
+export function analizarFinca({ datos, parcela, ubicacion, fecha = new Date(), zonas: zonasDadas, minAños }) {
   const mesActual = fecha.getMonth()
-  const lluvia = { ...resumenLluvia(datos.lluvia), ejemplo: datos.simulado }
+  const lluvia = { ...resumenLluvia(datos.lluvia, minAños), ejemplo: datos.simulado }
   const humedadMes = medianaMes(datos.humedad, mesActual)
-  const zonas = zonasParcela(parcela, ubicacion, humedadMes)
+  const zonas = zonasDadas ?? zonasParcela(parcela, ubicacion, humedadMes)
   const t = medianaMes(datos.temperatura, mesActual)
   const temperatura = t == null ? null : Math.round(t * 10) / 10
 

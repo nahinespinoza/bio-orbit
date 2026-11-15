@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ArrowRight, Sprout } from 'lucide-react'
 import Progreso from './Progreso.jsx'
 
-export default function PasoNombre({ nombre, onNombreChange, onSiguiente }) {
+export default function PasoNombre({ nombre, onNombreChange, onSiguiente, totalPasos = 2 }) {
   const [error, setError] = useState('')
 
   const enviar = (e) => {
@@ -12,14 +12,14 @@ export default function PasoNombre({ nombre, onNombreChange, onSiguiente }) {
       return
     }
     onNombreChange(nombre.trim())
-    onSiguiente()
+    onSiguiente(nombre.trim())
   }
 
   return (
     <form className="onb-form" onSubmit={enviar} noValidate>
       <div className="onb-top">
         <span className="onb-top-hueco" />
-        <Progreso paso={1} />
+        {totalPasos > 1 && <Progreso paso={1} total={totalPasos} />}
       </div>
 
       <div className="onb-cuerpo">

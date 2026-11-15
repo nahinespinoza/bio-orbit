@@ -395,6 +395,34 @@
   font-size: 12px;
   font-weight: 600;
 }
+.fg-btn-editar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--esmeralda);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fg-btn-editar:hover { background: #fff; }
+.fg-btn-editar:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+.fg-home-acciones { display: flex; align-items: center; gap: 10px; }
+.fg-btn-anadir-cabecera { min-height: 40px; padding: 0 14px; font-size: 13px; }
+.fg-tarjeta-finca.tocable { cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.fg-tarjeta-finca.tocable:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
+.fg-tarjeta-finca.tocable:active { transform: scale(0.99); }
+.fg-tarjeta-finca.tocable:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+.fg-tarjeta-flecha { flex-shrink: 0; color: var(--onb-texto-suave); }
 .fg-tarjeta-finca-info { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
 .fg-tarjeta-finca-texto { flex: 1; min-width: 0; }
 .fg-btn-anadir {

@@ -2,6 +2,12 @@ import { useState } from 'react'
 import Onboarding from './components/onboarding/Onboarding.jsx'
 import VistaMapaMovil from './components/mapa-movil/VistaMapaMovil.jsx'
 import FlujoGps from './components/flujo-gps/FlujoGps.jsx'
+import { FINCAS_EJEMPLO, PARCELA, UBICACION } from './lib/parcelaMonitoreada.js'
+import { RS_PARCELA1 } from './lib/remoteSensingParcela1.js'
+
+// En /prueba no se pide la ubicación: tras el nombre se entra al inicio con la
+// parcela monitoreada por el remote-sensing (Toacaso / Sigchos).
+const ES_PRUEBA = window.location.pathname.replace(/\/+$/, '') === '/prueba'
 
 export default function App() {
   // null mientras el usuario está en el onboarding
@@ -29,11 +35,16 @@ export default function App() {
     setSesion(null)
   }
 
+  const onNombreListo = ({ nombre }) => {
+    setSesion({ nombre, modo: 'finca', ubicacion: UBICACION, parcela: PARCELA })
+  }
+
   if (!sesion) {
     return (
       <Onboarding
         nombreInicial={ultimoNombre}
-        pasoInicial={ultimoNombre ? 2 : 1}
+        pasoInicial={ultimoNombre && !ES_PRUEBA ? 2 : 1}
+        onNombreListo={ES_PRUEBA ? onNombreListo : undefined}
         onUseCurrentLocation={onUseCurrentLocation}
         onSelectManually={onSelectManually}
       />
@@ -56,6 +67,8 @@ export default function App() {
       nombre={sesion.nombre}
       ubicacionInicial={sesion.ubicacion}
       parcelaInicial={sesion.parcela}
+      fincasExtra={ES_PRUEBA ? FINCAS_EJEMPLO : undefined}
+      remoteSensingPrincipal={ES_PRUEBA ? RS_PARCELA1 : undefined}
       onCancelar={volverAlOnboarding}
       onManual={() => onSelectManually({ nombre: sesion.nombre })}
     />

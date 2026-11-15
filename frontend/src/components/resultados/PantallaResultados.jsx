@@ -3,13 +3,18 @@ import {
   Check, ChevronLeft, CloudRain, Droplets, Layers, LoaderCircle, RefreshCw, Satellite, Sprout, Wheat, WifiOff, Zap,
 } from 'lucide-react'
 import { PERIODO, obtenerDatosNasa } from '../../lib/nasa.js'
-import { MESES_LARGOS, PREFERENCIAS_INICIALES, analizarFinca, compararRotaciones, formato } from './analisis.js'
+import {
+  MESES_LARGOS, PREFERENCIAS_INICIALES, analizarFinca, compararRotaciones, formato, zonasRemoteSensing,
+} from './analisis.js'
 import MapaSalud from './MapaSalud.jsx'
 import GraficoLluvia from './GraficoLluvia.jsx'
 import Rotaciones from './Rotaciones.jsx'
 import Widget from '../ui/Widget.jsx'
 import FilaAnalisis from '../ui/FilaAnalisis.jsx'
 import { IlustracionClima } from '../ui/Ilustraciones.jsx'
+import AlertaPrincipal from './AlertaPrincipal.jsx'
+import AnalisisCard from './AnalisisCard.jsx'
+import EstadoParcelaCard from './EstadoParcelaCard.jsx'
 import './resultados.css'
 
 const PASOS = {
@@ -26,6 +31,52 @@ const TITULOS = {
 }
 
 const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1)
+
+// --- Remote-sensing (datos quemados, Parcela 1) ------------------------------------------------
+// Lo que se presenta sale de `rs.resumen` (resumen-parcela1.json). La serie mensual de NASA POWER de la
+// parcela cubre 5 años (2021–2026): cada mes tiene 4 o 5 años con dato.
+const RS_MIN_AÑOS = 4
+const fechaCorta = (iso) => iso.split('-').reverse().join('/')
+const diaMes = (iso) => fechaCorta(iso).slice(0, 5)
+const pct = (v) => `${Math.round(v)}%`
+
+// Nombre corto de cada alerta para las etiquetas de riesgo de las tarjetas
+const CORTO = { NUTRICION_PROBABLE: 'Nitrógeno', NUTRIENTES: 'Nutrientes', PLAGAS_LANCHA: 'Lancha', HELADAS: 'Heladas' }
+
+function alertasRS(rs) {
+  return rs.resumen.alertas.map((a) => ({
+    id: a.codigo,
+    nivel: a.nivel,
+    confirmada: Boolean(a.confirmada),
+    titulo: rs.alertas_textos[a.codigo]?.titulo ?? CORTO[a.codigo] ?? a.codigo,
+    texto: rs.alertas_textos[a.codigo]?.mensaje ?? '',
+  }))
+}
+
+// "Lancha · alto (preventivo)" a partir de la alerta con ese código (null si no hay)
+function riesgoDe(alertas, codigo) {
+  const a = alertas.find((x) => x.id === codigo)
+  if (!a) return null
+  const nivel = a.nivel.toLowerCase()
+  return { nivel, texto: `${CORTO[codigo] ?? a.titulo} · ${nivel}${a.confirmada ? '' : ' (preventivo)'}` }
+}
+
+// El agua: el suelo (NASA, regional) y las hojas (Sentinel-2) pueden no coincidir.
+// La fila usa lenguaje de finca; el detalle explica las cifras (NDMI incluido).
+function aguaRS({ agua }) {
+  if (!agua) return { fila: 'Sin datos de agua para esta fecha.', titulo: null, texto: null }
+  if (agua.estado === 'FUENTES_DIFIEREN') {
+    return {
+      fila: 'Las fuentes difieren: suelo húmedo, hojas con poca agua',
+      titulo: 'El suelo y las hojas no coinciden',
+      texto:
+        `La humedad del suelo de la zona es ${pct(agua.regionalPct)} (NASA POWER), pero el satélite ve poca agua ` +
+        `en las hojas (NDMI ${formato(agua.ndmi, 2)}). Revisa el lote en campo: puede ser estrés local, ` +
+        'drenaje o poca cobertura del cultivo.',
+    }
+  }
+  return { fila: `Suelo de la zona con ${pct(agua.regionalPct)} de humedad`, titulo: null, texto: null }
+}
 
 function Cargando({ modo, paso }) {
   const pasos = PASOS[modo]
@@ -63,7 +114,9 @@ function estacionDelMes(mediana, promedio) {
   return { tipo: 'nubes', texto: 'Lluvia moderada' }
 }
 
-export default function PantallaResultados({ ubicacion, parcela, modo, onVolver, onProfundo, onAnalisis }) {
+// Con `remoteSensing` (datos quemados de remote-sensing/, ver frontend/scripts/generar_remote_sensing.py)
+// no se descarga nada: el clima sale de NASA POWER de la parcela y el mapa de salud de Sentinel-2.
+export default function PantallaResultados({ ubicacion, parcela, modo, remoteSensing: rs, onVolver, onProfundo, onAnalisis }) {
   const [datos, setDatos] = useState(null)
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
@@ -77,7 +130,10 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
     const control = new AbortController()
     const minimo = DURACION_MIN[modo]
     const inicio = performance.now()
-    obtenerDatosNasa(ubicacion, control.signal)
+    const fuente = rs
+      ? Promise.resolve({ lluvia: rs.mensual.lluvia, humedad: rs.mensual.humedad, temperatura: rs.mensual.temperatura, simulado: false })
+      : obtenerDatosNasa(ubicacion, control.signal)
+    fuente
       .then((d) => new Promise((ok) => setTimeout(() => ok(d), Math.max(0, minimo - (performance.now() - inicio)))))
       .then((d) => !control.signal.aborted && setDatos(d))
       .catch(() => {})
@@ -94,8 +150,17 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
   }, [datos, modo])
 
   const analisis = useMemo(
-    () => (datos ? analizarFinca({ datos, parcela, ubicacion }) : null),
-    [datos, parcela, ubicacion],
+    () =>
+      datos
+        ? analizarFinca({
+            datos,
+            parcela,
+            ubicacion,
+            zonas: rs ? zonasRemoteSensing(rs, parcela) : undefined,
+            minAños: rs ? RS_MIN_AÑOS : undefined,
+          })
+        : null,
+    [datos, parcela, ubicacion, rs],
   )
   const comparacion = useMemo(
     () => (analisis ? compararRotaciones(analisis.lluvia, prefs) : null),
@@ -157,6 +222,17 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
   const estacion = estacionDelMes(mesAhora.mediana, lluvia.promedioMes)
   const consejoLluvia = acciones.find((a) => a.id === 'lluvia' || a.id === 'sin-datos')
   const recomendado = comparacion.planes.find((p) => p.id === comparacion.recomendado)
+
+  // Remote-sensing (Parcela 1): lo que se presenta sale del resumen
+  const r = rs?.resumen
+  const agua = r ? aguaRS(r) : null
+  const consejoRS = r && {
+    verdor: r.salud && {
+      titulo: r.salud.mensaje,
+      texto: `Foto Sentinel-2 del ${fechaCorta(r.salud.fecha)}. ${rs.alertas_textos.NUTRICION_PROBABLE?.mensaje ?? ''}`,
+    },
+    humedad: agua.titulo && { titulo: agua.titulo, texto: agua.texto },
+  }
 
   const textoSiembra = !profundo
     ? 'Descubre qué sembrar en los próximos 4 años'
@@ -248,16 +324,111 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
     </>
   )
 
+  // Parcela 1 (remote-sensing): clima → estado de la parcela → alertas → análisis
+  const listaRS = r && (() => {
+    const alertas = alertasRS(rs)
+    const v = r.ventanaVulnerable
+    return (
+      <>
+        <Widget
+          tono="azul"
+          ilustracion={<IlustracionClima tipo={r.clima.lluvia7dMm >= 40 ? 'lluvia' : 'nubes'} />}
+          valor={formato(r.clima.tempMediaC)}
+          unidad="°C"
+          insignia="Últimos 7 días"
+          detalle={[
+            `Mín ${formato(r.clima.tempMinC)} °C · Máx ${formato(r.clima.tempMaxC)} °C`,
+            `Lluvia: ${formato(r.clima.lluvia7dMm)} mm en 7 días`,
+          ]}
+          etiqueta="Clima en tu parcela"
+          accion={{ texto: 'Ver lluvia', onClick: () => setDetalle('lluvia') }}
+        />
+
+        <EstadoParcelaCard parcela={parcela} zonas={zonas} salud={r.salud} onAbrir={() => setDetalle('verdor')} />
+
+        <AlertaPrincipal alertas={alertas} />
+
+        <section>
+          <h2 className="rs-titulo">Análisis de tu parcela</h2>
+          <ul className="ui-lista">
+            {/* La salud del cultivo se abre desde "Estado de tu parcela" (arriba) */}
+            <li>
+              <AnalisisCard
+                tono="azul"
+                Icono={Droplets}
+                titulo="Agua"
+                nota="NASA POWER + Sentinel-2"
+                onClick={() => setDetalle('humedad')}
+              >
+                {agua.fila}
+              </AnalisisCard>
+            </li>
+            <li>
+              <AnalisisCard
+                tono="turquesa"
+                Icono={CloudRain}
+                titulo="Lluvia"
+                riesgo={riesgoDe(alertas, 'PLAGAS_LANCHA')}
+                nota={r.lluvia?.fuente}
+                onClick={() => setDetalle('lluvia')}
+              >
+                {r.lluvia?.diciembreMm != null
+                  ? `Diciembre: unos ${formato(r.lluvia.diciembreMm, 0)} mm (promedio histórico)`
+                  : 'Sin datos de lluvia para el próximo mes.'}
+              </AnalisisCard>
+            </li>
+            <li>
+              <AnalisisCard
+                tono="verde"
+                Icono={Wheat}
+                titulo="Plan de siembra"
+                nota={profundo ? 'Próximos 4 años' : 'Análisis profundo'}
+                onClick={() => {
+                  if (!profundo) onProfundo()
+                  setDetalle('siembra')
+                }}
+              >
+                {v && (
+                  <span className="rs-ventana">
+                    Ventana vulnerable: {v.dias} días ({diaMes(v.desde)} al {diaMes(v.hasta)})
+                  </span>
+                )}
+                <span>{v ? 'La temporada pasada el cultivo estuvo débil: conviene rotar.' : textoSiembra}</span>
+              </AnalisisCard>
+            </li>
+          </ul>
+        </section>
+
+        {r.confianza && (
+          <p className="rs-fuentes-linea">
+            <Satellite size={14} /> {r.confianza.capturasUsadas} de {r.confianza.capturasTotales} fotos Sentinel-2
+            usadas · {formato(r.confianza.areaHa, 2)} ha
+          </p>
+        )}
+      </>
+    )
+  })()
+
   const vistaLluvia = (
     <>
-      {consejoLluvia && consejoLluvia.id !== 'sin-datos' && (
-        <div className={`rs-consejo nivel-${consejoLluvia.nivel}`}>
+      {r ? (
+        <div className="rs-consejo nivel-info">
           <CloudRain size={20} />
           <div>
-            <strong>{consejoLluvia.titulo}</strong>
-            <span>{consejoLluvia.texto}</span>
+            <strong>Diciembre: unos {formato(r.lluvia.diciembreMm, 0)} mm</strong>
+            <span>Promedio histórico de {r.lluvia.fuente}. En los últimos 7 días cayeron {formato(r.clima.lluvia7dMm)} mm.</span>
           </div>
         </div>
+      ) : (
+        consejoLluvia && consejoLluvia.id !== 'sin-datos' && (
+          <div className={`rs-consejo nivel-${consejoLluvia.nivel}`}>
+            <CloudRain size={20} />
+            <div>
+              <strong>{consejoLluvia.titulo}</strong>
+              <span>{consejoLluvia.texto}</span>
+            </div>
+          </div>
+        )
       )}
       <div className="rs-tarjeta">
         {ejemplo && <span className="rs-etiqueta-ejemplo">Datos de ejemplo</span>}
@@ -276,9 +447,20 @@ export default function PantallaResultados({ ubicacion, parcela, modo, onVolver,
       {cabecera}
       <div className="rs-contenido" ref={contenidoRef}>
         <div key={detalle ?? 'lista'} className="rs-vista">
-          {detalle === null && lista}
+          {detalle === null && (listaRS || lista)}
           {(detalle === 'verdor' || detalle === 'humedad') && (
-            <MapaSalud parcela={parcela} zonas={zonas} capa={detalle} />
+            <>
+              {consejoRS?.[detalle] && (
+                <div className={`rs-consejo nivel-${detalle === 'verdor' ? 'atencion' : 'info'}`}>
+                  {detalle === 'verdor' ? <Sprout size={20} /> : <Droplets size={20} />}
+                  <div>
+                    <strong>{consejoRS[detalle].titulo}</strong>
+                    <span>{consejoRS[detalle].texto}</span>
+                  </div>
+                </div>
+              )}
+              <MapaSalud parcela={parcela} zonas={zonas} capa={detalle} />
+            </>
           )}
           {detalle === 'lluvia' && vistaLluvia}
           {detalle === 'siembra' && profundo && (

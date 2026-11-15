@@ -1,0 +1,13 @@
+{
+  "clima": { "tempMediaC": 7.7, "tempMinC": 2.2, "tempMaxC": 13.0, "lluvia7dMm": 69.5 },
+  "salud": { "sana": 16.7, "alerta": 55.8, "critico": 27.5, "mensaje": "Déficit probable de nitrógeno", "fecha": "2026-10-27", "diasDesdeFoto": 19, "sectorMasAfectado": "oeste" },
+  "agua": { "regionalPct": 75.4, "ndmi": -0.1811, "estado": "FUENTES_DIFIEREN" },
+  "lluvia": { "diciembreMm": 117.1, "tipo": "promedio_historico", "fuente": "NASA POWER 2021-2026" },
+  "ventanaVulnerable": { "desde": "2026-06-29", "hasta": "2026-10-09", "dias": 102 },
+  "alertas": [
+    { "codigo": "NUTRICION_PROBABLE", "nivel": "MEDIO", "confirmada": true },
+    { "codigo": "PLAGAS_LANCHA", "nivel": "ALTO", "confirmada": false },
+    { "codigo": "HELADAS", "nivel": "MEDIO", "confirmada": false }
+  ],
+  "confianza": { "capturasUsadas": 9, "capturasTotales": 23, "areaHa": 1.17 }
+}

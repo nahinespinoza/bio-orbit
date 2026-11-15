@@ -4,6 +4,8 @@ import L from '../../lib/leaflet.js'
 import { TILE_SATELITE } from '../flujo-gps/geo.js'
 import { ESTADOS, ORDEN_ESTADOS, formato, textoZona } from './analisis.js'
 import { ICONO_ESTADO } from './iconos.js'
+import BarraSalud from './BarraSalud.jsx'
+import { ETIQUETAS_SALUD } from './salud.js'
 
 const ICONO_FOCO = L.divIcon({
   className: 'rs-foco',
@@ -13,7 +15,7 @@ const ICONO_FOCO = L.divIcon({
 })
 
 const ETIQUETAS_CAPA = {
-  verdor: { bien: 'Sano', atencion: 'Algo débil', problema: 'Débil', grave: 'Muy débil' },
+  verdor: ETIQUETAS_SALUD, // Sana / En alerta / Débil / Crítica: el mismo vocabulario en toda la app
   humedad: { bien: 'Húmedo', atencion: 'Algo seco', problema: 'Seco', grave: 'Muy seco' },
 }
 
@@ -38,7 +40,7 @@ export default function MapaSalud({ parcela, zonas, capa, resaltar }) {
           attributionControl={false}
         >
           <TileLayer url={TILE_SATELITE.url} maxZoom={19} />
-          {zonas.celdas.map((c, i) => (
+          {zonas.celdas.map((c, i) => c.estado[capa] && (
             <Rectangle
               key={i}
               bounds={c.limites}
@@ -50,18 +52,13 @@ export default function MapaSalud({ parcela, zonas, capa, resaltar }) {
           {resaltar && resumen.afectadas && <Marker position={resumen.afectadas.centro} icon={ICONO_FOCO} interactive={false} />}
         </MapContainer>
         {sim && <span className="rs-insignia-demo">Simulación · no es tu parcela real</span>}
+        {!sim && zonas.fuente && <span className="rs-insignia-demo">{zonas.fuente}</span>}
       </div>
 
-      {/* Barra apilada + leyenda con ícono y texto: el color nunca va solo */}
-      <div className="rs-barra-apilada" aria-hidden="true">
-        {resumen.distribucion
-          .filter((d) => d.porcentaje > 0)
-          .map((d) => (
-            <span key={d.estado} style={{ flexGrow: d.porcentaje, background: ESTADOS[d.estado].color }} />
-          ))}
-      </div>
+      <BarraSalud segmentos={resumen.distribucion} etiquetas={etiquetas} leyenda={false} />
       <ul className="rs-leyenda">
-        {ORDEN_ESTADOS.map((k) => {
+        {/* Con datos reales solo se listan los estados presentes (Sana / En alerta / Crítica) */}
+        {ORDEN_ESTADOS.filter((k) => sim || resumen.distribucion.find((x) => x.estado === k).porcentaje > 0).map((k) => {
           const d = resumen.distribucion.find((x) => x.estado === k)
           const Icono = ICONO_ESTADO[k]
           return (

@@ -118,10 +118,18 @@ const SIN_PARCELAS = []
 
 // `otrasParcelas`: polígonos ya guardados de la finca. Se muestran como
 // referencia y el cuadro nuevo aparece a su lado.
-export default function PantallaUbicarParcela({ ubicacion, hectareas, otrasParcelas = SIN_PARCELAS, onAceptar, onVolver }) {
+// Al editar una parcela existente: `centroInicial` pone el cuadro sobre ella,
+// `titulo` cambia el encabezado y `edicion` oculta el GPS y "agregar otra".
+export default function PantallaUbicarParcela({
+  ubicacion, hectareas, otrasParcelas = SIN_PARCELAS, centroInicial = null, titulo, edicion = false, onAceptar, onVolver,
+}) {
   const inicial = useMemo(
-    () => cuadradoPorArea(otrasParcelas.length ? centroAlLado(otrasParcelas, hectareas) : ubicacion, hectareas),
-    [ubicacion, hectareas, otrasParcelas],
+    () =>
+      cuadradoPorArea(
+        centroInicial ?? (otrasParcelas.length ? centroAlLado(otrasParcelas, hectareas) : ubicacion),
+        hectareas,
+      ),
+    [ubicacion, hectareas, otrasParcelas, centroInicial],
   )
   const limites = useMemo(
     () => L.latLngBounds([...inicial, ...otrasParcelas.flat()]).pad(otrasParcelas.length ? 0.12 : 0.9),
@@ -194,7 +202,7 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, otrasParce
       <div className={`fg-mapa fg-ubicar ${estado}`}>
         <MapContainer bounds={limites} className="map" zoomControl={false} doubleClickZoom={false}>
           <TileLayer url={TILE_SATELITE.url} attribution={TILE_SATELITE.attribution} maxZoom={19} />
-          <Marker position={[ubicacion.lat, ubicacion.lng]} icon={ICONO_GPS} interactive={false} />
+          {!edicion && <Marker position={[ubicacion.lat, ubicacion.lng]} icon={ICONO_GPS} interactive={false} />}
           {otrasParcelas.map((poligono, i) => (
             <Polygon
               key={`otra-${i}`}
@@ -254,7 +262,7 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, otrasParce
                 <Move size={22} />
               </span>
               <div>
-                <h1 className="fg-hoja-titulo">Pon el cuadro sobre tu parcela</h1>
+                <h1 className="fg-hoja-titulo">{titulo ?? 'Pon el cuadro sobre tu parcela'}</h1>
                 <p className="fg-hoja-texto">
                   Arrástralo con el dedo. Mide {formatoNumero(hectareas)} ha, como tu {otrasParcelas.length ? 'parcela' : 'finca'}.
                 </p>
@@ -297,9 +305,11 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, otrasParce
               <button className="onb-btn onb-btn-primario" onClick={() => aceptar()} autoFocus>
                 <Check size={20} /> {detectado ? 'Sí, guardar mi parcela' : 'Guardar así'}
               </button>
-              <button className="onb-btn onb-btn-secundario" onClick={() => aceptar({ otra: true })}>
-                <Plus size={20} /> Guardar y agregar otra parcela
-              </button>
+              {!edicion && (
+                <button className="onb-btn onb-btn-secundario" onClick={() => aceptar({ otra: true })}>
+                  <Plus size={20} /> Guardar y agregar otra parcela
+                </button>
+              )}
               <button className="fg-btn-texto" onClick={moverOtraVez}>
                 Moverlo otra vez
               </button>
