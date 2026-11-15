@@ -2,7 +2,7 @@
   "api": {
     "modulo": "sentinel_2",
     "version": "1.0",
-    "generado": "2026-11-15T00:23:32",
+    "generado": "2026-11-15T00:54:26",
     "fuente": "Copernicus Sentinel-2 L2A (Earth Search / AWS) + Open-Meteo (ERA5)",
     "rutas_relativas_a": "bio-orbit/sentinel_2/",
     "recursos": {
@@ -13,7 +13,7 @@
       "semanas": "Resumen semanal: índices, clima, alertas y ruta del reporte .md",
       "clima_diario": "T mín/máx/media, HR, lluvia, radiación y nubes de madrugada por día",
       "climatologia_mensual": "Promedios 2011-2025 por mes y clases seco/lluvioso, radiación, noches",
-      "alerta_cruzada": "Cruce NASA POWER (clima regional) + Sentinel-2 (parcela), si existe",
+      "alerta_cruzada": "Match NASA POWER + Sentinel-2 (de ../resultado_match.json, si ya se corrió)",
       "archivos": "Rutas de los entregables"
     }
   },
@@ -24,6 +24,7 @@
       -78.773999
     ],
     "area_ha": 1.17,
+    "altitud_msnm": 3588.0,
     "periodo": {
       "inicio": "2026-05-15",
       "fin": "2026-11-15"
@@ -5326,27 +5327,354 @@
     }
   ],
   "alerta_cruzada": {
-    "confirmada": null,
+    "fuente": "../resultado_match.json",
+    "confirmada": {
+      "codigo": "NUTRICION_PROBABLE",
+      "nivel": "MEDIO",
+      "confirmada": true,
+      "titulo": "Déficit de Nutrientes Probable",
+      "mensaje": "Lluvias fuertes pueden haber lavado el nitrógeno y el satélite ve poca clorofila. Evalúa una fertilización foliar fraccionada.",
+      "evidencia": {
+        "nasa_power": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE",
+          "alerta_lavado": true
+        },
+        "sentinel2": {
+          "fecha": "2026-10-27",
+          "estado_vigor": "amarillo",
+          "estado_humedad": "rojo",
+          "ndvi": 0.4482,
+          "ndre": 0.2495,
+          "ndmi": -0.1811,
+          "caida_ndvi_lote": -0.1444,
+          "caida_ndvi_peor_sector": -0.1237,
+          "peor_sector": "oeste",
+          "cambio_ndmi": 0.1382
+        }
+      }
+    },
     "cruces_evaluados": [
+      {
+        "codigo": "NUTRICION_PROBABLE",
+        "nivel": "MEDIO",
+        "confirmada": true,
+        "titulo": "Déficit de Nutrientes Probable",
+        "mensaje": "Lluvias fuertes pueden haber lavado el nitrógeno y el satélite ve poca clorofila. Evalúa una fertilización foliar fraccionada.",
+        "evidencia": {
+          "nasa_power": {
+            "estado_helada": "AMARILLO",
+            "estado_riego": "VERDE_OPTIMO",
+            "estado_estres_calor": "VERDE",
+            "alerta_lavado": true
+          },
+          "sentinel2": {
+            "fecha": "2026-10-27",
+            "estado_vigor": "amarillo",
+            "estado_humedad": "rojo",
+            "ndvi": 0.4482,
+            "ndre": 0.2495,
+            "ndmi": -0.1811,
+            "caida_ndvi_lote": -0.1444,
+            "caida_ndvi_peor_sector": -0.1237,
+            "peor_sector": "oeste",
+            "cambio_ndmi": 0.1382
+          }
+        }
+      },
       {
         "codigo": "LANCHA_PREVENTIVA",
         "nivel": "ALTO",
         "confirmada": false,
         "titulo": "Lancha: riesgo climático, sin daño visible aún",
-        "mensaje": "El clima favorece la Lancha, pero el satélite no detecta caída de vigor en la parcela. Mantén el control preventivo e inspecciona el sector oeste, que tiene más zonas en rojo."
+        "mensaje": "El clima favorece la Lancha, pero el satélite no ve caída de vigor. Mantén el control preventivo e inspecciona el sector oeste, que tiene más zonas en rojo.",
+        "evidencia": {
+          "nasa_power": {
+            "alerta": "PLAGAS_LANCHA",
+            "humedad_relativa_pct": 87.7
+          },
+          "sentinel2": {
+            "fecha": "2026-10-27",
+            "estado_vigor": "amarillo",
+            "estado_humedad": "rojo",
+            "ndvi": 0.4482,
+            "ndre": 0.2495,
+            "ndmi": -0.1811,
+            "caida_ndvi_lote": -0.1444,
+            "caida_ndvi_peor_sector": -0.1237,
+            "peor_sector": "oeste",
+            "cambio_ndmi": 0.1382
+          }
+        }
       },
       {
         "codigo": "HUMEDAD_DISCREPANTE",
         "nivel": "MEDIO",
         "confirmada": false,
         "titulo": "Clima húmedo, pero la parcela se ve seca",
-        "mensaje": "La humedad regional del suelo es adecuada, pero el satélite ve poca agua en el follaje de la parcela. Revisa el lote en campo: puede ser estrés local, drenaje o poca cobertura del cultivo."
+        "mensaje": "La humedad regional del suelo es adecuada, pero el satélite ve poca agua en el follaje. Revisa el lote en campo: puede ser estrés local, drenaje o poca cobertura del cultivo.",
+        "evidencia": {
+          "nasa_power": {
+            "estado_riego": "VERDE_OPTIMO",
+            "humedad_raiz_pct": 75.4,
+            "lluvia_7d": 139.6,
+            "alerta_sequia": false
+          },
+          "sentinel2": {
+            "fecha": "2026-10-27",
+            "estado_vigor": "amarillo",
+            "estado_humedad": "rojo",
+            "ndvi": 0.4482,
+            "ndre": 0.2495,
+            "ndmi": -0.1811,
+            "caida_ndvi_lote": -0.1444,
+            "caida_ndvi_peor_sector": -0.1237,
+            "peor_sector": "oeste",
+            "cambio_ndmi": 0.1382
+          }
+        }
+      }
+    ],
+    "historial": [
+      {
+        "fecha_captura": "2026-05-25",
+        "ventana_nasa": [
+          "19/05/2026",
+          "25/05/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "NUTRIENTES",
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "amarillo",
+          "humedad": "rojo",
+          "ndvi": 0.4121,
+          "caida_ndvi": null
+        },
+        "cruces": [
+          "NUTRICION_PROBABLE",
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": "NUTRICION_PROBABLE"
+      },
+      {
+        "fecha_captura": "2026-06-29",
+        "ventana_nasa": [
+          "23/06/2026",
+          "29/06/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.3011,
+          "caida_ndvi": 0.111
+        },
+        "cruces": [
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-07-14",
+        "ventana_nasa": [
+          "08/07/2026",
+          "14/07/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.2969,
+          "caida_ndvi": 0.0042
+        },
+        "cruces": [
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-07-29",
+        "ventana_nasa": [
+          "23/07/2026",
+          "29/07/2026"
+        ],
+        "nasa": {
+          "estado_helada": "ROJO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.3037,
+          "caida_ndvi": -0.0067
+        },
+        "cruces": [
+          "HUMEDAD_DISCREPANTE",
+          "HELADA_SIN_DANO"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-08-10",
+        "ventana_nasa": [
+          "04/08/2026",
+          "10/08/2026"
+        ],
+        "nasa": {
+          "estado_helada": "ROJO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.2691,
+          "caida_ndvi": 0.0345
+        },
+        "cruces": [
+          "HUMEDAD_DISCREPANTE",
+          "HELADA_SIN_DANO"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-08-23",
+        "ventana_nasa": [
+          "17/08/2026",
+          "23/08/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.2562,
+          "caida_ndvi": 0.0129
+        },
+        "cruces": [
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-09-17",
+        "ventana_nasa": [
+          "11/09/2026",
+          "17/09/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "gris",
+          "humedad": "no aplica",
+          "ndvi": 0.202,
+          "caida_ndvi": 0.0542
+        },
+        "cruces": [],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-10-09",
+        "ventana_nasa": [
+          "03/10/2026",
+          "09/10/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "PLAGAS_LANCHA",
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "rojo",
+          "humedad": "rojo",
+          "ndvi": 0.3039,
+          "caida_ndvi": -0.1019
+        },
+        "cruces": [
+          "LANCHA_PREVENTIVA",
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": null
+      },
+      {
+        "fecha_captura": "2026-10-27",
+        "ventana_nasa": [
+          "21/10/2026",
+          "27/10/2026"
+        ],
+        "nasa": {
+          "estado_helada": "AMARILLO",
+          "estado_riego": "VERDE_OPTIMO",
+          "estado_estres_calor": "VERDE"
+        },
+        "alertas_nasa": [
+          "PLAGAS_LANCHA",
+          "NUTRIENTES",
+          "HELADAS"
+        ],
+        "sentinel2": {
+          "vigor": "amarillo",
+          "humedad": "rojo",
+          "ndvi": 0.4482,
+          "caida_ndvi": -0.1444
+        },
+        "cruces": [
+          "NUTRICION_PROBABLE",
+          "LANCHA_PREVENTIVA",
+          "HUMEDAD_DISCREPANTE"
+        ],
+        "alerta_confirmada": "NUTRICION_PROBABLE"
       }
     ]
   },
   "archivos": {
     "resultado_prototipo": "resultado_prototipo_sentinel_2.json",
-    "resultado_integrado": "resultado_integrado.json",
+    "resultado_match": "../resultado_match.json",
     "entregable_equipo": "datos_sentinel/salida_s2/entregable_sentinel2.json",
     "serie_completa_json": "datos_sentinel/salida_s2/sentinel2_parcela.json",
     "serie_completa_csv": "datos_sentinel/salida_s2/sentinel2_parcela.csv",

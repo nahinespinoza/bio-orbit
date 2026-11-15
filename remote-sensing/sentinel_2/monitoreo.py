@@ -354,6 +354,16 @@ def clima_periodo(lat, lon, ini, fin):
     return out
 
 
+def altitud(lat, lon):
+    """Altura del centro de la parcela (Open-Meteo, modelo de elevación de 90 m). La usa el match con
+    NASA POWER para corregir sus temperaturas, que vienen a la altura media de una celda de ~50 km."""
+    try:
+        return float(_get("https://api.open-meteo.com/v1/elevation", dict(latitude=lat, longitude=lon))["elevation"][0])
+    except Exception:
+        f = DATOS / "parcela.json"
+        return json.loads(f.read_text(encoding="utf-8")).get("altitud_msnm") if f.exists() else None
+
+
 def climatologia(lat, lon):
     f = DATOS / "clima_historico_diario.csv"
     if f.exists():
@@ -643,7 +653,8 @@ def main():
     ini = date.fromisoformat(a.inicio) if a.inicio else (pd.Timestamp(fin) - pd.DateOffset(months=6)).date()
 
     geom, lat, lon, area = cargar_parcela(a.parcela)
-    info = dict(nombre=pathlib.Path(a.parcela).stem, lat=lat, lon=lon, area_ha=area)
+    info = dict(nombre=pathlib.Path(a.parcela).stem, lat=lat, lon=lon, area_ha=area,
+                altitud_msnm=altitud(lat, lon))
     print(f"Parcela {info['nombre']}: {area:.2f} ha, centro {lat:.6f}, {lon:.6f}; periodo {ini} a {fin}")
     (DATOS / "parcela.json").write_text(json.dumps(dict(info, inicio=str(ini), fin=str(fin)), indent=2),
                                         encoding="utf-8")

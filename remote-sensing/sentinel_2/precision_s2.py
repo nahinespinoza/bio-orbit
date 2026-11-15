@@ -382,16 +382,16 @@ ESTADO_VIGOR_TXT = {"gris": "INICIO/COSECHA - Suelo desnudo", "verde": "ÓPTIMO 
 ESTADO_HUM_TXT = {"rojo": "CRÍTICO - Estrés hídrico", "amarillo": "ALERTA - Humedad baja",
                   "verde": "ÓPTIMO - Humedad ideal", "azul": "EXCESO - Encharcamiento",
                   "no aplica": "NO APLICA - Suelo desnudo"}
-NASA_JSON = HERE.parent / "nasa-power" / "resultado_prototipo.json"  # resultado del módulo NASA POWER (opcional)
 RESULTADO_JSON = HERE / "resultado_prototipo_sentinel_2.json"  # misma forma input/output que el de nasa-power
-INTEGRADO_JSON = HERE / "resultado_integrado.json"
+ZONA = "Toacaso / Sigchos"
+# El match con NASA POWER está aparte: ../match_nasa_sentinel.py
 
 
 def exportar_resultado(s, parcela_gdf, conteo):
-    """resultado_sentinel2.json con la misma forma input/output que resultado_prototipo.json (NASA POWER).
-    Si ese archivo existe, también escribe resultado_integrado.json con la alerta cruzada."""
-    nasa = json.loads(NASA_JSON.read_text(encoding="utf-8")) if NASA_JSON.exists() else None
-    zona = nasa["input"]["ubicacion"]["zona"] if nasa else "Toacaso / Sigchos"
+    """resultado_prototipo_sentinel_2.json con la misma forma input/output que el resultado_prototipo.json
+    de NASA POWER (mismos nombres donde el dato es equivalente: zona, altitud, fecha_corte_simulada,
+    fecha_inicio/fecha_fin, semaforos con codigo/color/estado/mensaje)."""
+    zona = ZONA
     meta = DATA / "datos" / "parcela.json"
     per = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else {}
     pol = parcela_gdf[parcela_gdf.geom_type.isin(["Polygon", "MultiPolygon"])]
@@ -404,12 +404,13 @@ def exportar_resultado(s, parcela_gdf, conteo):
         "input": {
             "fuente_datos": "Copernicus Sentinel-2 L2A (reflectancia de superficie), Earth Search / AWS",
             "ubicacion": {
-                "zona": zona, "longitud": lon, "latitud": lat, "area_ha": round(area, 2),
+                "zona": zona, "longitud": lon, "latitud": lat, "altitud_msnm": per.get("altitud_msnm"),
+                "area_ha": round(area, 2),
                 "poligono_geojson": json.loads(pol[["geometry"]].to_json()),
             },
             "parametros_ejecucion": {
-                "fecha_corte": per.get("fin", date.today().isoformat()),
-                "rango_analizado": {"inicio": per.get("inicio"), "fin": per.get("fin")},
+                "fecha_corte_simulada": per.get("fin", date.today().isoformat()),
+                "rango_historico": {"inicio": per.get("inicio"), "fin": per.get("fin")},
                 "resolucion_m": 10,
                 "bandas": {"NDVI": "B08, B04", "NDRE": "B08, B05", "NDMI": "B08, B11", "mascara_nubes": "SCL"},
                 "max_nubosidad_poligono_pct": MAX_NUBE_POLIGONO * 100,
@@ -425,6 +426,9 @@ def exportar_resultado(s, parcela_gdf, conteo):
         },
         "output": {
             "zona": zona,
+            "altitud": per.get("altitud_msnm"),
+            "fecha_inicio": pd.Timestamp(u["fecha_anterior"] or u["fecha"]).strftime("%d/%m/%Y"),
+            "fecha_fin": pd.Timestamp(u["fecha"]).strftime("%d/%m/%Y"),
             "fecha_ultima_captura": pd.Timestamp(u["fecha"]).strftime("%d/%m/%Y"),
             "dias_desde_ultima_foto": s["ultima"]["dias_desde_hoy"],
             "estado_actual_lote": {
@@ -456,65 +460,7 @@ def exportar_resultado(s, parcela_gdf, conteo):
         },
     }
     RESULTADO_JSON.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    if nasa:
-        cruzar(nasa, out)
     return out
-
-
-def cruzar(nasa, s2):
-    """Alerta cruzada: clima regional (NASA POWER) + lectura a 10 m de la parcela (Sentinel-2)."""
-    o, e = s2["output"], s2["output"]["estado_actual_lote"]
-    var = e["variacion_ndvi_15d"]
-    sector = e["sector_mas_afectado"]
-    sec_caida = {k: v["caida_ndvi"] for k, v in o["sectores"].items() if v.get("caida_ndvi") is not None}
-    peor_caida = max(sec_caida, key=sec_caida.get) if sec_caida else None
-    cae_lote = var is not None and var <= -0.08
-    cae_sector = peor_caida is not None and sec_caida[peor_caida] >= 0.08
-    alertas = nasa["output"].get("proyeccion_30d", {}).get("alertas_preventivas", [])
-    lancha = next((a for a in alertas if a["codigo"] == "PLAGAS_LANCHA" and a["nivel"] in ("ALTO", "MEDIO")), None)
-    riego = nasa["output"]["semaforos"].get("estado_riego", {})
-    hum_s2 = o["semaforos"]["estado_humedad_parcela"]["codigo"]
-
-    cruces = []
-    if lancha:
-        if cae_lote or cae_sector:
-            donde = f"en el sector {peor_caida}" if cae_sector else "en todo el lote"
-            cruces.append(dict(codigo="LANCHA_CONFIRMADA", nivel="ALTO", confirmada=True,
-                               titulo="Alerta Confirmada de Lancha",
-                               mensaje=f"Condiciones climáticas favorables para Lancha y pérdida de vigor detectada "
-                                       f"{donde} de tu parcela. Aplica control preventivo hoy."))
-        else:
-            cruces.append(dict(codigo="LANCHA_PREVENTIVA", nivel=lancha["nivel"], confirmada=False,
-                               titulo="Lancha: riesgo climático, sin daño visible aún",
-                               mensaje="El clima favorece la Lancha, pero el satélite no detecta caída de vigor "
-                                       "en la parcela. Mantén el control preventivo e inspecciona"
-                                       + (f" el sector {sector}, que tiene más zonas en rojo." if sector else
-                                          " las hojas bajas.")))
-    if riego and hum_s2 in ("ROJO_ESTRES_HIDRICO", "AMARILLO_BAJA") and riego.get("codigo", "").startswith("VERDE"):
-        cruces.append(dict(codigo="HUMEDAD_DISCREPANTE", nivel="MEDIO", confirmada=False,
-                           titulo="Clima húmedo, pero la parcela se ve seca",
-                           mensaje="La humedad regional del suelo es adecuada, pero el satélite ve poca agua en el "
-                                   "follaje de la parcela. Revisa el lote en campo: puede ser estrés local, "
-                                   "drenaje o poca cobertura del cultivo."))
-    elif riego and hum_s2 == "ROJO_ESTRES_HIDRICO" and not riego.get("codigo", "").startswith("VERDE"):
-        cruces.append(dict(codigo="RIEGO_CONFIRMADO", nivel="ALTO", confirmada=True,
-                           titulo="Alerta Confirmada de Riego",
-                           mensaje="Déficit hídrico en la región y estrés hídrico visible en la parcela. "
-                                   "Activa riego esta semana."))
-
-    integrado = {
-        "input": {"nasa_power": nasa["input"], "sentinel2": s2["input"]},
-        "output": {
-            "zona": o["zona"],
-            "clima_regional_nasa_power": nasa["output"],
-            "parcela_sentinel2": o,
-            "alerta_cruzada_confirmada": next((c for c in cruces if c["confirmada"]), None),
-            "cruces_evaluados": cruces,
-        },
-    }
-    INTEGRADO_JSON.write_text(json.dumps(integrado, ensure_ascii=False, indent=2),
-                                                  encoding="utf-8")
-    return integrado
 
 
 if __name__ == "__main__":

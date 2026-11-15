@@ -19,7 +19,7 @@ python monitoreo.py      # DESCARGA lo nuevo (Sentinel-2 + clima) y después pro
 |---|---|---|
 | `monitoreo.py` | **Descarga** + procesamiento | Busca las escenas en el catálogo STAC de Earth Search (AWS) y lee solo el recorte de la parcela más 200 m alrededor. Guarda los TIF y PNG en `datos_sentinel/imagenes/` y baja el clima de Open-Meteo (ERA5). Después hace todo lo que hace `preprocesar.py`. Es incremental: solo baja las escenas nuevas. Opciones: `--inicio`, `--fin`, `--parcela` |
 | `preprocesar.py` | **Procesamiento** | Regenera todos los datos que muestra el Streamlit sin descargar nada: (1) índices por pase desde los TIF, (2) análisis a 10 m (`precision_s2.py`), (3) climatología, (4) reportes semanales y gráfico de series, (5) `api_sentinel_2.json` |
-| `precision_s2.py` | Módulo de análisis | Filtra las imágenes con < 20 % de nubes **sobre el polígono** y elige ~1 cada 15 días. Calcula NDVI, NDRE y NDMI píxel a píxel y aplica la regla A (vigor) y la regla B (humedad). Calcula el % de área por estado y los sectores N/S/E/O. Genera los PNG y TIF de `salida_s2/`, `resultado_prototipo_sentinel_2.json` y el cruce con NASA POWER. Lo llaman los dos scripts anteriores |
+| `precision_s2.py` | Módulo de análisis | Filtra las imágenes con < 20 % de nubes **sobre el polígono** y elige ~1 cada 15 días. Calcula NDVI, NDRE y NDMI píxel a píxel y aplica la regla A (vigor) y la regla B (humedad). Calcula el % de área por estado y los sectores N/S/E/O. Genera los PNG y TIF de `salida_s2/` y `resultado_prototipo_sentinel_2.json`. Lo llaman los dos scripts anteriores |
 | `reglas.py` | Configuración | Reglas R1-R4 del reporte semanal (sequía, lancha, nutrientes, heladas) y sus umbrales en `UMBRALES`. Si se edita, basta con correr `preprocesar.py` |
 
 ### Reglas a 10 m (`precision_s2.py`)
@@ -45,7 +45,6 @@ Los umbrales están al inicio del archivo, en `U_A`, `U_B` y `MAX_NUBE_POLIGONO`
 | Archivo | Qué contiene |
 |---|---|
 | `resultado_prototipo_sentinel_2.json` | Mismo formato `input` / `output` que `../nasa-power/resultado_prototipo.json`. **input:** fuente, ubicación y polígono, parámetros (bandas, nubosidad máxima, frecuencia) y capturas evaluadas. **output:** última captura, estado del lote (NDVI, NDRE, NDMI, variación a 15 días, % sano/alerta/crítico), semáforos de vigor y humedad, sectores, capas visuales y serie fenológica |
-| `resultado_integrado.json` | Cruce del clima regional (NASA POWER) con la parcela (Sentinel-2): `LANCHA_CONFIRMADA`, `LANCHA_PREVENTIVA`, `RIEGO_CONFIRMADO` o `HUMEDAD_DISCREPANTE`. Solo se genera si existe `../nasa-power/resultado_prototipo.json` |
 | `api_sentinel_2.json` | Todos los datos juntos para consumirlos como API |
 
 ### Recursos de `api_sentinel_2.json`
@@ -61,7 +60,7 @@ Los umbrales están al inicio del archivo, en `U_A`, `U_B` y `MAX_NUBE_POLIGONO`
 | `semanas` | Resumen semanal: índices, clima, alertas y ruta del reporte `.md` |
 | `clima_diario` | T mín/máx/media, HR, lluvia, radiación y nubes de madrugada por día |
 | `climatologia_mensual` | Promedios 2011-2025 por mes y clases seco/lluvioso, radiación y noches |
-| `alerta_cruzada` | Alerta confirmada y cruces evaluados con NASA POWER |
+| `alerta_cruzada` | Alerta confirmada, cruces y su historial, tomados de `../resultado_match.json` (si ya se corrió el match) |
 | `archivos` | Rutas de los entregables |
 
 Las rutas de imágenes en estos JSON son relativas a esta carpeta (`datos_sentinel/...`). Los `bounds_latlon`
@@ -70,12 +69,18 @@ van en el formato `[[sur, oeste], [norte, este]]` (EPSG:4326), listos para `L.im
 
 ---
 
+## Match con NASA POWER
+
+El cruce con el módulo del compañero está aparte, en `../match_nasa_sentinel.py`. Ver `../README.md`.
+
+---
+
 ## Datos (`datos_sentinel/`)
 
 | Ruta | Qué contiene | Lo genera |
 |---|---|---|
 | `papas_parcela.geojson` | Polígono de la parcela (1,17 ha) | entrada |
-| `datos/parcela.json` | Nombre, centro, área y periodo procesado | `monitoreo.py` |
+| `datos/parcela.json` | Nombre, centro, área, altitud (Open-Meteo, 3 588 m) y periodo procesado | `monitoreo.py` |
 | `datos/indices_por_fecha.csv` | Una fila por pase del satélite: % de nubes, % válido, estado y todos los índices | `monitoreo.py` / `preprocesar.py` |
 | `datos/clima_diario.csv` | Clima diario del periodo (Open-Meteo, ERA5 + pronóstico reciente) | `monitoreo.py` |
 | `datos/clima_historico_diario.csv` | Clima diario 2011-2025 (base de la climatología) | `monitoreo.py` (una sola vez) |

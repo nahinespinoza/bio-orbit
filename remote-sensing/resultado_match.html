@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match NASA Sentinel</title>
+<style>
+:root {
+  --bg:#f4f5f1; --card:#fff; --tx:#1d2521; --mu:#5d6862; --bd:#dfe3dc;
+  --rojo:#c0392b; --rojo-bg:#fde8e5; --amarillo:#b7791f; --amarillo-bg:#fdf3d8;
+  --verde:#2f7d4f; --verde-bg:#e2f4e8; --azul:#2b6cb0; --azul-bg:#e3effb; --gris:#6b7280; --gris-bg:#eceeef;
+  --acc:#1b4332;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#121614; --card:#1b211e; --tx:#e6ebe7; --mu:#9aa69f; --bd:#2c3530;
+  --rojo:#f1786b; --rojo-bg:#3a1f1c; --amarillo:#e9b55a; --amarillo-bg:#372c17; --verde:#6fcf97; --verde-bg:#17301f;
+  --azul:#7fb3ee; --azul-bg:#18273a; --gris:#a3a9b1; --gris-bg:#262b2f; --acc:#9fd8b5; } }
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--tx); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif }
+main { max-width:1080px; margin:0 auto; padding:24px 16px 48px }
+h1 { font-size:1.6rem; margin:0 } h2 { font-size:1.25rem; margin:.2rem 0 } h3 { font-size:1.02rem; margin:0 }
+h4 { margin:.2rem 0; font-size:.85rem; color:var(--mu); text-transform:uppercase; letter-spacing:.04em }
+.sub { color:var(--mu); margin:.3rem 0 1.2rem }
+section { margin-top:22px }
+.st { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--mu); font-weight:700; margin:0 0 10px }
+.card { background:var(--card); border:1px solid var(--bd); border-radius:14px; padding:16px }
+.grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)) }
+.hero { border-radius:16px; padding:18px 20px; border:1px solid var(--bd) }
+.hero-k { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em }
+.hero p { margin:.3rem 0 0 }
+.rojo.hero,.rojo.sem,.rojo.cruce { background:var(--rojo-bg) } .rojo .hero-k,.rojo .sem-e { color:var(--rojo) }
+.amarillo.hero,.amarillo.sem,.amarillo.cruce { background:var(--amarillo-bg) } .amarillo .hero-k,.amarillo .sem-e { color:var(--amarillo) }
+.verde.hero,.verde.sem,.verde.cruce { background:var(--verde-bg) } .verde .hero-k,.verde .sem-e { color:var(--verde) }
+.azul.hero,.azul.sem { background:var(--azul-bg) } .azul .sem-e { color:var(--azul) }
+.gris.sem { background:var(--gris-bg) } .gris .sem-e { color:var(--gris) }
+.cruce { border:1px solid var(--bd); border-radius:14px; padding:14px 16px; margin-bottom:10px }
+.cruce header { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center }
+.cruce p { margin:.5rem 0 }
+.tags { display:flex; gap:6px }
+details summary { cursor:pointer; color:var(--mu); font-size:.88rem }
+.ev { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:8px; font-size:.88rem }
+.ev ul { margin:0; padding-left:18px }
+.chip { display:inline-block; padding:1px 9px; border-radius:999px; font-size:.75rem; font-weight:700; white-space:nowrap; margin:1px 0 }
+.chip.rojo { background:var(--rojo-bg); color:var(--rojo) } .chip.amarillo { background:var(--amarillo-bg); color:var(--amarillo) }
+.chip.verde { background:var(--verde-bg); color:var(--verde) } .chip.azul { background:var(--azul-bg); color:var(--azul) }
+.chip.gris { background:var(--gris-bg); color:var(--gris) }
+.chip.conf { background:var(--acc); color:var(--card) } .chip.prev { border:1px solid var(--bd); color:var(--mu) }
+.sem { border-radius:12px; padding:12px 14px; border:1px solid var(--bd) }
+.sem-n { font-size:.78rem; color:var(--mu); font-weight:700; text-transform:uppercase }
+.sem-e { font-weight:800; margin:.15rem 0 } .sem-m { font-size:.88rem }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px }
+.kpi { background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:10px; text-align:center }
+.kpi b { display:block; font-size:1.15rem } .kpi span { font-size:.75rem; color:var(--mu) }
+.bar { display:flex; height:16px; border-radius:8px; overflow:hidden; margin:8px 0 4px }
+.seg.verde { background:var(--verde) } .seg.amarillo { background:var(--amarillo) } .seg.rojo { background:var(--rojo) } .seg.gris { background:var(--gris) }
+.imgs { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px }
+figure { margin:0; background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:8px }
+figure img { width:100%; display:block; border-radius:8px; image-rendering:pixelated; background:var(--gris-bg) }
+figcaption { font-size:.8rem; color:var(--mu); text-align:center; margin-top:4px }
+.tw { overflow-x:auto }
+table { border-collapse:collapse; width:100%; font-size:.86rem }
+th,td { padding:7px 8px; border-bottom:1px solid var(--bd); text-align:left; vertical-align:top }
+th { color:var(--mu); font-size:.75rem; text-transform:uppercase; font-weight:700 }
+.note { font-size:.86rem; color:var(--mu) }
+code { font-size:.82rem }
+</style></head>
+<body><main>
+<h1>Match NASA POWER + Sentinel-2</h1>
+<p class="sub">Toacaso / Sigchos · parcela a 3588 m · última foto limpia
+27/10/2026 · clima NASA de la misma semana (21/10/2026 – 27/10/2026)</p>
+
+<section class="hero amarillo">
+          <div class="hero-k">Alerta confirmada por las dos fuentes</div>
+          <h2>Déficit de Nutrientes Probable</h2><p>Lluvias fuertes pueden haber lavado el nitrógeno y el satélite ve poca clorofila. Evalúa una fertilización foliar fraccionada.</p></section>
+
+<section><p class="st">Cruces de la última captura</p>
+    <article class="cruce amarillo">
+      <header>
+        <h3>Déficit de Nutrientes Probable</h3>
+        <div class="tags"><span class="chip amarillo">MEDIO</span><span class="chip conf">Confirmada</span></div>
+      </header>
+      <p>Lluvias fuertes pueden haber lavado el nitrógeno y el satélite ve poca clorofila. Evalúa una fertilización foliar fraccionada.</p>
+      <details><summary>Evidencia · <code>NUTRICION_PROBABLE</code></summary>
+        <div class="ev"><div><h4>NASA POWER</h4><ul><li><b>estado_helada</b>: AMARILLO</li><li><b>estado_riego</b>: VERDE_OPTIMO</li><li><b>estado_estres_calor</b>: VERDE</li><li><b>alerta_lavado</b>: True</li></ul></div>
+        <div><h4>Sentinel-2</h4><ul><li><b>estado_vigor</b>: amarillo</li><li><b>estado_humedad</b>: rojo</li><li><b>ndvi</b>: 0.4482</li><li><b>ndre</b>: 0.2495</li><li><b>ndmi</b>: -0.1811</li><li><b>caida_ndvi_lote</b>: -0.1444</li><li><b>caida_ndvi_peor_sector</b>: -0.1237</li><li><b>peor_sector</b>: oeste</li><li><b>cambio_ndmi</b>: 0.1382</li></ul></div></div>
+      </details>
+    </article>
+    <article class="cruce rojo">
+      <header>
+        <h3>Lancha: riesgo climático, sin daño visible aún</h3>
+        <div class="tags"><span class="chip rojo">ALTO</span><span class="chip prev">Preventiva</span></div>
+      </header>
+      <p>El clima favorece la Lancha, pero el satélite no ve caída de vigor. Mantén el control preventivo e inspecciona el sector oeste, que tiene más zonas en rojo.</p>
+      <details><summary>Evidencia · <code>LANCHA_PREVENTIVA</code></summary>
+        <div class="ev"><div><h4>NASA POWER</h4><ul><li><b>alerta</b>: PLAGAS_LANCHA</li><li><b>humedad_relativa_pct</b>: 87.7</li></ul></div>
+        <div><h4>Sentinel-2</h4><ul><li><b>estado_vigor</b>: amarillo</li><li><b>estado_humedad</b>: rojo</li><li><b>ndvi</b>: 0.4482</li><li><b>ndre</b>: 0.2495</li><li><b>ndmi</b>: -0.1811</li><li><b>caida_ndvi_lote</b>: -0.1444</li><li><b>caida_ndvi_peor_sector</b>: -0.1237</li><li><b>peor_sector</b>: oeste</li><li><b>cambio_ndmi</b>: 0.1382</li></ul></div></div>
+      </details>
+    </article>
+    <article class="cruce amarillo">
+      <header>
+        <h3>Clima húmedo, pero la parcela se ve seca</h3>
+        <div class="tags"><span class="chip amarillo">MEDIO</span><span class="chip prev">Preventiva</span></div>
+      </header>
+      <p>La humedad regional del suelo es adecuada, pero el satélite ve poca agua en el follaje. Revisa el lote en campo: puede ser estrés local, drenaje o poca cobertura del cultivo.</p>
+      <details><summary>Evidencia · <code>HUMEDAD_DISCREPANTE</code></summary>
+        <div class="ev"><div><h4>NASA POWER</h4><ul><li><b>estado_riego</b>: VERDE_OPTIMO</li><li><b>humedad_raiz_pct</b>: 75.4</li><li><b>lluvia_7d</b>: 139.6</li><li><b>alerta_sequia</b>: False</li></ul></div>
+        <div><h4>Sentinel-2</h4><ul><li><b>estado_vigor</b>: amarillo</li><li><b>estado_humedad</b>: rojo</li><li><b>ndvi</b>: 0.4482</li><li><b>ndre</b>: 0.2495</li><li><b>ndmi</b>: -0.1811</li><li><b>caida_ndvi_lote</b>: -0.1444</li><li><b>caida_ndvi_peor_sector</b>: -0.1237</li><li><b>peor_sector</b>: oeste</li><li><b>cambio_ndmi</b>: 0.1382</li></ul></div></div>
+      </details>
+    </article></section>
+
+<section class="grid">
+  <div><p class="st">NASA POWER · clima de la semana de la foto</p><div class="grid"><div class="sem amarillo">
+      <div class="sem-n">Helada (T corregida)</div><div class="sem-e">PRECAUCIÓN - Madrugadas Frías</div>
+      <div class="sem-m">Madrugadas frías detectadas. Mantén el suelo con buena humedad para retener calor.</div></div><div class="sem verde">
+      <div class="sem-n">Riego</div><div class="sem-e">ÓPTIMO - Humedad Ideal</div>
+      <div class="sem-m">Humedad adecuada en zona de raíces. No se requiere riego adicional.</div></div><div class="sem verde">
+      <div class="sem-n">Calor (T corregida)</div><div class="sem-e">NORMAL - Temperatura Diurna Ideal</div>
+      <div class="sem-m">Días frescos ideales para el engrosamiento del tubérculo.</div></div></div></div>
+  <div><p class="st">Sentinel-2 · parcela a 10 m</p><div class="grid"><div class="sem amarillo">
+      <div class="sem-n">Vigor</div><div class="sem-e">ALERTA - Nutrición</div>
+      <div class="sem-m">Baja concentración de clorofila. Posible falta de nitrógeno o crecimiento lento; revisa fertilización.</div></div><div class="sem rojo">
+      <div class="sem-n">Humedad del follaje</div><div class="sem-e">CRÍTICO - Estrés hídrico</div>
+      <div class="sem-m">Estrés hídrico detectado en las hojas de la parcela. El cultivo está perdiendo turgencia; activa riego.</div></div></div></div>
+</section>
+
+<section><p class="st">Indicadores</p><div class="kpis">
+  <div class="kpi"><b>0.45</b><span>NDVI</span></div>
+  <div class="kpi"><b>0.25</b><span>NDRE</span></div>
+  <div class="kpi"><b>-0.18</b><span>NDMI</span></div>
+  <div class="kpi"><b>0.14</b><span>Cambio NDVI vs 2026-10-09</span></div>
+  <div class="kpi"><b>139.6 mm</b><span>Lluvia 7 días</span></div>
+  <div class="kpi"><b>75 %</b><span>Humedad raíz</span></div>
+  <div class="kpi"><b>88 %</b><span>Humedad aire</span></div>
+  <div class="kpi"><b>3.9 °C</b><span>T mín parcela (NASA 10.3)</span></div>
+  <div class="kpi"><b>13.6 °C</b><span>T máx parcela (NASA 21.4)</span></div>
+</div></section>
+
+<section class="grid">
+  <div class="card"><p class="st">Estado de la parcela</p>
+    <div class="bar"><div class="seg verde" style="flex:16.7" title="sano 16.7%"></div><div class="seg amarillo" style="flex:55.8" title="alerta 55.8%"></div><div class="seg rojo" style="flex:27.5" title="critico 27.5%"></div></div><div class="note">sano 16.7% · alerta 55.8% · critico 27.5%</div>
+    <div class="tw"><table><thead><tr><th>Sector</th><th>NDVI</th><th>Cambio</th><th>% rojo</th><th>% estrés</th></tr></thead>
+    <tbody><tr><td>Norte</td><td>0.41</td><td>0.15</td><td>11.4%</td><td>100.0%</td></tr><tr><td>Sur</td><td>0.51</td><td>0.14</td><td>39.6%</td><td>62.5%</td></tr><tr><td>Este</td><td>0.45</td><td>0.14</td><td>6.2%</td><td>87.5%</td></tr><tr><td>Oeste</td><td>0.35</td><td>0.12</td><td>66.7%</td><td>100.0%</td></tr></tbody></table></div>
+    <p class="note">Sector más afectado: <b>Oeste</b></p>
+  </div>
+  <div class="card"><p class="st">Próximo mes (Diciembre) · NASA al 11/11/2026</p>
+    <ul><li><span class="chip rojo">ALTO</span> <b>Plagas y Hongos (Tizón tardío / Lancha)</b>: Riesgo alto de Lancha (tizón tardío) para el próximo mes por alta humedad y lluvias esperadas. Revisa el envés de las hojas bajas y prepara control preventivo.</li></ul>
+    <p class="note">Lluvia esperada 117 mm · T mín esperada
+    10.5 °C (sin corregir por altura). Clima de la semana más reciente; la última foto limpia es 15 días anterior.</p>
+  </div>
+</section>
+
+<section><p class="st">Imágenes de la última captura</p><div class="imgs"><figure><img src="sentinel_2/datos_sentinel/salida_s2/png/rgb_20261027.png" alt="Color real" loading="lazy"><figcaption>Color real</figcaption></figure><figure><img src="sentinel_2/datos_sentinel/salida_s2/png/vigor_20261027.png" alt="Vigor (regla A)" loading="lazy"><figcaption>Vigor (regla A)</figcaption></figure><figure><img src="sentinel_2/datos_sentinel/salida_s2/png/humedad_20261027.png" alt="Humedad (regla B)" loading="lazy"><figcaption>Humedad (regla B)</figcaption></figure><figure><img src="sentinel_2/datos_sentinel/salida_s2/png/recorte_ndvi_20261027.png" alt="NDVI" loading="lazy"><figcaption>NDVI</figcaption></figure></div></section>
+
+<section class="card"><p class="st">Historial de cruces (6 meses)</p><div class="tw"><table>
+<thead><tr><th>Foto</th><th>Vigor</th><th>Humedad</th><th>NDVI</th><th>Cambio</th><th>Helada</th><th>Riego</th>
+<th>Calor</th><th>Cruces</th><th>Confirmada</th></tr></thead><tbody><tr><td>2026-10-27</td><td><span class="chip amarillo">amarillo</span></td><td><span class="chip rojo">rojo</span></td><td>0.45</td><td>0.14</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">NUTRICION_PROBABLE</span> <span class="chip amarillo">LANCHA_PREVENTIVA</span> <span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>NUTRICION_PROBABLE</td></tr><tr><td>2026-10-09</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.30</td><td>0.10</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">LANCHA_PREVENTIVA</span> <span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>—</td></tr><tr><td>2026-09-17</td><td><span class="chip gris">gris</span></td><td><span class="chip gris">no aplica</span></td><td>0.20</td><td>-0.05</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td>—</td><td>—</td></tr><tr><td>2026-08-23</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.26</td><td>-0.01</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>—</td></tr><tr><td>2026-08-10</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.27</td><td>-0.03</td><td><span class="chip rojo">ROJO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">HUMEDAD_DISCREPANTE</span> <span class="chip amarillo">HELADA_SIN_DANO</span></td><td>—</td></tr><tr><td>2026-07-29</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.30</td><td>0.01</td><td><span class="chip rojo">ROJO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">HUMEDAD_DISCREPANTE</span> <span class="chip amarillo">HELADA_SIN_DANO</span></td><td>—</td></tr><tr><td>2026-07-14</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.30</td><td>-0.00</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>—</td></tr><tr><td>2026-06-29</td><td><span class="chip rojo">rojo</span></td><td><span class="chip rojo">rojo</span></td><td>0.30</td><td>-0.11</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>—</td></tr><tr><td>2026-05-25</td><td><span class="chip amarillo">amarillo</span></td><td><span class="chip rojo">rojo</span></td><td>0.41</td><td>s/d</td><td><span class="chip amarillo">AMARILLO</span></td><td><span class="chip verde">VERDE_OPTIMO</span></td><td><span class="chip verde">VERDE</span></td><td><span class="chip amarillo">NUTRICION_PROBABLE</span> <span class="chip amarillo">HUMEDAD_DISCREPANTE</span></td><td>NUTRICION_PROBABLE</td></tr></tbody></table></div></section>
+
+<section class="card"><p class="st">Cómo se alinearon los datos</p>
+<ul class="note">
+  <li><b>Fecha:</b> ventana NASA de 7 días que termina el día de cada foto Sentinel-2. Último dato NASA: 2026-11-11
+  (15 días después de la última foto).</li>
+  <li><b>Altura:</b> NASA 2501 m vs parcela 3588.0 m
+  (1087 m). Corrección: T media -7.03 °C, T mín -6.47 °C,
+  T máx -7.81 °C (sesgo medio NASA - Open-Meteo en días comunes, 1690 días; teórica
+  -7.06 °C). Se usa en: estado_helada, estado_estres_calor, alerta HELADAS.</li>
+</ul></section>
+
+<p class="note">Generado desde <code>resultado_match.json</code> por <code>match_html.py</code>.</p>
+</main></body></html>

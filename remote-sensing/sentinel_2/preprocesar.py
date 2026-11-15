@@ -13,13 +13,13 @@ y regenera:
   3. datos/climatologia_mensual.csv     promedios mensuales y clases seco/lluvioso
   4. reportes/ + datos/historico_semanal.csv + imagenes/series_tiempo.png
   5. resultado_prototipo_sentinel_2.json   (formato input/output igual al de nasa-power)
-     resultado_integrado.json              (si existe ../nasa-power/resultado_prototipo.json)
   6. api_sentinel_2.json                   todo junto, para consumir como API
 
 Uso:
     python preprocesar.py
 
 Para bajar escenas nuevas primero corre monitoreo.py (descarga + este mismo preprocesado).
+El match con NASA POWER es aparte: python ../match_nasa_sentinel.py
 """
 import json
 import sys
@@ -33,6 +33,7 @@ import monitoreo as m  # noqa: E402  (arregla PROJ y define rutas)
 import precision_s2  # noqa: E402
 
 API_JSON = m.HERE / "api_sentinel_2.json"
+MATCH_JSON = m.HERE.parent / "resultado_match.json"  # lo escribe ../match_nasa_sentinel.py
 
 
 def _registros(df):
@@ -54,7 +55,7 @@ def exportar_api():
         raise SystemExit("No hay salida_s2/sentinel2_parcela.json: corre primero el preprocesado.")
     info = leer(D / "parcela.json") or {}
     geo = leer(m.DATA / "papas_parcela.geojson")
-    integrado = leer(precision_s2.INTEGRADO_JSON)
+    match = leer(MATCH_JSON)
 
     sem = pd.read_csv(D / "historico_semanal.csv") if (D / "historico_semanal.csv").exists() else pd.DataFrame()
     if not sem.empty:
@@ -82,13 +83,14 @@ def exportar_api():
                 "semanas": "Resumen semanal: índices, clima, alertas y ruta del reporte .md",
                 "clima_diario": "T mín/máx/media, HR, lluvia, radiación y nubes de madrugada por día",
                 "climatologia_mensual": "Promedios 2011-2025 por mes y clases seco/lluvioso, radiación, noches",
-                "alerta_cruzada": "Cruce NASA POWER (clima regional) + Sentinel-2 (parcela), si existe",
+                "alerta_cruzada": "Match NASA POWER + Sentinel-2 (de ../resultado_match.json, si ya se corrió)",
                 "archivos": "Rutas de los entregables",
             },
         },
         "parcela": {
             "nombre": info.get("nombre"), "centro_lat_lon": s2["parcela"]["centro"],
             "area_ha": None if info.get("area_ha") is None else round(info["area_ha"], 2),
+            "altitud_msnm": info.get("altitud_msnm"),
             "periodo": {"inicio": info.get("inicio"), "fin": info.get("fin")},
             "geojson": geo,
         },
@@ -102,13 +104,15 @@ def exportar_api():
         "semanas": _registros(sem),
         "clima_diario": _registros(pd.read_csv(D / "clima_diario.csv")),
         "climatologia_mensual": _registros(pd.read_csv(D / "climatologia_mensual.csv")),
-        "alerta_cruzada": None if integrado is None else {
-            "confirmada": integrado["output"]["alerta_cruzada_confirmada"],
-            "cruces_evaluados": integrado["output"]["cruces_evaluados"],
+        "alerta_cruzada": None if match is None else {
+            "fuente": f"../{MATCH_JSON.name}",
+            "confirmada": match["output"]["alerta_cruzada_confirmada"],
+            "cruces_evaluados": match["output"]["cruces_evaluados"],
+            "historial": match["output"]["historial_cruces"],
         },
         "archivos": {
             "resultado_prototipo": precision_s2.RESULTADO_JSON.name,
-            "resultado_integrado": precision_s2.INTEGRADO_JSON.name if integrado else None,
+            "resultado_match": f"../{MATCH_JSON.name}" if match else None,
             "entregable_equipo": f"{m.DATA.name}/salida_s2/entregable_sentinel2.json",
             "serie_completa_json": f"{m.DATA.name}/salida_s2/sentinel2_parcela.json",
             "serie_completa_csv": f"{m.DATA.name}/salida_s2/sentinel2_parcela.csv",
