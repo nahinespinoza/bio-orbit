@@ -1,14 +1,38 @@
 import { useState } from 'react'
-import { ArrowRight, Sprout } from 'lucide-react'
+import { ArrowRight, ChevronLeft, Sprout, Tractor } from 'lucide-react'
 import Progreso from './Progreso.jsx'
 
-export default function PasoNombre({ nombre, onNombreChange, onSiguiente }) {
+// El mismo paso sirve para el nombre del agricultor (primera vez) y para el de una finca más
+const TEXTOS = {
+  agricultor: {
+    Icono: Sprout,
+    saludo: '¡Te damos la bienvenida a Bio Orbit!',
+    titulo: '¿Cómo te llamas?',
+    placeholder: 'Ej. Juan Pérez',
+    autoComplete: 'name',
+    vacio: 'Escribe tu nombre para continuar.',
+  },
+  finca: {
+    Icono: Tractor,
+    saludo: 'Vamos a agregar otra finca',
+    titulo: '¿Cómo se llama tu finca?',
+    placeholder: 'Ej. Finca El Rosal',
+    autoComplete: 'off',
+    vacio: 'Escribe un nombre para tu finca.',
+  },
+}
+
+// `validar(nombre)` devuelve un mensaje de error o '' si el nombre sirve.
+// `onVolver` muestra el botón "Volver" (al registrar otra finca se puede cancelar).
+export default function PasoNombre({ modo = 'agricultor', nombre, onNombreChange, onSiguiente, onVolver, validar }) {
   const [error, setError] = useState('')
+  const { Icono, ...textos } = TEXTOS[modo]
 
   const enviar = (e) => {
     e.preventDefault() // Enter también envía el formulario
-    if (!nombre.trim()) {
-      setError('Escribe tu nombre para continuar.')
+    const mensaje = !nombre.trim() ? textos.vacio : (validar?.(nombre.trim()) ?? '')
+    if (mensaje) {
+      setError(mensaje)
       return
     }
     onNombreChange(nombre.trim())
@@ -18,24 +42,30 @@ export default function PasoNombre({ nombre, onNombreChange, onSiguiente }) {
   return (
     <form className="onb-form" onSubmit={enviar} noValidate>
       <div className="onb-top">
-        <span className="onb-top-hueco" />
+        {onVolver ? (
+          <button type="button" className="onb-volver" onClick={onVolver}>
+            <ChevronLeft size={20} /> Volver
+          </button>
+        ) : (
+          <span className="onb-top-hueco" />
+        )}
         <Progreso paso={1} />
       </div>
 
       <div className="onb-cuerpo">
         <div className="onb-avatar" aria-hidden="true">
-          <Sprout size={44} strokeWidth={1.75} />
+          <Icono size={44} strokeWidth={1.75} />
         </div>
-        <p className="onb-saludo">¡Te damos la bienvenida a Bio Orbit!</p>
+        <p className="onb-saludo">{textos.saludo}</p>
         <label htmlFor="onb-nombre" className="onb-titulo">
-          ¿Cómo te llamas?
+          {textos.titulo}
         </label>
         <input
           id="onb-nombre"
           className="onb-input"
           type="text"
-          placeholder="Ej. Juan Pérez"
-          autoComplete="name"
+          placeholder={textos.placeholder}
+          autoComplete={textos.autoComplete}
           autoFocus
           maxLength={60}
           value={nombre}

@@ -364,14 +364,91 @@
 /* ---------- Home ---------- */
 .fg-home { background: #f6f8f7; }
 .fg-home-cabecera {
+  /* Por encima del mapa de la tarjeta (Leaflet pone sus controles en z-index 1000) */
+  position: relative;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: max(18px, env(safe-area-inset-top)) 22px 14px;
+  gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) 22px 12px;
   background: #fff;
 }
-.fg-home-cabecera p { margin: 0; font-size: 14px; color: var(--onb-texto-suave); }
-.fg-home-cabecera h1 { margin: 0; font-size: 24px; font-weight: 600; }
+
+/* Selector de finca: nombre con flecha que abre la lista de fincas guardadas */
+/* El margen negativo va aquí y no en el botón: en el botón recortaba el nombre */
+.fg-selector { position: relative; min-width: 0; margin-left: -10px; }
+.fg-selector-boton {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--onb-texto);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+.fg-selector-boton:hover, .fg-selector-boton[aria-expanded='true'] { background: #f3f4f6; }
+.fg-selector-boton:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+.fg-selector-boton svg { flex-shrink: 0; color: var(--onb-texto-suave); transition: transform 0.2s ease; }
+.fg-selector-boton[aria-expanded='true'] svg { transform: rotate(180deg); }
+.fg-selector-nombre { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fg-selector-fondo { position: fixed; inset: 0; z-index: 1; }
+.fg-selector-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 2;
+  width: min(300px, calc(100vw - 32px));
+  padding: 6px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(17, 24, 39, 0.16), 0 0 0 1px rgba(17, 24, 39, 0.06);
+  transform-origin: top left;
+  animation: fg-menu-abrir 0.16s ease-out;
+}
+@keyframes fg-menu-abrir { from { opacity: 0; transform: translateY(-4px) scale(0.97); } }
+.fg-selector-lista { max-height: min(320px, 50dvh); overflow-y: auto; }
+.fg-selector-opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--onb-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fg-selector-opcion:hover, .fg-selector-opcion:focus-visible { background: #f3f4f6; outline: none; }
+.fg-selector-opcion-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fg-selector-opcion-texto strong { overflow: hidden; font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.fg-selector-opcion-texto small { font-size: 13px; color: var(--onb-texto-suave); }
+.fg-selector-opcion > svg { flex-shrink: 0; color: var(--esmeralda); }
+.fg-selector-separador { height: 1px; margin: 6px 10px; background: #e5e7eb; }
+.fg-selector-nueva { min-height: 50px; color: var(--esmeralda); font-size: 15px; font-weight: 600; }
+.fg-selector-nueva-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--esmeralda-suave);
+}
 .fg-home-contenido { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 24px; display: flex; flex-direction: column; gap: 20px; }
 .fg-home-contenido > * { flex-shrink: 0; }
 
@@ -456,7 +533,7 @@
 .fg-analisis-texto small { font-size: 13.5px; line-height: 1.3; opacity: 0.92; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fg-aparecer, .fg-radar-barrido, .fg-radar-anillo, .fg-escaneo, .fg-marcador-pulso,
+  .fg-aparecer, .fg-selector-menu, .fg-radar-barrido, .fg-radar-anillo, .fg-escaneo, .fg-marcador-pulso,
   .fg-check-halo, .fg-chispa, .fg-chip-punto { animation: none !important; }
   .fg-check-circulo, .fg-check-marca, .fg-trazo { animation-duration: 0.01s; }
 }

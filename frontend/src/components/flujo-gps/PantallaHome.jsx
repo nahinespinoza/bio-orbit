@@ -5,14 +5,13 @@ import L from '../../lib/leaflet.js'
 import { TILE_SATELITE, formatoNumero } from './geo.js'
 import { MENSAJE_ESTADO } from '../resultados/analisis.js'
 import FilaAnalisis from '../ui/FilaAnalisis.jsx'
+import SelectorFinca from './SelectorFinca.jsx'
 
-const saludo = () => {
-  const h = new Date().getHours()
-  return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
-}
-
-// Inicio: la finca registrada (una o varias parcelas) y los dos análisis disponibles.
-export default function PantallaHome({ nombre, ubicacion, parcelas, analisis, onProceso, onVerResultados, onAgregarParcela }) {
+// Inicio: arriba se elige la finca; debajo, sus parcelas y los dos análisis disponibles.
+export default function PantallaHome({
+  nombre, finca, fincas, onElegirFinca, onNuevaFinca, onProceso, onVerResultados, onAgregarParcela,
+}) {
+  const { ubicacion, parcelas, analisis } = finca
   const limites = useMemo(() => L.latLngBounds(parcelas.flatMap((p) => p.poligono)), [parcelas])
   const areaTotal = parcelas.reduce((s, p) => s + p.area, 0)
   const varias = parcelas.length > 1
@@ -28,11 +27,8 @@ export default function PantallaHome({ nombre, ubicacion, parcelas, analisis, on
   return (
     <div className="fg-pantalla fg-home">
       <header className="fg-home-cabecera">
-        <div>
-          <p>{saludo()},</p>
-          <h1>{primerNombre}</h1>
-        </div>
-        <span className="vm-avatar" aria-hidden="true">
+        <SelectorFinca activa={finca} fincas={fincas} onElegir={onElegirFinca} onNueva={onNuevaFinca} />
+        <span className="vm-avatar" title={nombre} aria-hidden="true">
           {primerNombre.charAt(0).toUpperCase()}
         </span>
       </header>
@@ -69,7 +65,7 @@ export default function PantallaHome({ nombre, ubicacion, parcelas, analisis, on
           </div>
           <div className="fg-tarjeta-finca-info">
             <div className="fg-tarjeta-finca-texto">
-              <h2>Mi finca</h2>
+              <h2>{finca.nombre}</h2>
               <p>
                 <MapPin size={14} />
                 {varias

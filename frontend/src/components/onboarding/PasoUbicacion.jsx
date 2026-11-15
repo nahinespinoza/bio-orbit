@@ -1,7 +1,7 @@
 import { ChevronLeft, LocateFixed, Map as MapIcon } from 'lucide-react'
 import Progreso from './Progreso.jsx'
 
-export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation, onSelectManually }) {
+export default function PasoUbicacion({ saludo, onVolver, onUseCurrentLocation, onSelectManually }) {
   return (
     <div className="onb-form">
       <div className="onb-top">
@@ -15,7 +15,7 @@ export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation, 
         <div className="onb-avatar" aria-hidden="true">
           <MapIcon size={44} strokeWidth={1.75} />
         </div>
-        <p className="onb-saludo">Hola, {nombre.split(' ')[0]}</p>
+        <p className="onb-saludo">{saludo}</p>
         <h1 className="onb-titulo">¿Dónde está tu finca?</h1>
         <p className="onb-subtitulo">Si estás ahora en tu finca, usa el GPS del celular. Si no, búscala y dibújala en el mapa.</p>
       </div>

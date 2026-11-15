@@ -18,21 +18,20 @@ const PANTALLA = {
 // Flujo que sigue a "Estoy en mi finca":
 // localizar → ✓ ubicación → hectáreas → ✓ superficie → "ahora ubica tu parcela" → mapa → home → resultados
 // Las pantallas ✓ e informativas avanzan solas.
-// Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio.
+// Trabaja sobre una finca (`finca`); los cambios se guardan en App con `onCambiar`.
+// Si la finca ya tiene parcelas (registrada antes o dibujada a mano), empieza en el inicio.
 export default function FlujoGps({
-  nombre, ubicacionInicial = null, parcelaInicial = null, onCancelar, onManual,
+  nombre, finca, fincas, onCambiar, onElegirFinca, onNuevaFinca, onCancelar, onManual,
 }) {
-  const [pantalla, setPantalla] = useState(parcelaInicial ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
+  const { ubicacion, parcelas, analisis } = finca
+  const [pantalla, setPantalla] = useState(parcelas.length ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
   const [direccion, setDireccion] = useState('adelante')
-  const [ubicacion, setUbicacion] = useState(ubicacionInicial)
-  const [hectareas, setHectareas] = useState(parcelaInicial?.area ?? null)
+  const [hectareas, setHectareas] = useState(parcelas[0]?.area ?? null)
   // La finca puede tener varias parcelas; la primera es la que usan los análisis.
-  const [parcelas, setParcelas] = useState(parcelaInicial ? [parcelaInicial] : [])
   const parcela = parcelas[0] ?? null
   const [agregando, setAgregando] = useState(false)
   const [haNueva, setHaNueva] = useState(null)
   const [modoAnalisis, setModoAnalisis] = useState('Rápido')
-  const [analisis, setAnalisis] = useState(null)
 
   const irA = (destino) => {
     setDireccion(destino > pantalla ? 'adelante' : 'atras')
@@ -40,7 +39,7 @@ export default function FlujoGps({
   }
 
   const alUbicar = (u) => {
-    setUbicacion(u)
+    onCambiar({ ubicacion: u })
     irA(PANTALLA.UBICACION_OK)
   }
 
@@ -52,7 +51,7 @@ export default function FlujoGps({
   // `otra`: el usuario eligió "Guardar y agregar otra parcela"
   // (`automatico` solo indica si se ajustó a los bordes; no se guarda en la parcela)
   const alAceptarParcela = ({ automatico: _automatico, ...resultado }, { otra = false } = {}) => {
-    setParcelas((prev) => (agregando ? [...prev, resultado] : [resultado]))
+    onCambiar((f) => ({ parcelas: agregando ? [...f.parcelas, resultado] : [resultado] }))
     if (otra) {
       setAgregando(true)
       setHaNueva(null)
@@ -152,16 +151,17 @@ export default function FlujoGps({
             modo={modoAnalisis}
             onVolver={() => irA(PANTALLA.HOME)}
             onProfundo={() => setModoAnalisis('Profundo')}
-            onAnalisis={setAnalisis}
+            onAnalisis={(a) => onCambiar({ analisis: a })}
           />
         )
       default:
         return (
           <PantallaHome
             nombre={nombre}
-            ubicacion={ubicacion}
-            parcelas={parcelas}
-            analisis={analisis}
+            finca={finca}
+            fincas={fincas}
+            onElegirFinca={onElegirFinca}
+            onNuevaFinca={onNuevaFinca}
             onProceso={analizar}
             onAgregarParcela={empezarNuevaParcela}
             onVerResultados={() => (analisis ? irA(PANTALLA.RESULTADOS) : analizar('Rápido'))}

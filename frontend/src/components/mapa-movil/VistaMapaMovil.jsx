@@ -36,10 +36,10 @@ const ESTILO = { color: '#ffffff', weight: 3, fillColor: '#10b981', fillOpacity:
 
 // Modo manual: el agricultor busca su finca y la dibuja tocando sus esquinas.
 // Al guardar, sigue el mismo camino que el flujo GPS (inicio → resultados).
-export default function VistaMapaMovil({ sesion, onVolver, onParcelaLista }) {
+export default function VistaMapaMovil({ nombre, onVolver, onParcelaLista }) {
   const [estado, setEstado] = useState('explorar') // explorar | dibujando | listo
   const [puntos, setPuntos] = useState([])
-  const primerNombre = sesion.nombre.split(' ')[0]
+  const primerNombre = nombre.split(' ')[0]
 
   const area = useMemo(() => (puntos.length >= 3 ? areaHa(puntos) : 0), [puntos])
   const muyChica = estado === 'listo' && area < AREA_MINIMA
@@ -68,7 +68,7 @@ export default function VistaMapaMovil({ sesion, onVolver, onParcelaLista }) {
             <strong>Dibuja tu finca</strong>
             <span>Hola, {primerNombre}</span>
           </div>
-          <span className="vm-avatar" title={sesion.nombre} aria-hidden="true">
+          <span className="vm-avatar" title={nombre} aria-hidden="true">
             {primerNombre.charAt(0).toUpperCase()}
           </span>
         </header>

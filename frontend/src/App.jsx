@@ -3,61 +3,114 @@ import Onboarding from './components/onboarding/Onboarding.jsx'
 import VistaMapaMovil from './components/mapa-movil/VistaMapaMovil.jsx'
 import FlujoGps from './components/flujo-gps/FlujoGps.jsx'
 
-export default function App() {
-  // null mientras el usuario está en el onboarding
-  const [sesion, setSesion] = useState(null)
-  const [ultimoNombre, setUltimoNombre] = useState('')
+let ultimoId = 0
+const fincaNueva = (nombre = '') => ({
+  id: `finca-${++ultimoId}`, nombre, ubicacion: null, parcelas: [], analisis: null,
+})
 
-  // La ubicación se obtiene dentro del flujo GPS (pantalla "Detectando tu ubicación")
-  const onUseCurrentLocation = ({ nombre }) => {
-    setSesion({ nombre, ubicacion: null, modo: 'gps' })
+// Las fincas viven solo mientras la app está abierta: al recargar se vuelve al onboarding.
+export default function App() {
+  const [agricultor, setAgricultor] = useState('')
+  // Fincas registradas (con al menos una parcela) y la que se ve en el inicio
+  const [fincas, setFincas] = useState([])
+  const [activaId, setActivaId] = useState(null)
+  // Finca que se está registrando: pasa a `fincas` al guardar su primera parcela.
+  // La primera se llama "Mi finca"; las demás piden nombre.
+  const [borrador, setBorrador] = useState(() => fincaNueva('Mi finca'))
+  // 'datos': nombre y "¿Dónde está tu finca?" · 'mapa': dibujarla a mano ·
+  // 'finca': GPS, inicio y análisis
+  const [etapa, setEtapa] = useState('datos')
+  const [pasoDatos, setPasoDatos] = useState(1)
+
+  const primeraVez = fincas.length === 0
+  const finca = borrador ?? fincas.find((f) => f.id === activaId)
+
+  // Aplica `cambios` (objeto o función de la finca) a una finca
+  const cambiarFinca = (id, cambios) => {
+    const aplicar = (f) => ({ ...f, ...(typeof cambios === 'function' ? cambios(f) : cambios) })
+    if (borrador?.id !== id) {
+      setFincas((fs) => fs.map((f) => (f.id === id ? aplicar(f) : f)))
+      return
+    }
+    const actualizado = aplicar(borrador)
+    if (!actualizado.parcelas.length) {
+      setBorrador(actualizado)
+      return
+    }
+    // Ya tiene su primera parcela: queda guardada y es la que se ve en el inicio
+    setFincas((fs) => [...fs, actualizado])
+    setActivaId(id)
+    setBorrador(null)
   }
 
-  const onSelectManually = ({ nombre }) => {
-    setSesion({ nombre, ubicacion: null, modo: 'manual' })
+  // Desde "¿Dónde está tu finca?": con el GPS ('finca') o dibujándola ('mapa')
+  const ubicarCon = (destino) => ({ nombre }) => {
+    if (primeraVez) setAgricultor(nombre)
+    else setBorrador((b) => ({ ...b, nombre }))
+    setEtapa(destino)
+  }
+
+  // Vuelve a "¿Dónde está tu finca?" conservando el nombre
+  const volverAUbicar = () => {
+    setPasoDatos(2)
+    setEtapa('datos')
+  }
+
+  // "Nueva finca" desde el selector del inicio
+  const empezarFinca = () => {
+    setBorrador(fincaNueva())
+    setPasoDatos(1)
+    setEtapa('datos')
+  }
+
+  // "Volver" desde el nombre de la finca nueva: regresa al inicio de la que se veía
+  const cancelarFinca = () => {
+    setBorrador(null)
+    setEtapa('finca')
+  }
+
+  if (etapa === 'datos') {
+    return (
+      <Onboarding
+        modo={primeraVez ? 'agricultor' : 'finca'}
+        nombreInicial={primeraVez ? agricultor : borrador.nombre}
+        pasoInicial={pasoDatos}
+        nombresUsados={fincas.map((f) => f.nombre)}
+        onCancelar={cancelarFinca}
+        onUseCurrentLocation={ubicarCon('finca')}
+        onSelectManually={ubicarCon('mapa')}
+      />
+    )
   }
 
   // El modo manual termina cuando el agricultor guarda el dibujo de su finca:
   // desde ahí sigue el mismo camino que el GPS (inicio → resultados).
-  const onParcelaLista = ({ ubicacion, parcela }) => {
-    setSesion((s) => ({ ...s, modo: 'finca', ubicacion, parcela }))
-  }
-
-  // Vuelve al paso "Ubica tu finca" conservando el nombre
-  const volverAlOnboarding = () => {
-    setUltimoNombre(sesion.nombre)
-    setSesion(null)
-  }
-
-  if (!sesion) {
-    return (
-      <Onboarding
-        nombreInicial={ultimoNombre}
-        pasoInicial={ultimoNombre ? 2 : 1}
-        onUseCurrentLocation={onUseCurrentLocation}
-        onSelectManually={onSelectManually}
-      />
-    )
-  }
-
-  if (sesion.modo === 'manual') {
+  if (etapa === 'mapa') {
     return (
       <VistaMapaMovil
-        sesion={sesion}
-        onVolver={volverAlOnboarding}
-        onParcelaLista={onParcelaLista}
+        nombre={agricultor}
+        onVolver={volverAUbicar}
+        onParcelaLista={({ ubicacion, parcela }) => {
+          cambiarFinca(borrador.id, { ubicacion, parcelas: [parcela] })
+          setEtapa('finca')
+        }}
       />
     )
   }
 
-  // 'gps' empieza localizando; 'finca' (dibujada a mano) empieza en el inicio.
+  // Una finca sin parcelas empieza localizando; una registrada, en el inicio.
+  // La key vuelve a montar el flujo al cambiar de finca.
   return (
     <FlujoGps
-      nombre={sesion.nombre}
-      ubicacionInicial={sesion.ubicacion}
-      parcelaInicial={sesion.parcela}
-      onCancelar={volverAlOnboarding}
-      onManual={() => onSelectManually({ nombre: sesion.nombre })}
+      key={finca.id}
+      nombre={agricultor}
+      finca={finca}
+      fincas={fincas}
+      onCambiar={(cambios) => cambiarFinca(finca.id, cambios)}
+      onElegirFinca={setActivaId}
+      onNuevaFinca={empezarFinca}
+      onCancelar={volverAUbicar}
+      onManual={() => setEtapa('mapa')}
     />
   )
 }
