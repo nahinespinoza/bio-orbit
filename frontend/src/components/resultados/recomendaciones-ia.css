@@ -159,3 +159,4 @@
   .rs:has(.pg) .rs-vista { animation: none; }
   .rs:has(.pg) .rs-contenido { scroll-behavior: auto; }
 }
+.pg-resumen { margin: 4px 0 12px; font-size: 13px; line-height: 1.45; color: #e0ece4; }

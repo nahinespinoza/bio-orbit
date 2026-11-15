@@ -52,7 +52,7 @@ Además de recomendar, el motor puede avisar de un riesgo del clima. La idea cab
 | `SEQUIA` (riego `ROJO_SECO`) | `fase_sensible_sequia` |
 | Suelo saturado (riego `AZUL_SATURADO`) | `tolerancia_exceso_agua` = baja |
 
-- **Las alertas** salen de `knowledge/structured/remote_sensing.json`, una copia de `backend/src/data/resultado_match.json` (lo genera `backend/src/match_nasa_sentinel.py`: reporte de ventanas de 7 días). Para actualizarlo, reemplace el archivo. Aquí no se recalcula ningún clima.
+- **Las alertas** salen de `knowledge/structured/remote_sensing.json`, una copia de `remote-sensing/resultado_match.json` (lo genera `remote-sensing/match_nasa_sentinel.py`: reporte de ventanas de 7 días). Para actualizarlo, reemplace el archivo. Aquí no se recalcula ningún clima.
 - **Solo la ventana más reciente:** las alertas y el semáforo de riego se toman solo de la semana más reciente (`proyeccion_vigente_nasa` / `clima_regional_nasa_power`; hoy 05-11/11/2026, que solo trae `PLAGAS_LANCHA`). La ventana de la última foto Sentinel-2 (21-27/10) ya no está vigente: sus `HELADAS` y `NUTRIENTES` no generan advertencias. Un cruce confirmado de esa foto solo se menciona («el satélite también ve…») si su alerta sigue en la ventana reciente. La fecha de los datos va en `signal.data_date` de cada advertencia y en `remote_sensing_date` / `remote_sensing_scope.data_date` del resultado.
 - **Altitud del lote:** las alertas son de la parcela monitoreada (Toacaso / Sigchos; altitud de `output.altitud_parcela_msnm`, o 3 588 msnm si falta) y la helada usa temperatura corregida a esa altura. Solo se aplican si el lote está a ±200 m de ella (3 388-3 788 m hoy). Fuera de ese rango no hay advertencias del remote-sensing; si la altitud es desconocida se aplican y consta `plot_altitude: "unknown"` (en `signal` y en `remote_sensing_scope`). Lo que cuenta el agricultor (`observations`: helada, lancha, suelo seco o encharcado) vale a cualquier altitud.
 - **Las sensibilidades** salen de `knowledge/structured/sensibilidades.json`. Sin dato, sin cita o de otra región (Australia, EcoCrop…) no hay advertencia. El detalle de qué cultivos tienen o no dato está en `propuesta_campos_tipados.json`.
@@ -105,10 +105,45 @@ Los modelos `gpt-5.4-*` no aceptan herramientas junto con `reasoning_effort` en 
 | `POST` | `/v1/sessions/{session_id}/messages` | Envía un mensaje al agente. El cliente genera `session_id` (UUID v4) y el primer mensaje crea la sesión |
 | `GET` | `/v1/sessions/{session_id}` | Estado de la sesión: datos del lote, datos faltantes, última recomendación, turnos y vencimiento |
 | `DELETE` | `/v1/sessions/{session_id}` | Borra la sesión de inmediato (`204`) |
+| `POST` | `/v1/recommendations` | Recomendación de una sola llamada con evidencia (remote-sensing + investigación de las fichas). Solo JSON |
 | `POST` | `/v1/recommend` | Llama al motor directamente, sin LLM y sin estado. Con `?include_explanation=true` agrega una explicación en español |
 | `GET` | `/v1/crops` | Lista de cultivos con familia, tipo, tags y confianza |
 | `GET` | `/v1/crops/{crop}` | Ficha de un cultivo. Acepta nombres comunes (tarwi, ataco, ulluco…) |
 | `GET` | `/health` | Estado: LLM activo, modo de búsqueda, número de cultivos, sesiones activas y fecha de la base |
+
+### Recomendación con evidencia (una sola llamada)
+
+`POST /v1/recommendations` recibe las respuestas de la pantalla de opciones y devuelve solo JSON (sin texto conversacional):
+
+```bash
+curl -X POST localhost:8000/v1/recommendations -H "Content-Type: application/json"   -d '{"previous_crop": "cebada", "priority": "low_labor", "irrigation": "rain_only", "waterlogging": "long"}'
+```
+
+- **Entrada:**
+  - `previous_crop`: un cultivo del pool, o `new_land`.
+  - `priority`: una de `market_value` | `speed` | `fewer_pests` | `low_labor`.
+  - `irrigation`: `rain_only` | `pump` | `canal` | `sprinkler_drip` | `manual`. `rain_only` es sin riego.
+  - `waterlogging`: `no` | `briefly` | `long`. Se traduce a drenaje bueno, regular o malo.
+  - `remote_sensing`: se acepta, pero en el MVP **se ignora y no se valida**: siempre se usa la copia del servidor, `knowledge/structured/remote_sensing.json`. La altitud sale de esa copia.
+- **Cómo decide:**
+  1. El motor aplica los filtros duros y la rotación, y entrega los **5 mejores por aptitud agronómica**, sin prioridades. Aquí no se aplica la regla de no comerciales: barbecho, pasto y abono verde también son candidatos.
+  2. El modelo (una llamada con salida estructurada) califica cada candidato de 0 a 100 en:
+     - **prioridad**, con el dato de la ficha;
+     - **riesgo de la parcela**: compara las condiciones del remote-sensing con la investigación del cultivo, que se lee del RAG por cultivo y tema.
+  3. El código combina: **afinidad = 0,30 · prioridad + 0,40 · riesgo + 0,30 · aptitud**, y 100 es el mejor cultivo.
+- **Reglas fijas del código:**
+  - sin dato de la prioridad → 30;
+  - advertencia ALTO del motor → riesgo ≤ 40; MEDIO → riesgo ≤ 70;
+  - evidencia solo de otra región o sin verificar → riesgo ≥ 50;
+  - sin investigación de los temas activos → riesgo 60;
+  - riesgo < 40 → afinidad ≤ 40 (riesgo primero).
+- **Salida:**
+  - `recommendation` y `alternatives` (hasta 4), cada una con `affinity`, `confidence` (alta, media o baja), `summary`, `why` (prioridad, riesgo y rotación, con su nota, su motivo y sus referencias), `rotation` y `advisories`;
+  - además: `how_to_compare`, `sources` (`F<n>` = fuente de la ficha, `I<n>` = fragmento de investigación), `missing_data`, `discarded`, `plot_conditions` y `flags`.
+- **Errores:**
+  - `422` con `{"errors": [...]}` (cultivo desconocido o entrada inválida);
+  - `503` sin `OPENAI_API_KEY`;
+  - `502` si el modelo falla.
 
 ### Conversación con el agente
 
@@ -180,8 +215,8 @@ Los errores de las rutas devuelven `detail: {code, message}`:
 |---|---|
 | `update_plot` | Valida y guarda en el estado los datos del lote que dio el agricultor |
 | `recommend_crop` | Ejecuta el motor con el lote registrado (exige los datos obligatorios) |
-| `search_sources` | Busca pasajes en las fuentes y acumula las citas |
-| `get_crop_profile` | Devuelve la ficha completa de un cultivo |
+| `search_sources` | Busca pasajes en las fuentes (opcionalmente solo los de un cultivo) y acumula las citas |
+| `get_crop_profile` | Devuelve las secciones pedidas de la ficha de un cultivo (nunca los indicadores de investigación) |
 | `list_crops` | Devuelve los cultivos conocidos |
 
 ### Motor de reglas (`app/engine/`)

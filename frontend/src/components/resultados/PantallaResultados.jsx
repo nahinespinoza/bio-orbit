@@ -421,7 +421,7 @@ export default function PantallaResultados({
           )}
           {detalle === 'lluvia' && vistaLluvia}
           {detalle === 'siembra' && (
-            <RecomendacionesIA finca={finca} ubicacion={ubicacion} monitoreada={Boolean(rs)} />
+            <RecomendacionesIA finca={finca} monitoreada={Boolean(rs)} />
           )}
         </div>
       </div>

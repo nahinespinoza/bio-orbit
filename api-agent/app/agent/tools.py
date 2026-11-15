@@ -1,11 +1,12 @@
 """Herramientas del agente. El LLM conversa; estas herramientas validan, recomiendan y buscan evidencia."""
 
 import json
-from typing import Literal
+from typing import Annotated, Literal
 
 from langchain.messages import ToolMessage
 from langchain.tools import ToolRuntime, tool
 from langgraph.types import Command
+from pydantic import Field
 
 from app.engine.crop_facts import crop_facts
 from app.engine.models import KnowledgeBase
@@ -18,6 +19,9 @@ from app.repository import crops as crops_repo
 Runtime = ToolRuntime[AgentContext, CropAdvisorState]
 Priority = Literal["market_value", "speed", "fewer_pests", "low_labor"]
 Observation = Literal["frost", "blight", "dry_soil", "waterlogging"]
+# Mismos valores que crops_repo.PROFILE_SECTIONS (lo verifica una prueba).
+Section = Literal["suelo", "clima", "ciclo_meses", "plagas", "enfermedades", "efecto_rotacion", "mano_obra",
+                  "facilidad_cultivo", "mercado", "huecos", "fuentes", "siguientes", "sensibilidades"]
 PASSAGE_CHARS = 900
 
 
@@ -164,30 +168,52 @@ def recommend_crop(runtime: Runtime) -> Command:
 
 
 @tool
-def search_sources(runtime: Runtime, query: str) -> Command:
-    """Busca pasajes en las fuentes (FAO, MAGAP, INIAP, estudios de Ecuador y documentos del proyecto).
+def search_sources(runtime: Runtime, query: str, crop: str | None = None) -> Command:
+    """Busca pasajes en las fuentes (FAO (cultivos andinos), MAGAP y documentos del proyecto).
 
     Úsala para explicar el porqué de una recomendación o para preguntas sobre cultivos, plagas, suelo y rotación.
     Escribe la consulta en español con palabras clave (p. ej. "plagas de la quinua", "rotación después de papa").
+    Si la pregunta es sobre un cultivo, pasa `crop` para buscar solo en pasajes que lo mencionan.
     """
-    docs = runtime.context.retriever.invoke(query)
+    result = runtime.context.sources.search(query, crop)
+    docs = result.docs
     citations = [format_citation(d) for d in docs]
     passages = []
     for i, (d, c) in enumerate(zip(docs, citations, strict=True), start=1):
         where = f"p. {c['page_label'] or c['page']}" if c["page"] else (c["section"] or "")
         passages.append(f"[{i}] {c['title']} ({where}; fiabilidad {c['reliability']}):\n{d.page_content[:PASSAGE_CHARS]}")
     content = "\n\n".join(passages) if passages else "No se encontraron pasajes relevantes."
+    if crop and result.crop is None:     # nombre que no está en el pool
+        hint = f" (parecidos: {', '.join(result.suggestions)})" if result.suggestions else ""
+        content = f"No reconozco «{crop}» como cultivo{hint}; resultados generales.\n\n{content}"
+    elif crop and not result.filtered:   # cultivo del pool con pasajes sin etiquetar: no se afirma que no existan
+        content = f"No pude filtrar los pasajes por «{crop}»; resultados generales.\n\n{content}"
     return Command(update={"citations": citations,
                            "messages": [ToolMessage(content, tool_call_id=runtime.tool_call_id)]})
 
 
 @tool
-def get_crop_profile(runtime: Runtime, crop: str) -> str:
-    """Devuelve la ficha de un cultivo: suelo, clima, ciclo, plagas, mano de obra, mercado, fuentes y huecos de datos."""
+def get_crop_profile(runtime: Runtime, crop: str, sections: Annotated[list[Section], Field(min_length=1)]) -> str:
+    """Devuelve solo las secciones pedidas de la ficha de un cultivo. Pide solo las secciones que necesitas para responder.
+
+    Secciones:
+    - suelo: textura, pH, drenaje, profundidad y exigencia de fertilidad.
+    - clima: altitud, temperatura, lluvia y si necesita riego.
+    - ciclo_meses: duración del ciclo en meses.
+    - plagas / enfermedades: las que lo atacan.
+    - efecto_rotacion: qué aporta o quita al suelo (nitrógeno, plagas que hospeda o corta).
+    - mano_obra: jornales por hectárea y si se puede mecanizar.
+    - facilidad_cultivo: qué tan fácil es de cultivar.
+    - mercado: precio de referencia, volatilidad y fuentes.
+    - huecos: datos que faltan en la ficha.
+    - fuentes: de dónde sale cada dato.
+    - siguientes: qué cultivos pueden ir después según las reglas de rotación.
+    - sensibilidades: helada, lancha, sequía, nitrógeno y exceso de agua.
+    """
     crop_id, suggestions = resolve_crop(crop, runtime.context.kb)
     if crop_id is None:
         return _json({"error": f"«{crop}» no está en el pool de cultivos.", "suggestions": suggestions})
-    return _json(crops_repo.get_crop_profile(runtime.context.conn, crop_id))
+    return _json(crops_repo.get_crop_sections(runtime.context.conn, crop_id, sections, runtime.context.kb.sensitivities))
 
 
 @tool

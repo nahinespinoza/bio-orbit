@@ -1,9 +1,0 @@
-# Solo el backend, para desarrollo local: docker compose up --build
-# Puerto 8001 en el host para no chocar con api-agent (8000).
-services:
-  backend:
-    build:
-      context: .
-    restart: unless-stopped
-    ports:
-      - "8001:8000"

@@ -2,9 +2,11 @@
 
 import json
 import sqlite3
+from collections.abc import Sequence
 from pathlib import Path
 
 from app.engine.advisories import read_signals
+from app.engine.conditions import plot_conditions
 from app.engine.models import Crop, KnowledgeBase, Transition, norm
 
 STRUCTURED_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "structured"
@@ -39,12 +41,13 @@ def _crop(row: sqlite3.Row) -> Crop:
     )
 
 
-def load_advisory_data(structured_dir: Path = STRUCTURED_DIR) -> tuple[dict, dict]:
-    """(sensibilidades por cultivo, alertas vigentes del remote-sensing). Archivo ausente = sin advertencias (no es un error)."""
+def load_advisory_data(structured_dir: Path = STRUCTURED_DIR) -> tuple[dict, dict, dict]:
+    """(sensibilidades por cultivo, alertas vigentes del remote-sensing, condiciones de la parcela).
+    Archivo ausente = sin advertencias ni condiciones (no es un error)."""
     sens_file, rs_file = structured_dir / "sensibilidades.json", structured_dir / "remote_sensing.json"
     sens = json.loads(sens_file.read_text(encoding="utf-8"))["cultivos"] if sens_file.exists() else {}
-    signals = read_signals(json.loads(rs_file.read_text(encoding="utf-8"))) if rs_file.exists() else {}
-    return sens, signals
+    rs = json.loads(rs_file.read_text(encoding="utf-8")) if rs_file.exists() else None
+    return sens, (read_signals(rs) if rs else {}), (plot_conditions(rs) if rs else {})
 
 
 def load_knowledge_base(conn: sqlite3.Connection, structured_dir: Path = STRUCTURED_DIR) -> KnowledgeBase:
@@ -52,8 +55,8 @@ def load_knowledge_base(conn: sqlite3.Connection, structured_dir: Path = STRUCTU
     edges: dict[str, list[Transition]] = {}
     for r in conn.execute("SELECT * FROM transitions ORDER BY rowid"):
         edges.setdefault(r["from_crop"], []).append(Transition(r["from_crop"], r["to_crop"], r["kind"], r["source_note"]))
-    sensitivities, signals = load_advisory_data(structured_dir)
-    return KnowledgeBase(crops=crops, edges=edges, sensitivities=sensitivities, signals=signals)
+    sensitivities, signals, conditions = load_advisory_data(structured_dir)
+    return KnowledgeBase(crops=crops, edges=edges, sensitivities=sensitivities, signals=signals, conditions=conditions)
 
 
 def list_crops(conn: sqlite3.Connection) -> list[dict]:
@@ -84,4 +87,39 @@ def get_crop_profile(conn: sqlite3.Connection, crop_id: str) -> dict | None:
         "profile": json.loads(row["profile_json"]),
         "next_crops": next_crops,
         "sources": [dict(r) for r in source_rows],
+    }
+
+
+# Secciones que el agente puede pedir. Los `indicadores*` de la ficha son notas de investigación: no se entregan
+# (lo útil de ellos ya está depurado en `sensibilidades`).
+PROFILE_SECTIONS: tuple[str, ...] = (
+    "suelo", "clima", "ciclo_meses", "plagas", "enfermedades", "efecto_rotacion", "mano_obra", "facilidad_cultivo",
+    "mercado", "huecos", "fuentes", "siguientes", "sensibilidades",
+)
+NO_SENSITIVITIES = {"valor": None, "nota": "Sin datos de sensibilidad con cita de Ecuador o los Andes."}
+
+
+def get_crop_sections(conn: sqlite3.Connection, crop_id: str, sections: Sequence[str], sensitivities: dict) -> dict | None:
+    """Cabecera corta del cultivo + solo las secciones pedidas. None si el cultivo no existe."""
+    invalid = [s for s in sections if s not in PROFILE_SECTIONS]
+    if invalid:
+        raise ValueError(f"Secciones no válidas: {', '.join(invalid)}. Opciones: {', '.join(PROFILE_SECTIONS)}.")
+    full = get_crop_profile(conn, crop_id)
+    if full is None:
+        return None
+    profile = full["profile"]
+
+    def value(section: str):
+        if section == "siguientes":
+            return full["next_crops"]
+        if section == "fuentes":
+            return {"citas": profile.get("fuentes"), "detalle": full["sources"]}
+        if section == "sensibilidades":
+            return sensitivities.get(crop_id) or NO_SENSITIVITIES
+        return profile.get(section)
+
+    return {
+        **{k: full[k] for k in ("crop_id", "name", "family", "crop_type", "tags", "confidence")},
+        "alcance_geografico": profile.get("alcance_geografico"),
+        "sections": {s: value(s) for s in sections},
     }

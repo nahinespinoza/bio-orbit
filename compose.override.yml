@@ -3,9 +3,6 @@ services:
   api-agent:
     ports:
       - "8000:8000"
-  backend:
-    ports:
-      - "8001:8000"
   frontend:
     ports:
       - "8080:8080"
