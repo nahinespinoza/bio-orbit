@@ -1,0 +1,13 @@
+mes,tmin_media,tmedia,hr,radiacion,nubes_madrugada,lluvia_mm,dias_tmin_bajo_6,clase_lluvia,clase_radiacion,clase_noches,nombre
+1,4.88,8.02,88.3,18.18,90.77,198.44,21.35,lluvioso,normal,normal,enero
+2,5.26,8.27,88.78,18.36,94.35,196.87,20.24,lluvioso,normal,nublado,febrero
+3,5.02,8.17,88.86,17.92,95.15,255.55,22.26,lluvioso,baja,nublado,marzo
+4,4.86,8.11,88.28,18.23,93.0,206.86,23.8,lluvioso,normal,nublado,abril
+5,4.93,8.07,87.84,17.4,91.96,140.87,23.42,normal,baja,normal,mayo
+6,4.35,7.55,85.23,17.57,89.22,74.58,25.13,seco,baja,despejado,junio
+7,4.04,7.22,83.53,17.84,86.98,51.83,26.45,seco,baja,despejado,julio
+8,3.7,7.39,80.91,19.84,81.44,55.56,27.03,seco,alta,despejado,agosto
+9,3.66,7.68,81.12,21.06,80.48,80.02,27.67,seco,alta,despejado,septiembre
+10,4.24,7.87,86.26,19.81,89.48,169.92,25.87,normal,alta,normal,octubre
+11,4.62,8.13,87.3,18.98,92.73,177.15,23.8,normal,alta,nublado,noviembre
+12,4.92,8.17,87.3,18.5,89.87,185.08,21.74,normal,normal,normal,diciembre
