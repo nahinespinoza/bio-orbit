@@ -1,0 +1,33 @@
+name: Deploy
+
+# Dokploy clona el repo y construye las imágenes (compose.yml); este workflow
+# solo le avisa que despliegue. Se lanza a mano (Actions → Deploy → Run workflow,
+# o `gh workflow run deploy.yml --ref main`). Necesita en el repo:
+#   secret   DOKPLOY_API_KEY
+#   variable DOKPLOY_COMPOSE_ID
+#   variable DOKPLOY_URL (URL base de Dokploy en el Oracle VPS, sin barra final)
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Deploy to Dokploy
+        env:
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
+          COMPOSE_ID: ${{ vars.DOKPLOY_COMPOSE_ID }}
+          SHA: ${{ github.sha }}
+        run: |
+          curl --fail-with-body -sS -X POST \
+            "${DOKPLOY_URL%/}/api/compose.deploy" \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H "x-api-key: $DOKPLOY_API_KEY" \
+            -d "{\"composeId\":\"$COMPOSE_ID\",\"title\":\"Deploy ${SHA::7}\",\"description\":\"Automatic deployment from GitHub Actions\"}"
