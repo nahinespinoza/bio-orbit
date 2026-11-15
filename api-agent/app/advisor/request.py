@@ -23,6 +23,9 @@ class AdvisorRequest(BaseModel):
     irrigation: Literal["rain_only", "pump", "canal", "sprinkler_drip", "manual"]
     waterlogging: Literal["no", "briefly", "long"] = Field(description="¿Se empoza el agua?")
     # MVP: se acepta sin validar y se IGNORA; siempre se usa la copia del servidor (knowledge/structured/remote_sensing.json).
+    altitude_masl: float | None = Field(default=None, ge=-50, le=6000,
+                                        description="Altitud del lote; si falta se usa la de la parcela monitoreada")
+    fertility: Literal["low", "medium", "high"] | None = Field(default=None, description="Fertilidad del suelo, si se conoce")
     remote_sensing: object = Field(default=None, description="Ignorado en el MVP: se usa la copia del servidor")
 
     model_config = {"json_schema_extra": {"examples": [
@@ -34,6 +37,8 @@ def to_plot_raw(req: AdvisorRequest, crop_id: str | None, altitude_masl: float |
     raw: dict = {"priorities": [req.priority],
                  "climate": {"altitude_masl": altitude_masl, "irrigation": IRRIGATION[req.irrigation]},
                  "soil": {"drainage": DRAINAGE[req.waterlogging]}}
+    if req.fertility:
+        raw["soil"]["fertility"] = req.fertility
     if crop_id is None:
         raw["new_land"] = True
     else:

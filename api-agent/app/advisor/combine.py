@@ -146,10 +146,13 @@ def combine(candidates: list[dict], payload_candidates: list[dict], scoring: Sco
                  "detail": apt_detail, "references": apt_refs},
             ],
             "rules_applied": rules,
+            "warnings": c["warnings"],
+            "rotation_warnings": (c["rotation"] or {}).get("warnings", []),
             "rotation": [{"cycle": st["cycle"], "crop": st["crop"], "name": st["name"],
                           "confidence": CONFIDENCE[CONFIDENCE_IN.get(st["confidence"], 0)]}
                          for st in (c["rotation"] or {}).get("sequence", [])],
-            "advisories": [{"level": a["level"], "message": a["message"]} for a in c["advisories"]],
+            "advisories": [{"level": a["level"], "message": a["message"], "signal": a["signal"], "crop_field": a["crop_field"]}
+                           for a in c["advisories"]],
             "priority_missing": pdata["missing"],
         })
     out.sort(key=lambda x: (-x["affinity"], x["crop"]))

@@ -41,12 +41,17 @@ def advise(req: AdvisorRequest, kb: KnowledgeBase, conn, scorer: Scorer) -> dict
     extra = frozenset({"exceso_agua"}) if req.waterlogging == "long" else frozenset()
     signals = read_signals(rs) if rs else {}
     conditions = plot_conditions(rs, extra) if rs else {}
-    altitude = rs["output"].get("altitud_parcela_msnm") if rs else None
+    rs_altitude = rs["output"].get("altitud_parcela_msnm") if rs else None
+    altitude = req.altitude_masl if req.altitude_masl is not None else rs_altitude
 
     v = validate_plot(to_plot_raw(req, crop_id, altitude), kb)
     if not v.ok:
         raise AdvisorInputError(v.errors)
     plot = v.plot
+    # UNKNOWN_SOIL se omite: la petición solo trae drenaje, así que avisaría siempre; se avisa solo de la fertilidad.
+    warnings = [w for w in v.warnings if w["code"] != "UNKNOWN_SOIL"]
+    if req.fertility is None:
+        warnings.append({"code": "UNKNOWN_FERTILITY", "message": "Sin fertilidad del suelo: puntúa neutro y baja la confianza."})
     ranked = rank_by_aptitude(plot, kb, signals=signals)
     if ranked["status"] != "ok":
         return {"status": "no_candidates", "discarded": ranked["discarded"], "outside_graph": ranked["outside_graph"],
@@ -72,6 +77,7 @@ def advise(req: AdvisorRequest, kb: KnowledgeBase, conn, scorer: Scorer) -> dict
         "alternatives": ranked_out[1:],
         "how_to_compare": scoring.how_to_compare,
         "sources": [refs[r] for r in sorted(cited, key=lambda x: (x[0], int(x[1:])))],
+        "warnings": warnings,
         "missing_data": [f"{c['name']}: {PRIORITY_LABEL[req.priority].lower()}" for c in ranked_out if c["priority_missing"]],
         "discarded": ranked["discarded"],
         "plot_conditions": conditions if scope_applies else None,
