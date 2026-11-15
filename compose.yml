@@ -1,0 +1,44 @@
+# Despliegue de bio-orbit (Dokploy: servicio Compose apuntando a este archivo).
+# Las variables salen del entorno (Dokploy) o de un .env en la raíz (ver .env.example).
+# Sin `ports`: Dokploy/Traefik enruta por dominio. En local, compose.override.yml publica los puertos.
+services:
+  api-agent:
+    build:
+      context: ./api-agent
+    restart: unless-stopped
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-gpt-5.4-mini}
+      CHAT_REASONING_EFFORT: ${CHAT_REASONING_EFFORT:-low}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}
+      DB_PATH: data/knowledge.db
+    volumes:
+      - api-data:/app/data
+    expose:
+      - "8000"
+
+  # Genera data/knowledge.db una vez (y al cambiar la base de conocimiento):
+  #   docker compose --profile ingest run --rm ingest
+  ingest:
+    profiles: ["ingest"]
+    build:
+      context: ./api-agent
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}
+      DB_PATH: data/knowledge.db
+    volumes:
+      - api-data:/app/data
+    command: ["python", "-m", "ingestion.build_db"]
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+volumes:
+  api-data:

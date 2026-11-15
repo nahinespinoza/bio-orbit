@@ -32,7 +32,7 @@ API REST (FastAPI) de un agente que guía a agricultores con poca experiencia en
 - **Agente:** LangChain `create_agent` + OpenAI (`gpt-5.4-mini`, razonamiento `low`, vía Responses API). Conversa, pregunta lo que falta y explica. **No calcula**: usa herramientas.
 - **Embeddings:** `text-embedding-3-small`.
 - **Logs:** loguru (herramientas usadas por turno, errores de OpenAI con traza).
-- **Motor de reglas:** `api-agent/app/engine/`, versión en Python de `api-agent/local/agente-rotacion/scripts/recomendar.mjs` (mismos resultados, verificado). Determinista, sin LLM.
+- **Motor de reglas:** `api-agent/app/engine/`, versión en Python de `local/agente-rotacion/scripts/recomendar.mjs` (mismos resultados, verificado). Determinista, sin LLM.
 - **RAG sobre SQLite:** `BM25Retriever` + `SQLiteVec` (langchain-community) unidos con `EnsembleRetriever` (langchain-classic).
 - **Memoria:** solo de corto plazo, por sesión (`InMemorySaver`, TTL de 120 min). Nada entre sesiones.
 
