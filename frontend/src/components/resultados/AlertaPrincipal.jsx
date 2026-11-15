@@ -37,14 +37,7 @@ function FilaAlerta({ alerta, abierta }) {
 export default function AlertaPrincipal({ alertas }) {
   const [abierta, setAbierta] = useState(false)
   const idLista = useId()
-  if (!alertas.length) {
-    return (
-      <section className="rs-alertas vacio">
-        <ShieldCheck size={20} aria-hidden="true" />
-        <span>Sin alertas para tu parcela esta semana.</span>
-      </section>
-    )
-  }
+  if (!alertas.length) return null // sin alertas no se muestra nada
 
   const ordenadas = ordenarAlertas(alertas)
   const altas = ordenadas.filter((a) => a.nivel === 'ALTO')

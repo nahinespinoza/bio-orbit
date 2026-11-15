@@ -104,11 +104,10 @@ function TarjetaFinca({ titulo, insignia, detalle, parcelas, onAgregarParcela, o
 // y tiene "Editar"; "Añadir parcela" es una acción de la pantalla (cabecera).
 // `fincasExtra` (ruta /prueba): más tarjetas de finca debajo de la principal.
 export default function PantallaHome({
-  nombre, ubicacion, parcelas, fincasExtra = [], onAgregarParcela, onEditarFinca, onVerFinca,
+  nombre, ubicacion, parcelas, nombrePrincipal = 'Mi finca', fincasExtra = [], onAgregarParcela, onEditarFinca, onVerFinca,
 }) {
   const primerNombre = nombre.split(' ')[0]
   const porGps = ubicacion.precision != null
-  const hayVarias = fincasExtra.length > 0
   const areaPrincipal = parcelas.reduce((s, p) => s + p.area, 0)
 
   return (
@@ -132,14 +131,16 @@ export default function PantallaHome({
 
       <div className="fg-home-contenido">
         <TarjetaFinca
-          titulo={hayVarias ? 'Parcela 1 Papa' : 'Mi finca'}
-          insignia={porGps ? 'Contorno aproximado' : ubicacion.zona ? 'Satélite' : 'Dibujada por ti'}
+          titulo={nombrePrincipal}
+          insignia={porGps ? 'Contorno aproximado' : ubicacion.zona || ubicacion.fija ? 'Satélite' : 'Dibujada por ti'}
           detalle={
             porGps
               ? `Ubicada con el GPS del celular (±${Math.round(ubicacion.precision)} m)`
               : ubicacion.zona
                 ? `${ubicacion.zona} · ${formatoNumero(areaPrincipal)} ha`
-                : 'Ubicada dibujándola en el mapa'
+                : ubicacion.fija
+                  ? `${formatoNumero(areaPrincipal)} ha`
+                  : 'Ubicada dibujándola en el mapa'
           }
           parcelas={parcelas}
           onEditar={onEditarFinca && (() => onEditarFinca('principal'))}
@@ -150,8 +151,8 @@ export default function PantallaHome({
           <TarjetaFinca
             key={f.id}
             titulo={f.nombre}
-            insignia="Satélite"
-            detalle={`${f.zona} · ${formatoNumero(f.parcelas.reduce((s, p) => s + p.area, 0))} ha`}
+            insignia={f.insignia ?? 'Satélite'}
+            detalle={[f.zona, `${formatoNumero(f.parcelas.reduce((s, p) => s + p.area, 0))} ha`].filter(Boolean).join(' · ')}
             parcelas={f.parcelas}
             onEditar={onEditarFinca && (() => onEditarFinca(i))}
             onAbrir={onVerFinca && (() => onVerFinca(i))}
