@@ -1,0 +1,375 @@
+{
+ "_meta": {
+  "descripcion": "Sensibilidades de cada cultivo que se cruzan con las alertas del remote-sensing (app/engine/advisories.py). Solo hay datos con cita de Ecuador (origen=ecuador) o de los Andes (origen=andes); lo demas no se incluye. El detalle de los campos sin dato esta en propuesta_campos_tipados.json.",
+  "campos": {
+   "tolerancia_helada": "alta|media|baja",
+   "fase_sensible_helada": "lista de fases",
+   "hospedero_lancha": "true si es hospedero de Phytophthora infestans",
+   "perdida_nitrogeno_por_lluvia": "true si hay cita de que el nitrogeno se pierde (lixiviacion)",
+   "fase_sensible_sequia": "lista de fases",
+   "tolerancia_exceso_agua": "alta|media|baja"
+  },
+  "generado_desde": "propuesta_campos_tipados.json"
+ },
+ "cultivos": {
+  "papa": {
+   "fase_sensible_helada": {
+    "valor": [
+     "emergencia",
+     "inicio_estolonizacion"
+    ],
+    "origen": "andes",
+    "fiabilidad": "baja",
+    "fuente": [
+     {
+      "cita": "fases mas susceptibles son emergencia e inicio de formacion de estolones",
+      "ref": "cultivos.json#cultivos.papa.indicadores.helada.nota"
+     }
+    ]
+   },
+   "hospedero_lancha": {
+    "valor": true,
+    "origen": "ecuador",
+    "fiabilidad": "alta",
+    "fuente": [
+     {
+      "cita": "Lancha tardía o tizón tardío (Phytophthora infestans",
+      "ref": "cultivos.json#cultivos.papa.enfermedades.0"
+     },
+     {
+      "cita": "causante de perdidas entre el 30% al 100% del rendimiento en pocos dias (Oyarzun et al., 2001)",
+      "url": "https://old.fontagro.org/new/uploads/productos/16678_-_Producto_20_(Apr).pdf",
+      "ref": "cultivos.json#cultivos.papa.indicadores.sanidad_lancha.fuentes[1]"
+     }
+    ]
+   },
+   "perdida_nitrogeno_por_lluvia": {
+    "valor": true,
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "N puede perderse por nitrificacion, lixiviacion y volatilizacion",
+      "ref": "cultivos.json#cultivos.papa.indicadores.fertilidad.perdidas_lavado"
+     }
+    ]
+   }
+  },
+  "oca": {
+   "tolerancia_helada": {
+    "valor": "media",
+    "origen": "ecuador",
+    "fiabilidad": "baja",
+    "fuente": [
+     {
+      "cita": "resistente a bajas temperaturas; las heladas destruyen el follaje",
+      "ref": "cultivos.json#cultivos.oca.clima.temperatura_c"
+     }
+    ]
+   }
+  },
+  "lizas": {
+   "tolerancia_helada": {
+    "valor": "media",
+    "origen": "andes",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+      "ref": "cultivos.json#cultivos.lizas.indicadores.helada.fuentes[0]"
+     },
+     {
+      "cita": "las heladas causan daño tanto a las plantas como a los tubérculos",
+      "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+      "ref": "cultivos.json#cultivos.lizas.indicadores.helada.fuentes[1]"
+     }
+    ]
+   }
+  },
+  "cebada": {
+   "fase_sensible_sequia": {
+    "valor": [
+     "formacion_polen",
+     "espigazon"
+    ],
+    "origen": "ecuador",
+    "fiabilidad": "alta",
+    "fuente": [
+     {
+      "cita": "Puesto que la formación de polen es sensible al estrés, déficit de agua y altas temperaturas ... puede reducir los rendimientos",
+      "url": "https://repositorio.iniap.gob.ec/server/api/core/bitstreams/d74c603e-2d8c-47aa-bc4a-98173ce4d5bc/content",
+      "ref": "cultivos.json#cultivos.cebada.indicadores.agua.fuentes[1]"
+     },
+     {
+      "cita": "formacion de polen/encanado-espigazon sensible a deficit hidrico",
+      "ref": "cultivos.json#cultivos.cebada.indicadores.agua.valor"
+     }
+    ]
+   }
+  },
+  "maiz": {
+   "tolerancia_helada": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "soporta mínimas hasta 8 °C",
+      "ref": "cultivos.json#cultivos.maiz.clima.temperatura_c"
+     },
+     {
+      "cita": "Nivel: sensible (en general mas que cebada/quinua)",
+      "ref": "cultivos.json#cultivos.maiz.indicadores.helada.valor"
+     },
+     {
+      "cita": "Prensa ecuatoriana reporta maiz quemado por heladas en sierra por encima de 2800 msnm",
+      "ref": "cultivos.json#cultivos.maiz.indicadores.helada.valor"
+     }
+    ]
+   },
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "alta",
+    "fuente": [
+     {
+      "cita": "no soporta excesos de agua ni encharcamiento (F1, F2)",
+      "ref": "cultivos.json#cultivos.maiz.suelo.drenaje"
+     }
+    ]
+   }
+  },
+  "quinua": {
+   "tolerancia_helada": {
+    "valor": "media",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "Las temperaturas ambientales bajas (por debajo de 5°C), especialmente durante la floración, producen esterilidad de polen y falta de fertilización",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[1]"
+     },
+     {
+      "cita": "los cultivares en Ecuador son adaptados a condiciones de valle andino, es decir con ausencia de temperaturas extremadamente bajas",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[2]"
+     },
+     {
+      "cita": "cultivars from the altiplano of Peru tolerated temperatures of -8°C for 4 hours ... At -4°C ... reductions were 50.7 and 65.7%",
+      "url": "https://agris.fao.org/search/ru/records/6878df965d9ad5f58d604635",
+      "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[0]"
+     }
+    ]
+   },
+   "fase_sensible_helada": {
+    "valor": [
+     "floracion"
+    ],
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "Las temperaturas ambientales bajas (por debajo de 5°C), especialmente durante la floración, producen esterilidad de polen y falta de fertilización",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[1]"
+     }
+    ]
+   },
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "alta",
+    "fuente": [
+     {
+      "cita": "no soporta excesos de agua (F1)",
+      "ref": "cultivos.json#cultivos.quinua.suelo.drenaje"
+     },
+     {
+      "cita": "En el caso de exceso de humedad, que empeora el problema de mildiu, se pueden instalar drenes cada 30 m",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.quinua.indicadores.exceso_agua.fuentes[0]"
+     }
+    ]
+   }
+  },
+  "amaranto": {
+   "tolerancia_helada": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "El amaranto, debido a su susceptibilidad a las heladas, se cultiva en zonas de la Sierra más bajas, principalmente en los valles interandinos",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.amaranto.indicadores.helada.fuentes[0]"
+     }
+    ]
+   },
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "el mal de semillero (causado por Pythium, Phytophtera y Rhizoctonia), que se presentan en el primer mes del cultivo, y sobre todo en suelos con mucha materia orgánica o anegados",
+      "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+      "ref": "cultivos.json#cultivos.amaranto.indicadores.exceso_agua.fuentes[0]"
+     }
+    ]
+   }
+  },
+  "qaniwa": {
+   "tolerancia_helada": {
+    "valor": "alta",
+    "origen": "andes",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "es el cultivo que más resiste bajas temperaturas y heladas (sin cifra)",
+      "ref": "cultivos.json#cultivos.qaniwa.clima.notas"
+     },
+     {
+      "cita": "(resumen de buscador) cultivos resistentes a heladas como la cañihua y quinua",
+      "url": "https://repositorio.inia.gob.pe/bitstreams/7b90cb33-eaf4-4f42-9a3c-955b561736eb/download",
+      "ref": "cultivos.json#cultivos.qaniwa.indicadores.helada.fuentes[0]"
+     }
+    ]
+   },
+   "fase_sensible_sequia": {
+    "valor": [
+     "inicio_crecimiento"
+    ],
+    "origen": "andes",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "sensible a la falta de humedad al inicio del crecimiento",
+      "ref": "cultivos.json#cultivos.qaniwa.clima.notas"
+     }
+    ]
+   }
+  },
+  "haba": {
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "andes",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "el exceso de humedad es perjudicial",
+      "ref": "cultivos.json#cultivos.haba.suelo.drenaje"
+     },
+     {
+      "cita": "Dato dado por el usuario (fuente 2): exceso de humedad perjudicial",
+      "ref": "cultivos.json#cultivos.haba.indicadores.exceso_agua.valor"
+     }
+    ]
+   }
+  },
+  "chocho": {
+   "tolerancia_helada": {
+    "valor": "media",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "planta adulta resistente a heladas, plántula y fase de eje floral susceptibles",
+      "ref": "cultivos.json#cultivos.chocho.clima.temperatura_c"
+     }
+    ]
+   },
+   "fase_sensible_helada": {
+    "valor": [
+     "plantula",
+     "eje_floral"
+    ],
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "plántula y fase de eje floral susceptibles",
+      "ref": "cultivos.json#cultivos.chocho.clima.temperatura_c"
+     }
+    ]
+   },
+   "fase_sensible_sequia": {
+    "valor": [
+     "floracion",
+     "fructificacion"
+    ],
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "susceptible a sequía en floración y fructificación",
+      "ref": "cultivos.json#cultivos.chocho.clima.lluvia_mm"
+     }
+    ]
+   },
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "franco arenosa o arenosa con un buen drenaje y un ph de 5.5 a 7 para evitar acumulacion de agua (verificado_texto)",
+      "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+      "ref": "cultivos.json#cultivos.chocho.indicadores.exceso_agua.fuentes[0]"
+     },
+     {
+      "cita": "Necesita buen drenaje",
+      "ref": "cultivos.json#cultivos.chocho.suelo.drenaje"
+     }
+    ]
+   }
+  },
+  "arveja": {
+   "tolerancia_exceso_agua": {
+    "valor": "baja",
+    "origen": "ecuador",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "la pudrición radical se presenta en suelos con mal drenaje (fuente 8)",
+      "ref": "cultivos.json#cultivos.arveja.suelo.drenaje"
+     }
+    ]
+   }
+  },
+  "olluco": {
+   "tolerancia_helada": {
+    "valor": "media",
+    "origen": "andes",
+    "fiabilidad": "media",
+    "fuente": [
+     {
+      "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+      "ref": "cultivos.json#cultivos.olluco.indicadores.helada.fuentes[0]"
+     },
+     {
+      "cita": "las heladas causan daño tanto a las plantas como a los tubérculos",
+      "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+      "ref": "cultivos.json#cultivos.olluco.indicadores.helada.fuentes[1]"
+     }
+    ]
+   }
+  },
+  "avena": {
+   "tolerancia_helada": {
+    "valor": "alta",
+    "origen": "ecuador",
+    "fiabilidad": "baja",
+    "fuente": [
+     {
+      "cita": "(resumen de buscador) resistente a heladas, tolerante a estrés hídrico y resistente a roya",
+      "url": "https://elproductor.com/2020/11/ecuador-tendra-una-nueva-semilla-de-avena-para-la-sierra-y-la-costa",
+      "ref": "cultivos.json#cultivos.avena.indicadores.helada.fuentes[0]"
+     }
+    ]
+   }
+  }
+ }
+}

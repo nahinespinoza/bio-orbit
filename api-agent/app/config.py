@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", env_file_encoding="utf-8", extra="ignore")
 
     openai_api_key: str | None = None
-    chat_model: str = "gpt-5.4-mini"
+    chat_model: str = "gpt-5.4"
     chat_reasoning_effort: str = "low"  # minimal | low | medium | high (modelos de razonamiento gpt-5.x)
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536

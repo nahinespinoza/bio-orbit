@@ -1,4 +1,8 @@
-"""Contrato del motor: las mismas 23 pruebas de local/agente-rotacion/tests/pruebas.mjs, ahora en Python."""
+"""Contrato del motor, ajustado a una base limitada a la papa.
+
+La base se limita a la papa y a los cultivos de sus rotaciones. Los acompañantes tienen ficha (suelo, clima, ciclo,
+plagas, mano de obra, facilidad, mercado, indicadores) y el grafo solo trae las aristas que involucran a la papa o que unen
+cultivos dentro de secuencias de las fuentes donde aparece. Por eso varios casos se formulan con la papa como cultivo siguiente."""
 
 import pytest
 
@@ -45,11 +49,12 @@ def test_only_potato_follows_graph_and_applies_f1(kb):
     assert any(d["crop"] == "papa" and d["filter"] == "F1" for d in r["discarded"])
 
 
-# 3. Papa y cebada
-def test_potato_and_barley_last_crop_rules_and_rotation_respects_f1_f2(kb):
-    r = run(kb, previous_crops=["cebada", "papa"], priorities=["fewer_pests", "speed"])
+# 3. Papa y cebada (la papa es el cultivo más reciente)
+def test_potato_then_barley_follows_graph_and_respects_f1_f2(kb):
+    r = run(kb, previous_crops=["papa", "cebada"], priorities=["fewer_pests", "speed"])
     assert r["status"] == "ok"
-    assert "cebada" not in names(r) and "trigo" not in names(r), "cereal tras cereal (F2)"
+    assert "papa" not in names(r)
+    assert set(names(r)) <= {e.to_crop for e in kb.edges["papa"]}
     seq = sequence(r)
     for a, b in zip(seq, seq[1:]):
         assert a != b
@@ -57,14 +62,22 @@ def test_potato_and_barley_last_crop_rules_and_rotation_respects_f1_f2(kb):
     assert len(set(seq)) == len(seq)
 
 
+def test_potato_can_sit_in_the_middle_of_a_rotation(kb):
+    """Las aristas entre acompañantes de secuencias con papa permiten rotaciones donde la papa no es el primer ni el último paso."""
+    r = run(kb, new_land=True, priorities=["market_value"])
+    seq = sequence(r)
+    assert r["status"] == "ok" and "papa" in seq[1:-1], seq
+    assert len(seq) >= 3
+
+
 # 4. Suelo pobre frente a fértil
-def test_poor_vs_fertile_soil_changes_recommendation(kb):
+def test_poor_soil_allows_recovery_crops_and_fertile_soil_does_not(kb):
     plot = {"previous_crops": ["papa"], "priorities": ["low_labor"], "climate": {"altitude_masl": 2800, "irrigation": "yes"}}
     poor = recommend({**plot, "soil": {"fertility": "low"}}, kb)
     rich = recommend({**plot, "soil": {"fertility": "high"}}, kb)
-    assert poor["recommendation"]["crop"] != rich["recommendation"]["crop"]
-    assert poor["recommendation"]["crop"] in RECOVERY
-    assert rich["recommendation"]["crop"] not in RECOVERY
+    assert RECOVERY & set(names(poor))
+    assert not RECOVERY & set(names(rich))
+    assert any(d["filter"] == "NON_COMMERCIAL_RULE" for d in rich["discarded"])
 
 
 def test_poor_soil_lowers_aptitude_of_demanding_crop(kb):
@@ -74,11 +87,11 @@ def test_poor_soil_lowers_aptitude_of_demanding_crop(kb):
     assert poor["recommendation"]["aptitude_score"] != rich["recommendation"]["aptitude_score"]
 
 
-# 5. Mismas condiciones, prioridades distintas
-def test_different_priorities_give_different_results(kb):
-    results = {p: run(kb, previous_crops=["papa"], priorities=[p]) for p in ("market_value", "speed", "fewer_pests", "low_labor")}
-    assert len({r["recommendation"]["crop"] for r in results.values()}) >= 2
-    assert len({tuple(sequence(r)) for r in results.values()}) >= 2
+# 5. Mismas condiciones, prioridades distintas (tras chocho, la papa es el único candidato del grafo)
+def test_different_priorities_change_the_potato_score(kb):
+    scores = {p: run(kb, previous_crops=["chocho"], priorities=[p])["recommendation"]["score"]
+              for p in ("market_value", "speed", "fewer_pests", "low_labor")}
+    assert len(set(scores.values())) >= 2
 
 
 # 6. Una, dos y tres prioridades
@@ -92,11 +105,12 @@ def test_weights_by_number_of_priorities(kb, n, weights):
 
 
 def test_priority_order_matters(kb):
-    a = run(kb, previous_crops=["papa"], priorities=["market_value", "low_labor"])
-    b = run(kb, previous_crops=["papa"], priorities=["low_labor", "market_value"])
+    a = run(kb, previous_crops=["chocho"], priorities=["market_value", "low_labor"])
+    b = run(kb, previous_crops=["chocho"], priorities=["low_labor", "market_value"])
+    assert a["recommendation"]["crop"] == b["recommendation"]["crop"] == "papa"
     assert [p["priority"] for p in a["recommendation"]["breakdown"]["priorities"]] == ["market_value", "low_labor"]
     assert [p["priority"] for p in b["recommendation"]["breakdown"]["priorities"]] == ["low_labor", "market_value"]
-    assert a["recommendation"]["score"] != b["recommendation"]["score"] or a["recommendation"]["crop"] != b["recommendation"]["crop"]
+    assert a["recommendation"]["score"] != b["recommendation"]["score"]
 
 
 # 7. Filtros duros y datos faltantes
@@ -106,22 +120,17 @@ def test_f2_no_tomato_after_potato_even_with_source5(kb):
 
 
 def test_f4_climate_discards_by_altitude(kb):
-    r = recommend({"previous_crops": ["papa"], "priorities": ["speed"], "climate": {"altitude_masl": 3600, "irrigation": "yes"}}, kb)
-    discarded = {d["crop"] for d in r["discarded"] if d["filter"] == "F4-climate"}
-    assert discarded & {"maiz", "quinua", "amaranto"}
+    r = recommend({"previous_crops": ["chocho"], "priorities": ["speed"], "climate": {"altitude_masl": 4600, "irrigation": "yes"}}, kb)
+    assert r["status"] == "no_candidates"
+    assert any(d["crop"] == "papa" and d["filter"] == "F4-climate" for d in r["discarded"])
 
 
-def test_f4_soil_discards_by_ph(kb):
-    r = run(kb, previous_crops=["papa"], priorities=["speed"], soil={"fertility": "medium", "ph": 4.0})
-    assert any(d["filter"] == "F4-soil" for d in r["discarded"])
-
-
-def test_f3_broad_bean_hosts_andean_weevil(kb):
-    without = run(kb, previous_crops=["papa"], priorities=["speed"])
-    assert not any(d["filter"] == "F3" for d in without["discarded"])
-    r = run(kb, previous_crops=["papa"], priorities=["speed"], last_pest=["gorgojo de los andes"])
-    assert any(d["filter"] == "F3" and d["crop"] == "haba" for d in r["discarded"])
-    assert "haba" not in names(r)
+def test_f3_potato_hosts_andean_weevil(kb):
+    without = run(kb, previous_crops=["chocho"], priorities=["speed"])
+    assert without["status"] == "ok" and without["recommendation"]["crop"] == "papa"
+    r = run(kb, previous_crops=["chocho"], priorities=["speed"], last_pest=["gorgojo de los andes"])
+    assert r["status"] == "no_candidates"
+    assert any(d["filter"] == "F3" and d["crop"] == "papa" for d in r["discarded"])
 
 
 def test_unknown_soil_warns_and_does_not_discard(kb):
@@ -132,7 +141,7 @@ def test_unknown_soil_warns_and_does_not_discard(kb):
 
 
 def test_missing_market_data_scores_neutral(kb):
-    r = run(kb, previous_crops=["cebada"], priorities=["market_value"])
+    r = run(kb, previous_crops=["papa"], priorities=["market_value"])
     for t in [r["recommendation"], *r["alternatives"]]:
         for p in t["breakdown"]["priorities"]:
             if p["missing"]:
@@ -176,8 +185,8 @@ def test_other_invalid_inputs(kb):
 
 
 def test_aliases(kb):
-    v = validate_plot({"previous_crops": ["Tarwi", "ataco", "Fríjol"], "priorities": ["speed"]}, kb)
-    assert v.plot.previous_crops == ["chocho", "amaranto", "frejol"]
+    v = validate_plot({"previous_crops": ["Tarwi", "ataco", "Papa"], "priorities": ["speed"]}, kb)
+    assert v.plot.previous_crops == ["chocho", "amaranto", "papa"]
 
 
 # 9. Rotación
@@ -196,10 +205,42 @@ def test_every_crop_has_profile_with_sources_and_confidence(kb):
         assert isinstance(crop.sources, tuple)
 
 
-# Valores de referencia verificados contra el motor JS (16/16 casos idénticos al pasarlo a Python).
-def test_reference_values_match_js_engine(kb):
-    r = run(kb, previous_crops=["cebada", "papa"], priorities=["fewer_pests", "speed"])
-    assert names(r) == ["mashua", "arveja", "amaranto"]
-    assert sequence(r) == ["mashua", "cebada", "amaranto", "abono"]
-    r = run(kb, previous_crops=["papa", "cebada"], priorities=["speed", "fewer_pests"])
-    assert (r["recommendation"]["crop"], r["recommendation"]["score"]) == ("amaranto", 61.0)
+# Valores de referencia (regresión del motor con la base limitada a la papa; ya no vienen del motor JS original).
+def test_reference_values(kb):
+    r = run(kb, previous_crops=["papa", "cebada"], priorities=["fewer_pests", "speed"])
+    assert names(r) == ["oca", "amaranto", "cebada"]
+    r = run(kb, previous_crops=["chocho"], priorities=["speed"])
+    assert (r["recommendation"]["crop"], r["recommendation"]["score"]) == ("papa", 65.8)
+
+
+# Indicadores de la parcela (3588 msnm): las fichas ampliadas de los acompañantes permiten descartar por altitud y por plaga.
+def test_altitude_3588_discards_cereals_and_pseudocereals_after_potato(kb):
+    r = recommend({"previous_crops": ["papa"], "priorities": ["speed"], "climate": {"altitude_masl": 3588, "irrigation": "no"}}, kb)
+    discarded = {d["crop"] for d in r["discarded"] if d["filter"] == "F4-climate"}
+    assert {"maiz", "quinua", "amaranto", "trigo"} <= discarded
+    assert not discarded & set(names(r))
+
+
+def test_companions_score_with_their_own_labor_and_market_data(kb):
+    """Con fichas recortadas, los acompañantes puntuaban 50 «sin dato» y ganaban a la papa por falta de datos."""
+    r = run(kb, new_land=True, priorities=["market_value", "low_labor"], climate={"altitude_masl": 3588})
+    top = r["recommendation"]
+    assert top["crop"] == "chocho"
+    assert not any(p["missing"] for p in top["breakdown"]["priorities"])
+    for t in [top, *r["alternatives"]]:
+        assert not next(p for p in t["breakdown"]["priorities"] if p["priority"] == "low_labor")["missing"]
+
+
+def test_profiles_do_not_cite_withdrawn_sources(kb):
+    """Fuente 4 (Tumbaco) retirada de la base; fuente 5 (blog Radeco) no es evidencia."""
+    for crop in kb.crops.values():
+        assert not {s.get("source_id") for s in crop.sources} & {4, 5}, crop.crop_id
+        assert not set(crop.market_source_ids) & {4, 5}, crop.crop_id
+
+
+def test_f3_broad_bean_hosts_andean_weevil(kb):
+    without = run(kb, previous_crops=["papa"], priorities=["speed"])
+    assert not any(d["filter"] == "F3" for d in without["discarded"])
+    r = run(kb, previous_crops=["papa"], priorities=["speed"], last_pest=["gorgojo de los andes"])
+    assert any(d["filter"] == "F3" and d["crop"] == "haba" for d in r["discarded"])
+    assert "haba" not in names(r)

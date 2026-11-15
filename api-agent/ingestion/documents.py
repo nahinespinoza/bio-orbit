@@ -1,7 +1,7 @@
 """Carga y fragmenta los documentos de origen con los loaders y splitters de LangChain.
 
-- PDFs originales (fuentes 1, 2 y 3): PyPDFLoader, un Document por página (metadatos `page` y `page_label`).
-- Página web de Redalyc (fuente 4): BSHTMLLoader.
+- PDFs originales (fuentes 1, 2 y 3; mixtos, contienen papa y otros cultivos): PyPDFLoader, un Document por página (metadatos `page` y `page_label`).
+- Página web de Redalyc (fuente 4): retirada de la base (no trata la papa); el loader html se conserva por si se agrega otra página.
 - Documentos del proyecto (knowledge/docs/*.md): TextLoader + MarkdownHeaderTextSplitter.
 - El blog de Radeco (fuente 5) NO se indexa: no es evidencia.
 """
@@ -20,6 +20,7 @@ logging.getLogger("pypdf").setLevel(logging.ERROR)  # avisos de fuentes tipográ
 
 CHUNK_SIZE = 1200
 CHUNK_OVERLAP = 200
+MD_CHUNK_SIZE = 1600   # docs .md: una sección `##` completa debe caber en un solo fragmento (07-indicadores-remote-sensing.md)
 
 
 @dataclass(frozen=True)
@@ -41,9 +42,6 @@ def default_sources(pdf_dir: Path, web_dir: Path, project_docs_dir: Path) -> lis
                   "FAO y ANPE-Perú, Guía de campo de los cultivos andinos", "pdf"),
         SourceDoc(pdf_dir / "magap-politica-agropecuaria-ecuatoriana-2015-2025.pdf", 3, "source", "high",
                   "MAGAP, Política agropecuaria ecuatoriana 2015-2025", "pdf"),
-        SourceDoc(web_dir / "redalyc-rentabilidad-cultivos-rotacion-tumbaco-2023.html", 4, "source", "high",
-                  "Montesdeoca et al. (2023), Rentabilidad de cultivos en rotación, Tumbaco", "html",
-                  encoding="iso-8859-1"),  # declarado en el <meta> de la página
     ]
     for md in sorted(project_docs_dir.glob("*.md")):
         docs.append(SourceDoc(md, None, "project_doc", "medium", f"Documento del proyecto: {md.stem}", "markdown"))
@@ -57,14 +55,12 @@ def norm(text: str) -> str:
 
 
 CROP_TERMS: dict[str, list[str]] = {
-    "papa": ["papa", "papas"], "melloco": ["melloco"], "oca": ["oca", "ocas"], "mashua": ["mashua", "mashwa", "isano"],
-    "olluco": ["olluco", "ulluco"], "lizas": ["lizas"], "achira": ["achira"], "jicama": ["jicama"],
-    "arracacha": ["arracacha", "zanahoria blanca"], "cebada": ["cebada"], "trigo": ["trigo"], "avena": ["avena"],
+    "papa": ["papa", "papas"], "oca": ["oca", "ocas"], "lizas": ["lizas"], "cebada": ["cebada"], "trigo": ["trigo"],
     "maiz": ["maiz", "choclo"], "quinua": ["quinua", "quinoa"], "amaranto": ["amaranto", "ataco", "kiwicha"],
     "qaniwa": ["qaniwa", "canihua", "kaniwa"], "haba": ["haba", "habas"], "chocho": ["chocho", "tarwi", "lupino"],
-    "arveja": ["arveja", "arvejas"], "lenteja": ["lenteja", "lentejas"], "frejol": ["frejol", "frijol"],
+    "arveja": ["arveja", "arvejas"], "lenteja": ["lenteja", "lentejas"],
     "abono": ["abono verde", "abonos verdes", "vicia"], "pasto": ["pasto", "pastos", "alfalfa", "pradera"],
-    "barbecho": ["barbecho"], "tomate": ["tomate"], "brocoli": ["brocoli"], "soya": ["soya", "soja"],
+    "barbecho": ["barbecho"],
 }
 _CROP_RX = {cid: re.compile(r"\b(" + "|".join(map(re.escape, terms)) + r")\b") for cid, terms in CROP_TERMS.items()}
 
@@ -77,6 +73,7 @@ def detect_crops(text: str) -> list[str]:
 # --- Carga y fragmentación ---------------------------------------------------------------------------
 
 _splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
+_md_splitter = RecursiveCharacterTextSplitter(chunk_size=MD_CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
 _md_headers = MarkdownHeaderTextSplitter(headers_to_split_on=[("#", "h1"), ("##", "h2"), ("###", "h3")])
 
 
@@ -106,7 +103,7 @@ def load_and_split(src: SourceDoc) -> list[Document]:
         sections = _md_headers.split_text(text)
         for s in sections:
             s.metadata = {**base, "section": " > ".join(v for k, v in s.metadata.items() if k.startswith("h"))}
-        chunks = _splitter.split_documents(sections)
+        chunks = _md_splitter.split_documents(sections)
 
     out = []
     for c in chunks:

@@ -2,8 +2,12 @@
 
 import json
 import sqlite3
+from pathlib import Path
 
+from app.engine.advisories import read_signals
 from app.engine.models import Crop, KnowledgeBase, Transition, norm
+
+STRUCTURED_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "structured"
 
 
 def _bool(value: int | None) -> bool | None:
@@ -35,12 +39,21 @@ def _crop(row: sqlite3.Row) -> Crop:
     )
 
 
-def load_knowledge_base(conn: sqlite3.Connection) -> KnowledgeBase:
+def load_advisory_data(structured_dir: Path = STRUCTURED_DIR) -> tuple[dict, dict]:
+    """(sensibilidades por cultivo, alertas vigentes del remote-sensing). Archivo ausente = sin advertencias (no es un error)."""
+    sens_file, rs_file = structured_dir / "sensibilidades.json", structured_dir / "remote_sensing.json"
+    sens = json.loads(sens_file.read_text(encoding="utf-8"))["cultivos"] if sens_file.exists() else {}
+    signals = read_signals(json.loads(rs_file.read_text(encoding="utf-8"))) if rs_file.exists() else {}
+    return sens, signals
+
+
+def load_knowledge_base(conn: sqlite3.Connection, structured_dir: Path = STRUCTURED_DIR) -> KnowledgeBase:
     crops = {r["crop_id"]: _crop(r) for r in conn.execute("SELECT * FROM crops ORDER BY rowid")}
     edges: dict[str, list[Transition]] = {}
     for r in conn.execute("SELECT * FROM transitions ORDER BY rowid"):
         edges.setdefault(r["from_crop"], []).append(Transition(r["from_crop"], r["to_crop"], r["kind"], r["source_note"]))
-    return KnowledgeBase(crops=crops, edges=edges)
+    sensitivities, signals = load_advisory_data(structured_dir)
+    return KnowledgeBase(crops=crops, edges=edges, sensitivities=sensitivities, signals=signals)
 
 
 def list_crops(conn: sqlite3.Connection) -> list[dict]:

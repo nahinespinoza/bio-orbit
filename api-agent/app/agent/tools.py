@@ -7,6 +7,8 @@ from langchain.messages import ToolMessage
 from langchain.tools import ToolRuntime, tool
 from langgraph.types import Command
 
+from app.engine.crop_facts import crop_facts
+from app.engine.models import KnowledgeBase
 from app.engine.recommender import recommend
 from app.engine.validation import REQUIRED_FIELDS, missing_fields, resolve_crop, validate_plot
 from app.memory.state import AgentContext, CropAdvisorState
@@ -15,6 +17,7 @@ from app.repository import crops as crops_repo
 
 Runtime = ToolRuntime[AgentContext, CropAdvisorState]
 Priority = Literal["market_value", "speed", "fewer_pests", "low_labor"]
+Observation = Literal["frost", "blight", "dry_soil", "waterlogging"]
 PASSAGE_CHARS = 900
 
 
@@ -30,9 +33,11 @@ def _merge_plot(current: dict, update: dict) -> dict:
     for group in ("soil", "climate"):
         if group in update:
             merged[group] = {**merged.get(group, {}), **update[group]}
-    for key in ("priorities", "last_pest", "rotation_cycles", "use_source5"):
+    for key in ("priorities", "last_pest", "rotation_cycles", "use_source5", "observations"):
         if key in update:
             merged[key] = update[key]
+    if "notes" in update:   # las notas se acumulan: cada turno agrega las nuevas
+        merged["notes"] = list(dict.fromkeys([*merged.get("notes", []), *update["notes"]]))
     return merged
 
 
@@ -52,6 +57,8 @@ def update_plot(
     irrigation: Literal["yes", "no", "unknown"] | None = None,
     last_pest: list[str] | None = None,
     rotation_cycles: int | None = None,
+    observations: list[Observation] | None = None,
+    notes: list[str] | None = None,
 ) -> Command:
     """Registra datos del lote que dio el agricultor. Envía SOLO los campos que mencionó en la conversación;
     deja en null todo lo que no ha dicho (así se sabe qué falta preguntar).
@@ -61,6 +68,10 @@ def update_plot(
     priorities: de 1 a 3, en orden de importancia.
     "unknown" solo cuando el agricultor DIJO que no sabe ese dato; nunca para datos que no se han preguntado.
     last_pest: plaga o enfermedad fuerte del último ciclo, solo si la mencionó.
+    observations: lo que el agricultor ve HOY en su lote, solo si lo mencionó: frost (heladas), blight (lancha),
+    dry_soil (suelo seco), waterlogging (agua empozada). Envía la lista completa de lo que ha contado.
+    notes: SOLO lo que el agricultor cuenta y no cabe en ningún otro campo (tipo de riego, tamaño de la parcela, si tiene
+    comprador o semilla, recursos, preferencias). Una frase corta por nota, con sus palabras; envía solo las nuevas.
     """
     raw: dict = {}
     if previous_crops is not None:
@@ -80,6 +91,10 @@ def update_plot(
         raw["last_pest"] = last_pest
     if rotation_cycles is not None:
         raw["rotation_cycles"] = rotation_cycles
+    if observations is not None:
+        raw["observations"] = observations
+    if notes is not None:
+        raw["notes"] = notes
 
     result = validate_plot(raw, runtime.context.kb, partial=True)
     plot = _merge_plot(runtime.state.get("plot") or {}, result.normalized)
@@ -94,8 +109,8 @@ def update_plot(
     return Command(update={"plot": plot, "messages": [ToolMessage(_json(content), tool_call_id=runtime.tool_call_id)]})
 
 
-def _summary(result: dict) -> dict:
-    """Versión compacta del resultado del motor para el LLM."""
+def _summary(result: dict, kb: KnowledgeBase) -> dict:
+    """Versión compacta del resultado del motor para el LLM. El cultivo recomendado trae `facts` de su ficha."""
     if result["status"] != "ok":
         return result
 
@@ -107,18 +122,21 @@ def _summary(result: dict) -> dict:
                         for p in t["breakdown"]["priorities"]],
             "agronomy": [f"{a['name']}: {a['detail']} ({round(a['value'])}/100)" for a in t["breakdown"]["aptitude"]],
             "transition": t["transition"], "warnings": t["warnings"],
+            "advisories": [{"rule": a["rule"], "level": a["level"], "message": a["message"]} for a in t.get("advisories", [])],
         }
 
     rot = result["rotation"]
     return {
         "status": "ok",
-        "recommendation": crop(result["recommendation"]),
+        "recommendation": {**crop(result["recommendation"]), "facts": crop_facts(kb.crops[result["recommendation"]["crop"]])},
         "alternatives": [crop(a) for a in result["alternatives"]],
         "rotation": {"sequence": [f"{s['cycle']}. {s['name']} ({s['role']}; "
                                   f"{s['transition']['kind'] + ': ' + s['transition']['source_note'] if s['transition'] else 'inicio'})"
                                   for s in rot["sequence"]],
                      "ends_with_ender": rot["ends_with_ender"], "warnings": rot["warnings"]} if rot else None,
         "discarded": [f"{d['crop']}: {d['filter']} — {d['reason']}" for d in result["discarded"]],
+        # cultivos que el motor ni siquiera evaluó: no siguen a lo que sembró antes según las reglas de rotación
+        "not_after_previous_crop": result.get("outside_graph", []),
         "warnings": [w["message"] for w in result["warnings"]],
         "missing_data": result["missing_data"],
         "note": result["note"],
@@ -141,7 +159,7 @@ def recommend_crop(runtime: Runtime) -> Command:
     result = recommend(plot, runtime.context.kb)
     return Command(update={
         "last_recommendation": result,
-        "messages": [ToolMessage(_json(_summary(result)), tool_call_id=runtime.tool_call_id)],
+        "messages": [ToolMessage(_json(_summary(result, runtime.context.kb)), tool_call_id=runtime.tool_call_id)],
     })
 
 

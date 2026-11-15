@@ -7,6 +7,7 @@ Códigos de error en inglés; mensajes en español (los lee el agente y se los t
 import difflib
 from dataclasses import dataclass, field
 
+from app.engine.advisories import OBSERVATIONS
 from app.engine.models import (
     DEFAULT_CYCLES, IRRIGATION, PH_WORDS, PRIORITIES, SOIL_SCALES, UNKNOWN, KnowledgeBase, PlotInput, norm,
 )
@@ -23,6 +24,7 @@ ALIASES = {
     "choclo": "maiz", "tomates": "tomate", "soja": "soya", "ocas": "oca",
 }
 MAX_HISTORY = 4
+MAX_NOTES, NOTE_CHARS = 10, 300
 
 
 @dataclass
@@ -201,6 +203,21 @@ def validate_plot(raw: dict, kb: KnowledgeBase, *, allow_unknown_crops: bool = F
         items = lp if isinstance(lp, list) else ([p for p in str(lp).split(",")] if lp else [])
         out["last_pest"] = [norm(p) for p in items if norm(p)]
 
+    if not partial or "observations" in raw:
+        obs = raw.get("observations")
+        items = obs if isinstance(obs, list) else ([p for p in str(obs).split(",")] if obs else [])
+        clean = list(dict.fromkeys(norm(p).replace(" ", "_") for p in items if norm(p)))
+        bad = [p for p in clean if p not in OBSERVATIONS]
+        if bad:
+            r.error("INVALID_VALUE", f"observations: «{', '.join(bad)}» no es válida. Opciones: {', '.join(OBSERVATIONS)}.", field="observations")
+        else:
+            out["observations"] = clean
+
+    if "notes" in raw:   # contexto libre que no cabe en el esquema (riego manual, parcela pequeña, comprador…)
+        nt = raw["notes"]
+        items = nt if isinstance(nt, list) else ([nt] if nt else [])
+        out["notes"] = [" ".join(str(x).split())[:NOTE_CHARS] for x in items if str(x).strip()][:MAX_NOTES]
+
     r.normalized = out
     if r.ok and not partial:
         r.plot = PlotInput(
@@ -208,6 +225,7 @@ def validate_plot(raw: dict, kb: KnowledgeBase, *, allow_unknown_crops: bool = F
             altitude_masl=climate.get("altitude_masl"), irrigation=str(climate.get("irrigation", UNKNOWN)),
             priorities=out["priorities"], last_pest=out.get("last_pest", []),
             rotation_cycles=out.get("rotation_cycles", DEFAULT_CYCLES), use_source5=out.get("use_source5", False),
+            observations=out.get("observations", []), notes=out.get("notes", []),
         )
     return r
 
