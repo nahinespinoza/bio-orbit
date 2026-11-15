@@ -1,0 +1,1256 @@
+{
+ "_meta": {
+  "descripcion": "Grafo de transiciones entre cultivos extraído de out/arbol-de-decision-rotacion.html (constantes CROPS y EDGES), sin modificar el HTML.",
+  "tipos": {
+   "fuente": "respaldada por una fuente de la 1 a la 4",
+   "general": "generalización de una regla de fuente (p. ej. «cereales» o «otras leguminosas»)",
+   "inferida": "propuesta propia, ninguna fuente lo afirma",
+   "fuente5": "solo blog Radeco (fuente 5, baja fiabilidad); no usar como evidencia"
+  },
+  "fuentes": {
+   "1": "FAO, Producción orgánica de cultivos andinos (Ecuador)",
+   "2": "FAO/ANPE-Perú, Guía de campo de los cultivos andinos",
+   "3": "MAGAP, Política agropecuaria 2015-2025",
+   "4": "Montesdeoca et al. 2023, Redalyc (Tumbaco)",
+   "5": "Blog Radeco Agro (baja fiabilidad)"
+  },
+  "generado": "2026-11-14"
+ },
+ "nodos": [
+  {
+   "id": "papa",
+   "nombre": "Papa",
+   "familia": "Solanáceas",
+   "tags": [
+    "starter",
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "melloco",
+   "nombre": "Melloco",
+   "familia": "Baseláceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "oca",
+   "nombre": "Oca",
+   "familia": "Oxalidáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "mashua",
+   "nombre": "Mashua",
+   "familia": "Tropeoláceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "olluco",
+   "nombre": "Olluco / añu",
+   "familia": "Baseláceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "lizas",
+   "nombre": "Lizas",
+   "familia": "Baseláceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "achira",
+   "nombre": "Achira",
+   "familia": "Cannáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "jicama",
+   "nombre": "Jícama",
+   "familia": "Asteráceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "arracacha",
+   "nombre": "Zanahoria blanca (arracacha)",
+   "familia": "Apiáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "cebada",
+   "nombre": "Cebada",
+   "familia": "Gramíneas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "trigo",
+   "nombre": "Trigo",
+   "familia": "Gramíneas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "avena",
+   "nombre": "Avena",
+   "familia": "Gramíneas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "maiz",
+   "nombre": "Maíz",
+   "familia": "Gramíneas",
+   "tags": [
+    "starter",
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "quinua",
+   "nombre": "Quinua",
+   "familia": "Amarantáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "amaranto",
+   "nombre": "Amaranto / ataco",
+   "familia": "Amarantáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "qaniwa",
+   "nombre": "Qañiwa (cañihua)",
+   "familia": "Amarantáceas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "haba",
+   "nombre": "Haba",
+   "familia": "Leguminosas",
+   "tags": [
+    "starter",
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "chocho",
+   "nombre": "Chocho (tarwi)",
+   "familia": "Leguminosas",
+   "tags": [
+    "starter",
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "arveja",
+   "nombre": "Arveja",
+   "familia": "Leguminosas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "lenteja",
+   "nombre": "Lenteja",
+   "familia": "Leguminosas",
+   "tags": [
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "frejol",
+   "nombre": "Fréjol",
+   "familia": "Leguminosas",
+   "tags": [
+    "starter",
+    "follower"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "abono",
+   "nombre": "Abono verde (vicia, tarwi, tréboles)",
+   "familia": "Leguminosas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "pasto",
+   "nombre": "Pasto / pradera (incl. alfalfa)",
+   "familia": "Pastos",
+   "tags": [
+    "starter",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "barbecho",
+   "nombre": "Barbecho / descanso",
+   "familia": "Descanso",
+   "tags": [
+    "starter",
+    "ender"
+   ],
+   "solo_fuente5": false
+  },
+  {
+   "id": "tomate",
+   "nombre": "Tomate",
+   "familia": "Solanáceas",
+   "tags": [
+    "starter",
+    "follower"
+   ],
+   "solo_fuente5": true
+  },
+  {
+   "id": "brocoli",
+   "nombre": "Brócoli",
+   "familia": "Brasicáceas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": true
+  },
+  {
+   "id": "soya",
+   "nombre": "Soya",
+   "familia": "Leguminosas",
+   "tags": [
+    "follower",
+    "ender"
+   ],
+   "solo_fuente5": true
+  }
+ ],
+ "aristas": [
+  {
+   "de": "pasto",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (papa tras pasto)"
+  },
+  {
+   "de": "papa",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (papa, 2 siembras)"
+  },
+  {
+   "de": "papa",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (cereal tras papa)"
+  },
+  {
+   "de": "papa",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (cereal tras papa)"
+  },
+  {
+   "de": "papa",
+   "a": "quinua",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (cereal tras papa)"
+  },
+  {
+   "de": "papa",
+   "a": "amaranto",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (cereal tras papa)"
+  },
+  {
+   "de": "papa",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (cereal tras papa)"
+  },
+  {
+   "de": "cebada",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "cebada",
+   "a": "arveja",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "cebada",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "trigo",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "trigo",
+   "a": "arveja",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "trigo",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "maiz",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "maiz",
+   "a": "arveja",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "maiz",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "quinua",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "quinua",
+   "a": "arveja",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "quinua",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "amaranto",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "amaranto",
+   "a": "arveja",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "amaranto",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (leguminosa tras cereal)"
+  },
+  {
+   "de": "haba",
+   "a": "pasto",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (pasto tras leguminosa)"
+  },
+  {
+   "de": "arveja",
+   "a": "pasto",
+   "tipo": "fuente",
+   "fuente": "1 · Cuadro 5 (pasto tras leguminosa)"
+  },
+  {
+   "de": "papa",
+   "a": "haba",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba"
+  },
+  {
+   "de": "haba",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba (B y C)"
+  },
+  {
+   "de": "haba",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba (B y C)"
+  },
+  {
+   "de": "cebada",
+   "a": "chocho",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba (año 4: haba, chocho o trigo)"
+  },
+  {
+   "de": "cebada",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba (año 4: haba, chocho o trigo)"
+  },
+  {
+   "de": "trigo",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · rotación de haba (B reinicia con papa)"
+  },
+  {
+   "de": "chocho",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "lenteja",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "frejol",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "chocho",
+   "a": "abono",
+   "tipo": "fuente",
+   "fuente": "1 · cultivo de chocho (sistemas de Chimborazo, Cotopaxi, Pichincha, Imbabura)"
+  },
+  {
+   "de": "quinua",
+   "a": "chocho",
+   "tipo": "fuente",
+   "fuente": "1 · quinua (rotar con haba, chocho, papa o maíz)"
+  },
+  {
+   "de": "quinua",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · quinua (rotar con haba, chocho, papa o maíz)"
+  },
+  {
+   "de": "quinua",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "1 · quinua (rotar con haba, chocho, papa o maíz)"
+  },
+  {
+   "de": "maiz",
+   "a": "chocho",
+   "tipo": "fuente",
+   "fuente": "1 · maíz (rotar con haba, chocho, papa o quinua)"
+  },
+  {
+   "de": "maiz",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "1 · maíz (rotar con haba, chocho, papa o quinua)"
+  },
+  {
+   "de": "maiz",
+   "a": "quinua",
+   "tipo": "fuente",
+   "fuente": "1 · maíz (rotar con haba, chocho, papa o quinua)"
+  },
+  {
+   "de": "quinua",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "2 · Puno (papa, quinua, cereal)"
+  },
+  {
+   "de": "quinua",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "2 · Puno (papa, quinua, cereal)"
+  },
+  {
+   "de": "amaranto",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-amaranto-cereales-haba / -chocho)"
+  },
+  {
+   "de": "amaranto",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-amaranto-cereales-haba / -chocho)"
+  },
+  {
+   "de": "amaranto",
+   "a": "chocho",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-amaranto-cereales-haba / -chocho)"
+  },
+  {
+   "de": "maiz",
+   "a": "amaranto",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-maíz o cereales-amaranto)"
+  },
+  {
+   "de": "cebada",
+   "a": "amaranto",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-maíz o cereales-amaranto)"
+  },
+  {
+   "de": "trigo",
+   "a": "amaranto",
+   "tipo": "fuente",
+   "fuente": "1 · amaranto (papa-maíz o cereales-amaranto)"
+  },
+  {
+   "de": "maiz",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "2 · Cusco (maíz, maíz, maíz, papa)"
+  },
+  {
+   "de": "maiz",
+   "a": "trigo",
+   "tipo": "fuente",
+   "fuente": "2 · Cusco (maíz, trigo, haba, maíz)"
+  },
+  {
+   "de": "haba",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "2 · Cusco (papa/cebada, haba, maíz, maíz)"
+  },
+  {
+   "de": "frejol",
+   "a": "maiz",
+   "tipo": "fuente",
+   "fuente": "4 · Tumbaco (fríjol-maíz)"
+  },
+  {
+   "de": "maiz",
+   "a": "frejol",
+   "tipo": "fuente",
+   "fuente": "4 · Tumbaco (fríjol-maíz)"
+  },
+  {
+   "de": "haba",
+   "a": "melloco",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "haba",
+   "a": "oca",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "haba",
+   "a": "achira",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "haba",
+   "a": "jicama",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "haba",
+   "a": "mashua",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "chocho",
+   "a": "melloco",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "chocho",
+   "a": "oca",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "chocho",
+   "a": "achira",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "chocho",
+   "a": "jicama",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "chocho",
+   "a": "mashua",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "quinua",
+   "a": "melloco",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "quinua",
+   "a": "oca",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "quinua",
+   "a": "achira",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "quinua",
+   "a": "jicama",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "quinua",
+   "a": "mashua",
+   "tipo": "fuente",
+   "fuente": "1 · haba, chocho o quinua antes del tubérculo"
+  },
+  {
+   "de": "cebada",
+   "a": "melloco",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "cebada",
+   "a": "oca",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "cebada",
+   "a": "achira",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "cebada",
+   "a": "jicama",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "trigo",
+   "a": "melloco",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "trigo",
+   "a": "oca",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "trigo",
+   "a": "achira",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "trigo",
+   "a": "jicama",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "avena",
+   "a": "melloco",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "avena",
+   "a": "oca",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "avena",
+   "a": "achira",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "avena",
+   "a": "jicama",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "maiz",
+   "a": "melloco",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "maiz",
+   "a": "oca",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "maiz",
+   "a": "achira",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "maiz",
+   "a": "jicama",
+   "tipo": "general",
+   "fuente": "1 · «cereales» antes del tubérculo"
+  },
+  {
+   "de": "cebada",
+   "a": "mashua",
+   "tipo": "fuente",
+   "fuente": "1 · mashua (alternar con leguminosas y cereales)"
+  },
+  {
+   "de": "trigo",
+   "a": "mashua",
+   "tipo": "fuente",
+   "fuente": "1 · mashua (alternar con leguminosas y cereales)"
+  },
+  {
+   "de": "haba",
+   "a": "arracacha",
+   "tipo": "fuente",
+   "fuente": "1 · zanahoria blanca (rotar con leguminosas)"
+  },
+  {
+   "de": "lenteja",
+   "a": "arracacha",
+   "tipo": "fuente",
+   "fuente": "1 · zanahoria blanca (rotar con leguminosas)"
+  },
+  {
+   "de": "abono",
+   "a": "arracacha",
+   "tipo": "fuente",
+   "fuente": "1 · zanahoria blanca (rotar con leguminosas)"
+  },
+  {
+   "de": "papa",
+   "a": "oca",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco (papa, oca/lizas, olluco, cebada)"
+  },
+  {
+   "de": "papa",
+   "a": "lizas",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco (papa, oca/lizas, olluco, cebada)"
+  },
+  {
+   "de": "oca",
+   "a": "olluco",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco"
+  },
+  {
+   "de": "lizas",
+   "a": "olluco",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco"
+  },
+  {
+   "de": "olluco",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco"
+  },
+  {
+   "de": "cebada",
+   "a": "barbecho",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco (cebada, descanso)"
+  },
+  {
+   "de": "barbecho",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "2 · muyuy de Cusco (papa tras descanso)"
+  },
+  {
+   "de": "papa",
+   "a": "qaniwa",
+   "tipo": "fuente",
+   "fuente": "2 · Puno suni (papa, qañiwa, cebada/avena, oca, pasto)"
+  },
+  {
+   "de": "qaniwa",
+   "a": "cebada",
+   "tipo": "fuente",
+   "fuente": "2 · Puno suni"
+  },
+  {
+   "de": "qaniwa",
+   "a": "avena",
+   "tipo": "fuente",
+   "fuente": "2 · Puno suni"
+  },
+  {
+   "de": "oca",
+   "a": "pasto",
+   "tipo": "fuente",
+   "fuente": "2 · Puno suni (…oca, pasto)"
+  },
+  {
+   "de": "cebada",
+   "a": "avena",
+   "tipo": "fuente",
+   "fuente": "2 · Puno circunlacustre (cereal, luego haba o avena)"
+  },
+  {
+   "de": "trigo",
+   "a": "avena",
+   "tipo": "fuente",
+   "fuente": "2 · Puno circunlacustre (cereal, luego haba o avena)"
+  },
+  {
+   "de": "avena",
+   "a": "barbecho",
+   "tipo": "fuente",
+   "fuente": "2 · Puno circunlacustre (haba o avena, barbecho)"
+  },
+  {
+   "de": "haba",
+   "a": "barbecho",
+   "tipo": "fuente",
+   "fuente": "2 · Puno circunlacustre (haba o avena, barbecho)"
+  },
+  {
+   "de": "papa",
+   "a": "barbecho",
+   "tipo": "fuente",
+   "fuente": "2 · puna (papa amarga, descanso, pastos nativos)"
+  },
+  {
+   "de": "papa",
+   "a": "pasto",
+   "tipo": "fuente",
+   "fuente": "2 · puna (papa amarga, descanso, pastos nativos)"
+  },
+  {
+   "de": "abono",
+   "a": "papa",
+   "tipo": "fuente",
+   "fuente": "2 · tarwi aporta N a la papa siguiente (Franco, 1991)"
+  },
+  {
+   "de": "chocho",
+   "a": "pasto",
+   "tipo": "general",
+   "fuente": "1 · Cuadro 5 ampliado a otras leguminosas"
+  },
+  {
+   "de": "lenteja",
+   "a": "pasto",
+   "tipo": "general",
+   "fuente": "1 · Cuadro 5 ampliado a otras leguminosas"
+  },
+  {
+   "de": "frejol",
+   "a": "pasto",
+   "tipo": "general",
+   "fuente": "1 · Cuadro 5 ampliado a otras leguminosas"
+  },
+  {
+   "de": "abono",
+   "a": "pasto",
+   "tipo": "general",
+   "fuente": "1 · Cuadro 5 ampliado a otras leguminosas"
+  },
+  {
+   "de": "pasto",
+   "a": "maiz",
+   "tipo": "inferida",
+   "fuente": "2 · tras alfalfa o pastos va «un cultivo alimenticio» (no dice cuál)"
+  },
+  {
+   "de": "pasto",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "2 · tras alfalfa o pastos va «un cultivo alimenticio» (no dice cuál)"
+  },
+  {
+   "de": "pasto",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "2 · tras alfalfa o pastos va «un cultivo alimenticio» (no dice cuál)"
+  },
+  {
+   "de": "pasto",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "2 · tras alfalfa o pastos va «un cultivo alimenticio» (no dice cuál)"
+  },
+  {
+   "de": "lenteja",
+   "a": "papa",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: leguminosa antes de papa"
+  },
+  {
+   "de": "arveja",
+   "a": "papa",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: leguminosa antes de papa"
+  },
+  {
+   "de": "melloco",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "melloco",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "melloco",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "melloco",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "melloco",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "oca",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "oca",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "oca",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "oca",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "mashua",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "mashua",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "mashua",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "mashua",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "mashua",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "achira",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "achira",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "achira",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "achira",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "achira",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "jicama",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "jicama",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "jicama",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "jicama",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "jicama",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "arracacha",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "arracacha",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "arracacha",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "arracacha",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "arracacha",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "olluco",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "olluco",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "olluco",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "olluco",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "lizas",
+   "a": "cebada",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "lizas",
+   "a": "trigo",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "lizas",
+   "a": "haba",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "lizas",
+   "a": "pasto",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "lizas",
+   "a": "barbecho",
+   "tipo": "inferida",
+   "fuente": "Propuesta propia: las fuentes no dicen qué sigue al tubérculo secundario"
+  },
+  {
+   "de": "frejol",
+   "a": "tomate",
+   "tipo": "fuente5",
+   "fuente": "5 · secuencia intensiva (maíz, fréjol, tomate, brócoli)"
+  },
+  {
+   "de": "tomate",
+   "a": "brocoli",
+   "tipo": "fuente5",
+   "fuente": "5 · secuencia intensiva"
+  },
+  {
+   "de": "maiz",
+   "a": "soya",
+   "tipo": "fuente5",
+   "fuente": "5 · costa (maíz y soya)"
+  },
+  {
+   "de": "soya",
+   "a": "maiz",
+   "tipo": "fuente5",
+   "fuente": "5 · costa (maíz y soya)"
+  }
+ ]
+}
