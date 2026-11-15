@@ -2,11 +2,12 @@
 
 Desde el análisis de una parcela, abrir **Próximos sembríos**.
 El formulario usa `GET /v1/crops` y envía cultivo anterior, una prioridad,
-riego, drenaje y fertilidad opcional a `POST /v1/recommend`. El drenaje se pregunta
-como «¿Se empoza el agua?», con respuestas sobre lo que ocurre después de llover.
+tipo de riego y si se empoza el agua a `POST /v1/recommendations` (una sola llamada
+con evidencia; el modelo de lenguaje tarda ~20 s, por eso el límite es de 60 s).
+Altitud y clima salen de la copia de remote-sensing del servidor, no del formulario.
 
-La pantalla muestra el resultado real del motor: primera opción, puntaje,
-confianza, motivos, alternativas y la rotación de cada alternativa. Una rotación
+La pantalla muestra el resultado real del motor: primera opción, afinidad,
+confianza, motivos con fuentes, alternativas y la rotación de cada alternativa. Una rotación
 puede tener menos de cuatro ciclos; no se presenta como un calendario de años.
 Los errores y la ausencia de candidatos se muestran sin inventar resultados.
 

@@ -1,5 +1,7 @@
 // La misma ruta funciona con el proxy de Vite y con Nginx en Compose.
 const API = '/api/pitagoras'
+// /v1/recommendations hace una llamada al modelo de lenguaje (~20 s): tarda más que el catálogo.
+const LIMITE_MS = 60000
 
 export const PRIORIDADES = [
   { id: 'market_value', nombre: 'Valor de venta', detalle: 'Priorizar el mercado' },
@@ -8,19 +10,29 @@ export const PRIORIDADES = [
   { id: 'low_labor', nombre: 'Menos trabajo', detalle: 'Reducir la mano de obra' },
 ]
 
-export const CONFIANZA = { high: 'Alta', medium: 'Media', low: 'Baja' }
+export const RIEGOS = [
+  { id: 'rain_only', nombre: 'Solo lluvia' },
+  { id: 'pump', nombre: 'Bomba' },
+  { id: 'canal', nombre: 'Acequia o canal' },
+  { id: 'sprinkler_drip', nombre: 'Aspersión o goteo' },
+  { id: 'manual', nombre: 'Manual (regadera o manguera)' },
+]
+
+export const ENCHARCAMIENTOS = [
+  { id: 'no', nombre: 'No, se absorbe rápido' },
+  { id: 'briefly', nombre: 'Solo por un rato' },
+  { id: 'long', nombre: 'Sí, por mucho tiempo' },
+]
+
+// El servicio devuelve la confianza en español.
+export const CONFIANZA = { alta: 'Alta', media: 'Media', baja: 'Baja' }
 
 export function crearSolicitud(datos) {
   return {
-    new_land: datos.cultivo === 'new_land',
-    previous_crops: datos.cultivo === 'new_land' ? [] : [datos.cultivo],
-    priorities: [datos.prioridad],
-    climate: {
-      altitude_masl: datos.altitud == null || datos.altitud === '' ? null : Number(datos.altitud),
-      irrigation: datos.riego,
-    },
-    soil: { fertility: datos.fertilidad, drainage: datos.drenaje },
-    rotation_cycles: 4,
+    previous_crop: datos.cultivo,
+    priority: datos.prioridad,
+    irrigation: datos.riego,
+    waterlogging: datos.drenaje,
   }
 }
 
@@ -29,14 +41,14 @@ async function consultar(ruta, { signal, ...opciones } = {}) {
   const cancelar = () => control.abort()
   signal?.addEventListener('abort', cancelar, { once: true })
   if (signal?.aborted) control.abort()
-  const limite = setTimeout(cancelar, 60000)   // la recomendación con evidencia hace una llamada al modelo (~20 s)
+  const limite = setTimeout(cancelar, LIMITE_MS)
   try {
     const respuesta = await fetch(`${API}${ruta}`, { ...opciones, signal: control.signal })
     const contenido = respuesta.headers.get('content-type') ?? ''
     if (!contenido.includes('application/json')) throw new Error('El servicio de Pitágoras no está disponible. Intenta de nuevo en un momento.')
     const datos = await respuesta.json()
     if (!respuesta.ok) {
-      const errores = datos.errors?.map((e) => e.message).join(' ')
+      const errores = datos.errors?.map((e) => e.message).join(' ') || datos.detail?.message
       throw new Error(errores || 'No pudimos consultar a Pitágoras. Revisa tu conexión e inténtalo de nuevo.')
     }
     return datos
@@ -60,25 +72,28 @@ export async function obtenerCultivos(signal) {
 }
 
 export async function recomendarCultivos(datos, signal) {
-  const resultado = await consultar('/v1/recommend', {
+  const resultado = await consultar('/v1/recommendations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(crearSolicitud(datos)),
     signal,
   })
   if (resultado.status === 'no_candidates') return resultado
-  if (resultado.status !== 'ok' || !resultado.recommendation?.name || !Number.isFinite(resultado.recommendation.score)) {
+  if (resultado.status !== 'ok' || !resultado.recommendation?.name || !Number.isFinite(resultado.recommendation.affinity)) {
     throw new Error('La recomendación llegó incompleta. Inténtalo de nuevo.')
   }
   return resultado
 }
 
-// El motor todavía comparte una captura de Toacaso entre todas las consultas.
-// No atribuir esas alertas a otra parcela, aunque coincida su altitud.
+// El servicio evalúa siempre la captura de Toacaso (remote-sensing). Sus alertas
+// no se atribuyen a una finca que no está monitoreada.
 export function alertasDeParcela(cultivo, monitoreada) {
-  return (cultivo.advisories ?? []).filter((a) =>
-    monitoreada || !a.signal?.sources?.includes('remote_sensing'),
-  )
+  return monitoreada ? cultivo.advisories ?? [] : []
+}
+
+export function referenciasDe(resultado, ids = []) {
+  const fuentes = resultado.sources ?? []
+  return ids.map((id) => fuentes.find((f) => f.id === id)).filter(Boolean)
 }
 
 export function textoAdvertencia(texto) {
