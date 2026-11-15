@@ -126,3 +126,7 @@
 @media (prefers-reduced-motion: reduce) {
   .onb-adelante, .onb-atras { animation: none; }
 }
+
+/* Logo de la app en el primer paso (trae fondo blanco: va en un círculo blanco) */
+.onb-avatar.onb-logo { overflow: hidden; background: #fff; box-shadow: 0 8px 22px rgba(4, 120, 87, 0.16); }
+.onb-avatar.onb-logo img { display: block; width: 90%; height: auto; }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ArrowRight, Sprout } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import logo from '../../assets/logo-bio-orbit.png'
 import Progreso from './Progreso.jsx'
 
 export default function PasoNombre({ nombre, onNombreChange, onSiguiente, totalPasos = 2 }) {
@@ -23,8 +24,8 @@ export default function PasoNombre({ nombre, onNombreChange, onSiguiente, totalP
       </div>
 
       <div className="onb-cuerpo">
-        <div className="onb-avatar" aria-hidden="true">
-          <Sprout size={44} strokeWidth={1.75} />
+        <div className="onb-avatar onb-logo" aria-hidden="true">
+          <img src={logo} alt="" width="88" height="88" />
         </div>
         <p className="onb-saludo">¡Te damos la bienvenida a Bio Orbit!</p>
         <label htmlFor="onb-nombre" className="onb-titulo">

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { Sprout } from 'lucide-react'
+import logo from '../../assets/logo-bio-orbit.png'
 import './bienvenida.css'
 
 const DURACION = 3200 // ms; tocar en cualquier parte adelanta
@@ -31,7 +31,7 @@ export default function PantallaBienvenida({ nombre, onFin }) {
             <span className="bv-onda d2" />
             <span className="bv-onda d3" />
             <span className="bv-circulo">
-              <Sprout size={52} strokeWidth={1.75} />
+              <img src={logo} alt="" width="104" height="104" />
             </span>
           </div>
           <p className="bv-saludo">Bienvenido</p>
