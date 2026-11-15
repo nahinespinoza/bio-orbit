@@ -29,7 +29,7 @@ async function consultar(ruta, { signal, ...opciones } = {}) {
   const cancelar = () => control.abort()
   signal?.addEventListener('abort', cancelar, { once: true })
   if (signal?.aborted) control.abort()
-  const limite = setTimeout(cancelar, 20000)
+  const limite = setTimeout(cancelar, 60000)   // la recomendación con evidencia hace una llamada al modelo (~20 s)
   try {
     const respuesta = await fetch(`${API}${ruta}`, { ...opciones, signal: control.signal })
     const contenido = respuesta.headers.get('content-type') ?? ''
