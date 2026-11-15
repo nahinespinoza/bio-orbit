@@ -15,7 +15,7 @@ COPY app ./app
 COPY ingestion ./ingestion
 COPY knowledge ./knowledge
 # data/ es un volumen: ahí vive knowledge.db. Si no existe, el arranque lo genera (con embeddings si hay OPENAI_API_KEY);
-# si ya existe se reutiliza. Para regenerarla tras cambiar la base de conocimiento: docker compose --profile ingest run --rm ingest
+# si ya existe se reutiliza. Para regenerarla tras cambiar la base de conocimiento: docker compose --profile ingest run --rm bio-orbit-ingest
 RUN mkdir -p /app/data && chown app:app /app/data
 USER app
 EXPOSE 8000

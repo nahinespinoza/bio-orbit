@@ -299,8 +299,8 @@ El agente se prueba con un modelo de chat guionado. `create_agent`, las herramie
 ### Con Docker Compose (desde la raíz del repo)
 
 ```bash
-docker compose --profile ingest run --rm ingest   # genera knowledge.db en el volumen api-data
-docker compose up -d api-agent                    # en local, compose.override.yml publica el puerto 8000
+docker compose --profile ingest run --rm bio-orbit-ingest   # genera knowledge.db en el volumen api-data
+docker compose up -d bio-orbit-api-agent                    # en local, compose.override.yml publica el puerto 8000
 ```
 
 En producción (Dokploy), `compose.yml` no publica puertos: Traefik enruta por dominio. Repite la ingesta cada vez que cambie la base de conocimiento.

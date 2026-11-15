@@ -108,7 +108,7 @@ docker run --env-file .env -v ./api-agent/data:/app/data -p 8000:8000 crop-advis
 Con Docker Compose todo entra por el servicio `proxy` (nginx Alpine, `proxy/`): `/api/*` → `api-agent:8000/*` y `/` → `frontend`.
 
 ```bash
-docker compose --profile ingest run --rm ingest   # una vez: genera knowledge.db en el volumen
+docker compose --profile ingest run --rm bio-orbit-ingest   # una vez: genera knowledge.db en el volumen
 docker compose up -d --build                      # http://localhost:8080 y http://localhost:8080/api/health
 ```
 
