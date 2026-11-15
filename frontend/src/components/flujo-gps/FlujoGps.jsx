@@ -6,25 +6,39 @@ import PantallaHectareas from './PantallaHectareas.jsx'
 import PantallaUbicarParcela from './PantallaUbicarParcela.jsx'
 import PantallaHome from './PantallaHome.jsx'
 import PantallaResultados from '../resultados/PantallaResultados.jsx'
+import PantallaAnalizando from '../reporte/PantallaAnalizando.jsx'
+import CarruselInsights from '../reporte/CarruselInsights.jsx'
+import { DefsReporte } from '../reporte/IlustracionesReporte.jsx'
+import { reporteEjemplo, reporteToacaso } from '../../lib/reporteFincas.js'
 import { centroide, formatoNumero } from './geo.js'
 import '../onboarding/onboarding.css'
 import '../mapa-movil/mapa-movil.css'
 import './flujo-gps.css'
+import '../reporte/reporte.css'
 
 const PANTALLA = {
   LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, INFO_UBICAR: 5, UBICAR_PARCELA: 6, HOME: 7, RESULTADOS: 8,
   // Editar una finca: por cada parcela, animación → cuadro sobre la parcela; al final, ✓
   EDITAR_INFO: 9, EDITAR_PARCELA: 10, EDITAR_OK: 11,
+  // Ruta "/": al registrar la primera parcela, "Analizando…" → resumen de la semana → inicio
+  ANALIZANDO: 12, RESUMEN_INICIAL: 13,
 }
 
 // Flujo que sigue a "Estoy en mi finca":
 // localizar → ✓ ubicación → hectáreas → ✓ superficie → "ahora ubica tu parcela" → mapa → home → resultados
 // Las pantallas ✓ e informativas avanzan solas.
-// Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio.
+// Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio
+// (en "/" pasa antes por "Analizando…" y el resumen de la semana).
 export default function FlujoGps({
   nombre, ubicacionInicial = null, parcelaInicial = null, fincasExtra, remoteSensingPrincipal, onCancelar, onManual,
 }) {
-  const [pantalla, setPantalla] = useState(parcelaInicial ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
+  // En "/" (sin `fincasExtra`) el resumen de la semana se muestra una vez, antes del primer inicio
+  const conResumenInicial = !fincasExtra
+  const [pantalla, setPantalla] = useState(
+    parcelaInicial ? (conResumenInicial ? PANTALLA.ANALIZANDO : PANTALLA.HOME) : PANTALLA.LOCALIZANDO,
+  )
+  const [resumenVisto, setResumenVisto] = useState(Boolean(parcelaInicial) || !conResumenInicial)
+  const [reporteInicial, setReporteInicial] = useState(null)
   const [direccion, setDireccion] = useState('adelante')
   const [ubicacion, setUbicacion] = useState(ubicacionInicial)
   const [hectareas, setHectareas] = useState(parcelaInicial?.area ?? null)
@@ -69,6 +83,7 @@ export default function FlujoGps({
   }
 
   // Tocar una tarjeta abre el análisis de esa finca (su primera parcela).
+  // En resultados, el selector de la cabecera cambia de finca sin volver al inicio.
   const [seleccion, setSeleccion] = useState(null) // null = finca principal
   const verFinca = (finca) => {
     if (finca === 'principal') {
@@ -76,10 +91,28 @@ export default function FlujoGps({
     } else {
       const parcelaFinca = fincas[finca].parcelas[0]
       const [lat, lng] = centroide(parcelaFinca.poligono)
-      setSeleccion({ ubicacion: { lat, lng, precision: null }, parcela: parcelaFinca })
+      setSeleccion({ finca, ubicacion: { lat, lng, precision: null }, parcela: parcelaFinca })
     }
     setModoAnalisis('Rápido')
     irA(PANTALLA.RESULTADOS)
+  }
+
+  const fincaActiva = seleccion ? seleccion.finca : 'principal'
+  const opcionesFinca = [
+    { id: 'principal', nombre: nombreDe('principal'), parcelas },
+    ...fincas.map((f, i) => ({ id: String(i), nombre: f.nombre, parcelas: f.parcelas })),
+  ]
+  // Toacaso (Parcela 1 en /prueba) tiene datos reales; el resto, los mismos marcados "Datos de ejemplo"
+  const reporteDe = (finca) => (finca === 'principal' && remoteSensingPrincipal ? reporteToacaso() : reporteEjemplo())
+
+  // Va al inicio; en "/" la primera vez pasa antes por "Analizando…" y el resumen de la semana
+  const irAlInicio = () => {
+    if (resumenVisto) {
+      irA(PANTALLA.HOME)
+    } else {
+      setResumenVisto(true)
+      irA(PANTALLA.ANALIZANDO)
+    }
   }
 
   const cancelarEdicion = () => {
@@ -115,7 +148,7 @@ export default function FlujoGps({
       irA(PANTALLA.HECTAREAS)
     } else {
       setAgregando(false)
-      irA(PANTALLA.HOME)
+      irAlInicio()
     }
   }
 
@@ -238,9 +271,29 @@ export default function FlujoGps({
           />
         )
       }
+      case PANTALLA.ANALIZANDO:
+        return (
+          <PantallaAnalizando
+            finca={{ nombre: nombreDe('principal'), parcelas }}
+            onListo={(r) => {
+              setReporteInicial(r)
+              irA(PANTALLA.RESUMEN_INICIAL)
+            }}
+          />
+        )
+      case PANTALLA.RESUMEN_INICIAL:
+        return (
+          <CarruselInsights
+            finca={{ nombre: nombreDe('principal'), parcelas }}
+            reporte={reporteInicial}
+            onSalir={() => irA(PANTALLA.HOME, 'adelante')}
+          />
+        )
       case PANTALLA.RESULTADOS:
         return (
           <PantallaResultados
+            // Al cambiar de finca con el selector, la pantalla se vuelve a montar con sus datos
+            key={fincaActiva}
             ubicacion={seleccion?.ubicacion ?? ubicacion}
             parcela={seleccion?.parcela ?? parcela}
             modo={modoAnalisis}
@@ -251,6 +304,17 @@ export default function FlujoGps({
               irA(PANTALLA.HOME)
             }}
             onProfundo={() => setModoAnalisis('Profundo')}
+            finca={{ nombre: nombreDe(fincaActiva), parcelas: parcelasDe(fincaActiva) }}
+            reporte={reporteDe(fincaActiva)}
+            selector={{
+              fincas: opcionesFinca,
+              activaId: String(fincaActiva),
+              onElegir: (id) => verFinca(id === 'principal' ? 'principal' : Number(id)),
+              onNueva: () => {
+                setSeleccion(null)
+                empezarNuevaParcela()
+              },
+            }}
           />
         )
       default:
@@ -271,6 +335,8 @@ export default function FlujoGps({
   return (
     <div className="marco onb">
       <div className="marco-tarjeta fg">
+        {/* Degradados de las ilustraciones del resumen de la semana (se definen una vez) */}
+        <DefsReporte />
         <div key={pantalla} className={`fg-transicion onb-${direccion}`}>
           {contenido()}
         </div>

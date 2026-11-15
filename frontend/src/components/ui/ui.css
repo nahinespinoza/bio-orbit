@@ -13,6 +13,11 @@
 }
 .ui-widget.tono-azul { background: linear-gradient(140deg, #173f7d 0%, #2563b8 48%, #6fa6e6 100%); }
 .ui-widget.tono-verde { background: linear-gradient(140deg, #053d2e 0%, #047857 50%, #3fbf8a 100%); }
+.ui-widget.tono-noche    { background: linear-gradient(140deg, #1e1b4b 0%, #4338ca 100%); }
+.ui-widget.tono-tierra   { background: linear-gradient(140deg, #4a2c14 0%, #8a5a2b 100%); }
+.ui-widget.tono-fuego    { background: linear-gradient(140deg, #7c2d12 0%, #c2410c 100%); }
+.ui-widget.tono-turquesa { background: linear-gradient(140deg, #164e63 0%, #0e7490 100%); }
+.ui-widget.tono-ocre     { background: linear-gradient(140deg, #3b2f0b 0%, #7c5e10 100%); }
 /* Brillo suave en la esquina, como el reflejo del widget del tiempo */
 .ui-widget::after {
   content: '';
@@ -32,6 +37,7 @@
 .ui-widget-valor sup { margin: 4px 0 0 3px; font-size: 17px; font-weight: 500; opacity: 0.9; }
 .ui-widget-detalle { margin: 6px 0 0; font-size: 14px; line-height: 1.3; opacity: 0.92; }
 .ui-widget-detalle + .ui-widget-detalle { margin-top: 2px; }
+.ui-widget-estado { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 14px; font-weight: 600; line-height: 1.3; }
 .ui-widget-insignia {
   margin-bottom: 6px;
   padding: 2px 8px;
@@ -70,6 +76,19 @@
 }
 .ui-widget-pie button:hover { background: rgba(255, 255, 255, 0.12); }
 .ui-widget-pie button:focus-visible { outline: 3px solid rgba(255, 255, 255, 0.6); outline-offset: 1px; }
+
+/* Punto de color de un estado: siempre va junto a su texto */
+.ui-punto { display: inline-block; flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--nivel, #9ca3af); }
+.ui-nivel-bien { --nivel: #16a34a; }
+.ui-nivel-atencion { --nivel: #facc15; }
+.ui-nivel-problema { --nivel: #b91c1c; }
+.ui-nivel-exceso { --nivel: #1d4ed8; }
+.ui-nivel-sin_dato { --nivel: #9ca3af; }
+/* Sobre fondos oscuros (widgets, carrusel) el mismo color, más claro, para que se distinga */
+.ui-widget .ui-nivel-bien, .ui-sobre-oscuro .ui-nivel-bien { --nivel: #4ade80; }
+.ui-widget .ui-nivel-problema, .ui-sobre-oscuro .ui-nivel-problema { --nivel: #f87171; }
+.ui-widget .ui-nivel-exceso, .ui-sobre-oscuro .ui-nivel-exceso { --nivel: #93c5fd; }
+.ui-widget .ui-nivel-sin_dato, .ui-sobre-oscuro .ui-nivel-sin_dato { --nivel: #d1d5db; }
 
 /* Miniatura del mapa usada como "ilustración" en el widget de la finca */
 .ui-miniatura {

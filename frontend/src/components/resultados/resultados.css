@@ -496,3 +496,31 @@
 @media (prefers-reduced-motion: reduce) {
   .rs-estado, .rs-alertas-toggle svg { transition: none; }
 }
+
+/* ---------- Selector de finca en la cabecera de resultados ---------- */
+.rs-cabecera .fg-selector { flex: 1; min-width: 0; margin-left: -6px; }
+.rs-cabecera .fg-selector-boton { font-size: 20px; min-height: 44px; }
+
+/* ---------- Tarjeta "Resumen de la semana" (abre el resumen de lib/reporte.js) ---------- */
+.rs-resumen-semana { flex-wrap: wrap; gap: 10px 12px; padding: 14px 16px; cursor: default; }
+.rs-resumen-semana:hover { background: #0b1533; }
+.rs-resumen-semana-botones { display: flex; gap: 8px; width: 100%; }
+.rs-resumen-semana-botones button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rs-resumen-semana-botones button.principal { border-color: #fff; background: #fff; color: #0b1533; }
+.rs-resumen-semana-botones button:hover { filter: brightness(1.1); }
+.rs-resumen-semana-botones button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }

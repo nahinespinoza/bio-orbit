@@ -15,6 +15,10 @@ import { IlustracionClima } from '../ui/Ilustraciones.jsx'
 import AlertaPrincipal from './AlertaPrincipal.jsx'
 import AnalisisCard from './AnalisisCard.jsx'
 import EstadoParcelaCard from './EstadoParcelaCard.jsx'
+import TarjetaResumenSemana from './TarjetaResumenSemana.jsx'
+import SelectorFinca from '../flujo-gps/SelectorFinca.jsx'
+import CarruselInsights from '../reporte/CarruselInsights.jsx'
+import ResumenSemanaCompacto from '../reporte/ResumenSemanaCompacto.jsx'
 import './resultados.css'
 
 const PASOS = {
@@ -116,12 +120,17 @@ function estacionDelMes(mediana, promedio) {
 
 // Con `remoteSensing` (datos quemados de remote-sensing/, ver frontend/scripts/generar_remote_sensing.py)
 // no se descarga nada: el clima sale de NASA POWER de la parcela y el mapa de salud de Sentinel-2.
-export default function PantallaResultados({ ubicacion, parcela, modo, remoteSensing: rs, onVolver, onProfundo, onAnalisis }) {
+// `finca` ({ nombre, parcelas }) + `reporte` (lib/reporte.js): tarjeta "Resumen de la semana".
+// `selector` ({ fincas, activaId, onElegir, onNueva }): con varias fincas, la cabecera cambia de finca sin volver.
+export default function PantallaResultados({
+  ubicacion, parcela, modo, remoteSensing: rs, finca, reporte, selector, onVolver, onProfundo, onAnalisis,
+}) {
   const [datos, setDatos] = useState(null)
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
   const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia | siembra
   const [prefs, setPrefs] = useState(PREFERENCIAS_INICIALES)
+  const [presentacion, setPresentacion] = useState(null) // null | 'interactivo' | 'resumido'
   const contenidoRef = useRef(null)
   const profundo = modo === 'Profundo'
 
@@ -197,13 +206,38 @@ export default function PantallaResultados({ ubicacion, parcela, modo, remoteSen
       >
         <ChevronLeft size={24} />
       </button>
-      <h1>{detalle ? TITULOS[detalle] : 'Resultados'}</h1>
+      {!detalle && selector?.fincas.length > 1 ? (
+        <SelectorFinca
+          activa={selector.fincas.find((f) => f.id === selector.activaId) ?? selector.fincas[0]}
+          fincas={selector.fincas}
+          onElegir={selector.onElegir}
+          onNueva={selector.onNueva}
+        />
+      ) : (
+        <h1>{detalle ? TITULOS[detalle] : 'Resultados'}</h1>
+      )}
       {!detalle && (
         <span className={`rs-modo ${profundo ? 'profundo' : ''}`}>
           {profundo ? <Layers size={14} /> : <Zap size={14} />} {modo}
         </span>
       )}
     </header>
+  )
+
+  if (presentacion && reporte && finca) {
+    const salir = () => setPresentacion(null)
+    return presentacion === 'interactivo'
+      ? <CarruselInsights finca={finca} reporte={reporte} onSalir={salir} />
+      : <ResumenSemanaCompacto finca={finca} reporte={reporte} onSalir={salir} />
+  }
+
+  const tarjetaResumen = reporte && finca && (
+    <TarjetaResumenSemana
+      periodo={reporte.periodoClima}
+      ejemplo={reporte.ejemplo}
+      onInteractivo={() => setPresentacion('interactivo')}
+      onResumido={() => setPresentacion('resumido')}
+    />
   )
 
   if (!analisis) {
@@ -265,6 +299,8 @@ export default function PantallaResultados({ ubicacion, parcela, modo, remoteSen
         etiqueta={estacion.texto}
         accion={{ texto: 'Ver lluvia', onClick: () => setDetalle('lluvia') }}
       />
+
+      {tarjetaResumen}
 
       <section>
         <h2 className="rs-titulo">Análisis de tu parcela</h2>
@@ -347,6 +383,8 @@ export default function PantallaResultados({ ubicacion, parcela, modo, remoteSen
         <EstadoParcelaCard parcela={parcela} zonas={zonas} salud={r.salud} onAbrir={() => setDetalle('verdor')} />
 
         <AlertaPrincipal alertas={alertas} />
+
+        {tarjetaResumen}
 
         <section>
           <h2 className="rs-titulo">Análisis de tu parcela</h2>
