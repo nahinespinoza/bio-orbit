@@ -1,5 +1,5 @@
-// La misma ruta funciona con el proxy de Vite y con Nginx en Compose.
-const API = '/api/pitagoras'
+// La misma ruta funciona con el proxy de Vite y con el proxy Nginx de Compose (proxy/).
+const API = '/api'
 // /v1/recommendations hace una llamada al modelo de lenguaje (~20 s): tarda más que el catálogo.
 const LIMITE_MS = 60000
 

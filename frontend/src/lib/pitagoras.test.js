@@ -6,7 +6,7 @@ const formulario = { cultivo: 'papa', prioridad: 'speed', riego: 'rain_only', dr
 
 test('envía las respuestas de la pantalla al contrato de /v1/recommendations', async (t) => {
   t.mock.method(globalThis, 'fetch', async (url, opciones) => {
-    assert.equal(url, '/api/pitagoras/v1/recommendations')
+    assert.equal(url, '/api/v1/recommendations')
     assert.equal(opciones.method, 'POST')
     assert.deepEqual(JSON.parse(opciones.body), {
       previous_crop: 'papa', priority: 'speed', irrigation: 'rain_only', waterlogging: 'no',

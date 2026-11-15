@@ -8,10 +8,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: '0.0.0.0',
     proxy: {
-      '/api/pitagoras': {
+      '/api': {
         target: loadEnv(mode, '..', '').PITAGORAS_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/pitagoras/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

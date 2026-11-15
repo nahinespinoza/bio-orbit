@@ -1,8 +1,6 @@
 # Solo local (docker compose lo carga solo). Dokploy usa compose.yml tal cual.
+# Todo entra por el proxy: http://localhost:8080 (frontend) y http://localhost:8080/api/ (api-agent).
 services:
-  api-agent:
-    ports:
-      - "8000:8000"
-  frontend:
+  proxy:
     ports:
       - "8080:8080"

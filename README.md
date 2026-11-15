@@ -105,6 +105,13 @@ docker build -t crop-advisor api-agent
 docker run --env-file .env -v ./api-agent/data:/app/data -p 8000:8000 crop-advisor
 ```
 
+Con Docker Compose todo entra por el servicio `proxy` (nginx Alpine, `proxy/`): `/api/*` → `api-agent:8000/*` y `/` → `frontend`.
+
+```bash
+docker compose --profile ingest run --rm ingest   # una vez: genera knowledge.db en el volumen
+docker compose up -d --build                      # http://localhost:8080 y http://localhost:8080/api/health
+```
+
 ### Límites del MVP
 - `langchain-community` está archivado (sin mantenimiento desde junio de 2026). `SQLiteVec` y `BM25Retriever` no filtran por metadatos.
 - Sin embeddings, la búsqueda es solo por palabras clave y falla con preguntas parafraseadas.

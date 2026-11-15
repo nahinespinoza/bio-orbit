@@ -23,9 +23,10 @@ uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 Desde `frontend/`, ejecutar `npm run dev` y abrir `/prueba`.
-Vite reenvía `/api/pitagoras` al puerto 8000. El destino puede cambiarse mediante
-`PITAGORAS_PROXY_TARGET` en el `.env` raíz. En Docker Compose, Nginx reenvía la
-misma ruta a `api-agent:8000`, sin CORS ni claves del modelo en el navegador.
+Vite reenvía `/api` al puerto 8000. El destino puede cambiarse mediante
+`PITAGORAS_PROXY_TARGET` en el `.env` raíz. En Docker Compose, el servicio `proxy`
+(nginx Alpine) reenvía la misma ruta a `api-agent:8000`, sin CORS ni claves del
+modelo en el navegador.
 
 Validación: `npm test`, `npm run build`, `npm run lint`.
 
