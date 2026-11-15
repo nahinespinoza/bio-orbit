@@ -1,0 +1,4074 @@
+{
+  "_meta": {
+    "descripcion": "PROPUESTA de campos tipados por cultivo para que el motor (reglas deterministas) pueda cruzar la ficha con los indicadores de la parcela. No la lee ningun codigo. No modifica cultivos.json ni transiciones.json.",
+    "generado": "2026-11-15",
+    "paso": "1 de 5 (campos tipados). Pasos 3-5 (motor, esquema SQL, ingestion) NO iniciados.",
+    "politica": [
+      "Solo se rellena un valor si tiene cita de Ecuador (origen=ecuador) o de los Andes (origen=andes) en cultivos.json (bloque 'indicadores' o campos existentes). Todo lo demas es null con razon_null.",
+      "Un dato solo de otra region NO se guarda como valor: queda null y razon_null lo menciona; 'origen' del null indica de donde venia la evidencia descartada.",
+      "null equivale a 'desconocida': ninguna regla puede generar advertencia con un campo null (a lo sumo R8 'no hay dato confiable').",
+      "fiabilidad = fiabilidad de la evidencia para el enunciado tipado (alta|media|baja). Las reglas de advertencia exigen fiabilidad >= media (decision D3 propuesta).",
+      "Cuando la propia ficha tiene datos en conflicto, se tipa el mas restrictivo bien citado y se anota el conflicto en 'nota' (ver decisiones_pendientes).",
+      "Tres valores llevan marca de INTERPRETACION PROPIA en su nota (oca.tolerancia_helada, maiz.tolerancia_helada, maiz.temperatura_minima_tolerada_c): requieren validacion agronomica antes de usarse."
+    ],
+    "origen": {
+      "ecuador": "dato de Ecuador (INIAP, FAO Sierra de Ecuador, tesis/estudios ecuatorianos)",
+      "andes": "dato de Peru/Bolivia/Andes (CIP, FAO/ANPE-Peru, revisiones andinas)",
+      "otra_region": "Australia, Canada, Europa, EcoCrop global, etc. NO usable (solo aparece en nulls)"
+    },
+    "parcela_referencia": {
+      "altitud_msnm": 3588,
+      "zona": "Toacaso / Sigchos, Ecuador",
+      "fuente": "knowledge/docs/07-indicadores-remote-sensing.md"
+    },
+    "estructura_celda": {
+      "valor": "dato tipado o null",
+      "origen": "ecuador|andes|otra_region|null",
+      "fiabilidad": "alta|media|baja|null",
+      "fuente": "lista de citas: {tipo:ficha|indicadores, ref (ruta en cultivos.json), url?, cita}",
+      "razon_null": "solo si valor es null",
+      "nota": "opcional"
+    }
+  },
+  "campos": {
+    "altitud_msnm": {
+      "tipo": "objeto",
+      "valores": "{min,max[,extras]} metros",
+      "descripcion": "Rango en que las fuentes de Ecuador/Andes documentan el cultivo. Se tipa el mas restrictivo bien citado y se anota el conflicto con la ficha.",
+      "usado_por": [
+        "R1"
+      ]
+    },
+    "ciclo_meses": {
+      "tipo": "objeto",
+      "valores": "{min,max} meses",
+      "descripcion": "Siembra a cosecha.",
+      "usado_por": [
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R8"
+      ]
+    },
+    "meses_siembra": {
+      "tipo": "objeto",
+      "valores": "{meses:[1..12], opcional sobre_3200_msnm, todo_el_anio_en_algunas_zonas}",
+      "descripcion": "Meses de siembra documentados para la sierra.",
+      "usado_por": [
+        "R6"
+      ]
+    },
+    "siembra_condicion_lluvia": {
+      "tipo": "objeto",
+      "valores": "{tipo: inicio_de_lluvias | lluvia_acumulada_min_mm, mm?}",
+      "descripcion": "Condicion de lluvia ligada a la siembra.",
+      "usado_por": [
+        "R6",
+        "R7"
+      ]
+    },
+    "dias_a_floracion": {
+      "tipo": "objeto",
+      "valores": "{min,max} dias",
+      "descripcion": "Siembra a floracion (no usado hoy por ninguna regla: ver R-NV3).",
+      "usado_por": []
+    },
+    "tolerancia_helada": {
+      "tipo": "enum",
+      "valores": "alta|media|baja (null = desconocida)",
+      "descripcion": "Tolerancia cualitativa del follaje/planta aerea a la helada.",
+      "usado_por": [
+        "R2",
+        "R8"
+      ]
+    },
+    "fase_sensible_helada": {
+      "tipo": "lista de enum",
+      "valores": "emergencia|inicio_estolonizacion|plantula|eje_floral|floracion",
+      "descripcion": "Fases mas sensibles.",
+      "usado_por": []
+    },
+    "temperatura_minima_tolerada_c": {
+      "tipo": "objeto",
+      "valores": "{valor_c, duracion_h|null} grados C de aire",
+      "descripcion": "Minima que la fuente dice que el cultivo aguanta.",
+      "usado_por": [
+        "R2"
+      ]
+    },
+    "umbral_frio_floracion_c": {
+      "tipo": "numero",
+      "valores": "grados C",
+      "descripcion": "Por debajo de este valor, en floracion, hay esterilidad de polen.",
+      "usado_por": [
+        "R3"
+      ]
+    },
+    "tolerancia_exceso_agua": {
+      "tipo": "enum",
+      "valores": "alta|media|baja (null = desconocida)",
+      "descripcion": "Tolerancia cualitativa al exceso de agua/encharcamiento.",
+      "usado_por": [
+        "R4"
+      ]
+    },
+    "fase_sensible_exceso_agua": {
+      "tipo": "lista de enum",
+      "valores": "plantula|todo_el_ciclo",
+      "descripcion": "Fase en que el exceso de agua es mas danino; si es null se usa todo el ciclo.",
+      "usado_por": [
+        "R4"
+      ]
+    },
+    "hospedero_lancha": {
+      "tipo": "booleano",
+      "valores": "true|false (null = sin cita)",
+      "descripcion": "Hospedero de Phytophthora infestans con cita.",
+      "usado_por": [
+        "R5"
+      ]
+    },
+    "condiciones_lancha_referencia": {
+      "tipo": "objeto",
+      "valores": "{altitud_msnm,t_media_c,hr_pct,lluvia_mm_mes}",
+      "descripcion": "Condiciones observadas en un ensayo con lancha (NO umbral). Reservado.",
+      "usado_por": []
+    },
+    "tolerancia_sequia": {
+      "tipo": "enum",
+      "valores": "alta|media|baja (null = desconocida)",
+      "descripcion": "Tolerancia cualitativa a la sequia.",
+      "usado_por": [
+        "R10"
+      ]
+    },
+    "fase_sensible_sequia": {
+      "tipo": "lista de enum",
+      "valores": "inicio_crecimiento|floracion|fructificacion|formacion_polen|espigazon",
+      "descripcion": "Fases en que el deficit de agua es mas danino.",
+      "usado_por": [
+        "R10"
+      ]
+    },
+    "temperatura_maxima_tolerada_c": {
+      "tipo": "objeto",
+      "valores": "{valor_c, efecto} grados C de aire",
+      "descripcion": "Temperatura desde la que la fuente reporta efecto negativo.",
+      "usado_por": [
+        "R9"
+      ]
+    },
+    "exigencia_nitrogeno": {
+      "tipo": "enum",
+      "valores": "alta|media|baja (null = desconocida)",
+      "descripcion": "Demanda de nitrogeno del cultivo.",
+      "usado_por": [
+        "R11"
+      ]
+    },
+    "fija_nitrogeno": {
+      "tipo": "booleano",
+      "valores": "true|false",
+      "descripcion": "Leguminosa que fija nitrogeno (campo existente de la ficha).",
+      "usado_por": [
+        "R11"
+      ]
+    },
+    "perdida_nitrogeno_por_lluvia": {
+      "tipo": "booleano",
+      "valores": "true|null",
+      "descripcion": "Hay cita de Ecuador/Andes de que el nitrogeno se pierde (lixiviacion) en este cultivo.",
+      "usado_por": [
+        "R11"
+      ]
+    },
+    "enfermedad_favorecida_por_humedad": {
+      "tipo": "lista de objetos",
+      "valores": "[{nombre,favorecida_por[,perdida_max_pct]}]",
+      "descripcion": "Enfermedades que la fuente liga a humedad/lluvia (para redactar el mensaje; no decide).",
+      "usado_por": []
+    }
+  },
+  "cultivos": {
+    "papa": {
+      "nombre": "Papa (Solanum tuberosum, S. phureja, S. andigenum, S. chaucha)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2400,
+            "max": 3700
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 2400"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3700"
+            }
+          ],
+          "nota": "La ficha no indica a que fuente numerada corresponde cada cifra. Fuente 2 (Peru) da 2000-3800 msnm."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6,
+            "max": 7
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.ciclo_meses.nota",
+              "cita": "Fuente 1: cosecha a los 6 a 7 meses de la siembra"
+            }
+          ]
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              5,
+              6,
+              10,
+              11,
+              12
+            ],
+            "todo_el_anio_en_algunas_zonas": true
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.papa.indicadores.ciclo_siembra.fuentes[0]",
+              "url": "https://cipotato.org/wp-content/uploads/Documentacion%20PDF/Fripapa1.pdf",
+              "cita": "Existen dos epocas de siembra: meses de octubre a diciembre siembra de invierno y los meses de mayo a junio siembra de verano."
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.indicadores.ciclo_siembra.sierra_norte_centro",
+              "cita": "en ciertas zonas del norte se siembra todo el ano"
+            }
+          ],
+          "nota": "Octubre-diciembre (invierno) y mayo-junio (verano). La propia fuente dice que en ciertas zonas del norte se siembra todo el ano: no usar como ventana cerrada."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha solo da dos epocas (invierno/verano) sin ligarlas a la lluvia."
+        },
+        "dias_a_floracion": {
+          "valor": {
+            "min": 104,
+            "max": 104
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.papa.indicadores.fenologia_indices.fuentes[2]",
+              "url": "https://cipotato.org/wp-content/uploads/Documentacion%20PDF/Fripapa1.pdf",
+              "cita": "Dias a la floracion 104; Dias a la cosecha 171 (Semitardia)"
+            }
+          ],
+          "nota": "INIAP-Fripapa 99 a 3050 msnm y 11 C. La parcela esta a 3588 msnm: el desfase no esta cuantificado."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha dice 'variedades sensibles y tolerantes' (fuente 2, Peru) y no hay dato de helada confirmado para Fripapa ni Superchola: la tolerancia varia por variedad."
+        },
+        "fase_sensible_helada": {
+          "valor": [
+            "emergencia",
+            "inicio_estolonizacion"
+          ],
+          "origen": "andes",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.indicadores.helada.nota",
+              "cita": "fases mas susceptibles son emergencia e inicio de formacion de estolones"
+            }
+          ],
+          "nota": "Resumen de busqueda sobre un estudio de Puno (Peru, papas nativas); no verificado en texto completo."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo '-2,5 C' de una revision de origen no confirmado y '-1 C' de una nota periodistica (baja fiabilidad)."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha (huecos_indicadores) no halla rangos de humedad de suelo ni efecto del exceso con cifras; 'suelos humedos y pesados dan tuberculo mas firme' no es una tolerancia."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.enfermedades.0",
+              "cita": "Lancha tardía o tizón tardío (Phytophthora infestans"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.papa.indicadores.sanidad_lancha.fuentes[1]",
+              "url": "https://old.fontagro.org/new/uploads/productos/16678_-_Producto_20_(Apr).pdf",
+              "cita": "causante de perdidas entre el 30% al 100% del rendimiento en pocos dias (Oyarzun et al., 2001)"
+            }
+          ],
+          "nota": "Perdidas de 30-100 % del rendimiento en pocos dias (Oyarzun 2001, citado por FONTAGRO)."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": {
+            "altitud_msnm": 2650,
+            "t_media_c": 12.4,
+            "hr_pct": 86.7,
+            "lluvia_mm_mes": 128
+          },
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.indicadores.sanidad_lancha.temperatura_humedad_favorable",
+              "cita": "Ensayo Carchi 2650 msnm: T media 12,4 C, HR 86,7 %, 128 mm/mes (condiciones del ensayo, no umbral)"
+            }
+          ],
+          "nota": "Condiciones de un ensayo, NO umbral. La ficha no da URL propia para esta cifra. Reservado: ninguna regla lo cita."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La unica cifra de HR/T para lancha (HR>80 %, 15-22 C) cita una referencia mexicana (otra region); CIP Quito (resumen) asocia el inoculo aereo NEGATIVAMENTE con la HR. Evidencia contradictoria."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La fuente 1 recomienda terrenos 'no propensos a sequia, heladas ni granizo': es un criterio para elegir terreno, no una tolerancia."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": "alta",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.papa.indicadores.fertilidad.fuentes[0]",
+              "url": "https://revistadigital.uce.edu.ec/index.php/SIEMBRA/article/download/2665/9004/40695",
+              "cita": "el cultivo de papa de la Sierra de Ecuador puede extraer 70 kg N ha-1 cuando el rendimiento es de 17 t ha-1 y de 220 kg N ha-1 para un rendimiento de 50 t ha-1 (Siembra 11(2), 2024)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.suelo.notas",
+              "cita": "Exigencia de fertilidad 'alta' es inferencia"
+            }
+          ],
+          "nota": "Extraccion de 70 kg N/ha (17 t/ha) a 220 kg N/ha (50 t/ha) en la Sierra (Oyarzun 2002 citado por Gaibor 2024). El nivel 'alta' es inferencia de la ficha."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.papa.indicadores.fertilidad.perdidas_lavado",
+              "cita": "N puede perderse por nitrificacion, lixiviacion y volatilizacion"
+            }
+          ],
+          "nota": "Solo cualitativo (Gaibor 2024, suelos volcanicos de Chimborazo): la ficha dice que no hay cifras de lavado con lluvia fuerte en papa de Sierra ni umbral de lluvia."
+        }
+      }
+    },
+    "oca": {
+      "nombre": "Oca (Oxalis tuberosa)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 3000,
+            "max": 3800
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 3000"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3800"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.clima.notas",
+              "cita": "es la franja de mayor concentración (fuente 1 y 2)"
+            }
+          ]
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6,
+            "max": 8
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.ciclo_meses.nota",
+              "cita": "Fuente 1: cosecha a los 6-8 meses según variedad"
+            }
+          ]
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha (indicadores.ciclo_siembra): 'Epocas de siembra en sierra ecuatoriana ligadas a lluvia: no hallado'."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": "media",
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.clima.temperatura_c",
+              "cita": "resistente a bajas temperaturas; las heladas destruyen el follaje"
+            }
+          ],
+          "nota": "INTERPRETACION PROPIA: F1 dice a la vez 'resistente a bajas temperaturas' y 'las heladas destruyen el follaje'. Sin umbral ni fase."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo FAO EcoCrop (base global): minima absoluta de crecimiento 5 C; no es dato de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato directo; solo una guia INIA Peru (en resumen de busqueda) recomienda terreno con buen drenaje: recomendacion, no tolerancia."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'Hospedero de Phytophthora infestans: NO hallado dato (ni confirma ni descarta)'."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": {
+            "valor_c": 28,
+            "efecto": "destruye la planta"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.clima.temperatura_c",
+              "cita": "más de 28 C destruye la planta (fuente 1)"
+            }
+          ]
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.oca.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "lizas": {
+      "nombre": "Lizas / papa lisa (Ullucus tuberosus), sinónimo de olluco y melloco",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2800,
+            "max": 4000,
+            "ideal_min": 3000,
+            "ideal_max": 3600
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.altitud_temperatura.fuentes[1]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "between 2800 and 4000 m a.s.l. (ideal 3000-3600 m); temperatures between 8 and 14 C"
+            }
+          ],
+          "nota": "Ficha: 2000-4000 (fuente 2, Peru/Bolivia). Revision 2026: 2800-4000 (ideal 3000-3600)."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6,
+            "max": 7.3
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lizas.ciclo_meses.nota",
+              "cita": "Fuente 2: 180 a 220 días según altitud y variedad"
+            }
+          ],
+          "nota": "Fuente 1 (melloco, Ecuador): 160 a 260 dias."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'Epocas de siembra recomendadas en meses: no hallado'."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": {
+            "min": 98,
+            "max": 130
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.ciclo_siembra.valor",
+              "cita": "floracion a 98-130 dias"
+            }
+          ],
+          "nota": "Saraguro (Loja), 2850 msnm; no es Toacaso ni 3588 msnm."
+        },
+        "tolerancia_helada": {
+          "valor": "media",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.helada.fuentes[0]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.helada.fuentes[1]",
+              "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+              "cita": "las heladas causan daño tanto a las plantas como a los tubérculos"
+            }
+          ],
+          "nota": "Evidencia mixta: revision 2026 'tolerante a helada'; CIP (Peru) y Saraguro (Ecuador) reportan dano y ecotipos rojo/blanco mas susceptibles que el verde."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "CIP: dano en plantas y en tuberculos mal aporcados o dejados en campo (noches de fines de mayo a julio); no define fase fenologica."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cifra; la pudricion 'gotera' (Pythium) depende de suelo arcilloso y T < 18 C: es condicional, no una tolerancia general."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: hospedero de P. infestans NO hallado; el capitulo CIP no lista Phytophthora (ausencia, no prueba)."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": [
+            {
+              "nombre": "manchas foliares (Ascochyta, Alternaria) y Botrytis",
+              "favorecida_por": "humedad del ambiente, neblina y lluvia"
+            }
+          ],
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.sanidad.fuentes[3]",
+              "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+              "cita": "La intensidad de la enfermedad depende de la humedad del ambiente. (mancha oval, Ascochyta)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.exceso_agua.valor",
+              "cita": "Botrytis, Alternaria y Ascochyta favorecidas por neblina/lluvia/agua libre"
+            }
+          ],
+          "nota": "Datos del CIP (Peru central)."
+        },
+        "tolerancia_sequia": {
+          "valor": "alta",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.lizas.indicadores.helada.fuentes[0]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive"
+            }
+          ],
+          "nota": "Revision 2026: 'tolerant to frost and drought'. Sin cifra."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lizas.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      },
+      "nota": "Las fichas 'lizas' y 'olluco' tienen contenido identico en cultivos.json (mismo cultivo, Ullucus tuberosus); se tipan igual."
+    },
+    "cebada": {
+      "nombre": "Cebada",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2400,
+            "max": 3500,
+            "max_con_variedades_especiales": 3600,
+            "variedades_especiales": [
+              "INIAP-Shyri 2000",
+              "INIAP-Dorada 71"
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.altitud_temperatura.fuentes[0]",
+              "url": "https://repositorio.iniap.gob.ec/server/api/core/bitstreams/d74c603e-2d8c-47aa-bc4a-98173ce4d5bc/content",
+              "cita": "se ha difundido ampliamente en el callejón Interandino entre los 2400 y 3500 m.s.n.m."
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.altitud_temperatura.valor",
+              "cita": "Shyri 2000 2400-3600 msnm, Dorada 71 2500-3600"
+            }
+          ],
+          "nota": "Ficha clima: 0-3900 (fuente 2, Peru/Bolivia, 'altura optima' por frecuencia de cultivo). La ficha dice: viable a 3588 msnm solo con variedades de limite alto."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 4,
+            "max": 6
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.ciclo_siembra.valor",
+              "cita": "Ciclo 120-179 dias segun variedad"
+            }
+          ],
+          "nota": "Conversion propia (120-179 d = 4-6 meses); a 3000-3600 msnm esperar 5-6 meses."
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              10,
+              11,
+              12
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.ciclo_siembra.valor",
+              "cita": "en Ecuador tipicamente oct-dic en la sierra"
+            }
+          ],
+          "nota": "La ficha: mes exacto para Toacaso no confirmado."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": {
+            "tipo": "inicio_de_lluvias"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.agua.fuentes[2]",
+              "url": "https://repositorio.iniap.gob.ec/server/api/core/bitstreams/d74c603e-2d8c-47aa-bc4a-98173ce4d5bc/content",
+              "cita": "las épocas de siembra son al inicio de la época lluviosa o invernal en cada localidad, estimando que la época de cosecha coincida con la época seca"
+            }
+          ]
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo referencia generica de Uruguay/Argentina (tolera helada en estado vegetativo, sufre en espigazon). INIAP solo dice que en el piso andino alto 'frecuentemente ocurren heladas'."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Espigazon-floracion-llenado viene de Uruguay/Argentina (otra region)."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: sin dato fiable; solo 'textura franca con buen drenaje optima' (tesis UTC, fuente secundaria)."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: cebada NO seria hospedera de P. infestans, pero 'no se hallo cita explicita, es conocimiento general'. Sin cita no se tipa."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": [
+            "formacion_polen",
+            "espigazon"
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.agua.fuentes[1]",
+              "url": "https://repositorio.iniap.gob.ec/server/api/core/bitstreams/d74c603e-2d8c-47aa-bc4a-98173ce4d5bc/content",
+              "cita": "Puesto que la formación de polen es sensible al estrés, déficit de agua y altas temperaturas ... puede reducir los rendimientos"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.cebada.indicadores.agua.valor",
+              "cita": "formacion de polen/encanado-espigazon sensible a deficit hidrico"
+            }
+          ],
+          "nota": "INIAP. Sin dias a floracion: la fase no se puede ubicar en el calendario."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "INIAP dice que la formacion de polen es sensible a 'altas temperaturas', sin cifra."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.cebada.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "trigo": {
+      "nombre": "Trigo",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": null,
+            "max": 3300
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.trigo.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3300"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.trigo.clima.notas",
+              "cita": "para Triticum sativum: 0-3300 msnm"
+            }
+          ],
+          "nota": "Fuente 2 (Peru/Bolivia): rango de 'altura optima' por mayor frecuencia de cultivo, no limite fisiologico; 'en Ecuador no hay dato'."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin duracion de ciclo con cita de Ecuador/Andes."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin meses de siembra para la sierra con cita de Ecuador/Andes."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo referencia generica de Argentina/Uruguay (espigazon -1 a -2 C): otra region."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia al exceso de agua con cita de Ecuador/Andes."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita; solo 'no hospedero de Globodera' (Revelo 1984)."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.trigo.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "maiz": {
+      "nombre": "Maíz",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2200,
+            "max": 3000
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 2200"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3000"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.notas",
+              "cita": "variedades INIAP de altura entre 2200 y 3000 msnm"
+            }
+          ],
+          "nota": "La ficha: 'es el cultivo menos adecuado a 3588 msnm de la lista'."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6.8,
+            "max": 9
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.ciclo_meses.nota",
+              "cita": "variedades INIAP de 205 a 270 días de siembra a cosecha"
+            }
+          ]
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              10,
+              11,
+              12
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.notas",
+              "cita": "Siembra octubre-diciembre con inicio de lluvias (F1)"
+            }
+          ]
+        },
+        "siembra_condicion_lluvia": {
+          "valor": {
+            "tipo": "inicio_de_lluvias"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.notas",
+              "cita": "Siembra octubre-diciembre con inicio de lluvias (F1)"
+            }
+          ]
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha no da dias a floracion de maiz (solo choclo: 40-50 dias tras floracion, F2)."
+        },
+        "tolerancia_helada": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.temperatura_c",
+              "cita": "soporta mínimas hasta 8 °C"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.indicadores.helada.valor",
+              "cita": "Nivel: sensible (en general mas que cebada/quinua)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.indicadores.helada.valor",
+              "cita": "Prensa ecuatoriana reporta maiz quemado por heladas en sierra por encima de 2800 msnm"
+            }
+          ],
+          "nota": "INTERPRETACION: F1 da 10-20 C y 'soporta minimas hasta 8 C'. La prensa (INAMHI) es de baja fiabilidad; la cifra de -7 a -4 C es de Corteva (otra region) y no se usa."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'sin umbral por fase para maiz suave andino'."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": {
+            "valor_c": 8,
+            "duracion_h": null
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.temperatura_c",
+              "cita": "soporta mínimas hasta 8 °C"
+            }
+          ],
+          "nota": "Redaccion ambigua en la ficha ('soporta minimas hasta 8 C'): se lee como minima de aire tolerada = 8 C. REQUIERE VALIDACION."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.suelo.drenaje",
+              "cita": "no soporta excesos de agua ni encharcamiento (F1, F2)"
+            }
+          ]
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'Condiciones climaticas favorables no citadas en la fuente'."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": {
+            "valor_c": 30,
+            "efecto": "problemas de absorcion"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.clima.temperatura_c",
+              "cita": "desde 30 °C hay problemas de absorción (F1)"
+            }
+          ]
+        },
+        "exigencia_nitrogeno": {
+          "valor": "alta",
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.maiz.indicadores.fertilidad.fuentes[0]",
+              "url": "https://revistas.usfq.edu.ec/index.php/avances/article/download/2588/2987/19010",
+              "cita": "el cultivo (variedades de libre polinización) requiere de al menos 100 kg ha-1 de N fraccionado en tres aplicaciones"
+            }
+          ],
+          "nota": "Bolivar, principal zona de maiz de la Sierra."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.maiz.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "quinua": {
+      "nombre": "Quinua",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2200,
+            "max": 3000
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 2200"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3000"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.clima.notas",
+              "cita": "Altitud 2200-3000 msnm en Ecuador (F1)"
+            }
+          ],
+          "nota": "CONFLICTO dentro de la ficha: indicadores.altitud_temperatura dice 'rango tipico 2300-3700 msnm' y 'A 3588 msnm es viable pero con riesgo de helada' (manual CIP/INIAP 2002). El filtro del motor usa 2200-3000 y descarta la quinua a 3588 msnm. Ver decisiones_pendientes."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 4.8,
+            "max": 7.3
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.ciclo_meses.nota",
+              "cita": "F1: cosecha a 145-220 días según variedad, altitud y clima"
+            }
+          ]
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              10,
+              11,
+              12,
+              1
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.clima.notas",
+              "cita": "Siembra octubre-enero (F1)"
+            }
+          ],
+          "nota": "Manual CIP/INIAP: ideal sep-oct; en Carchi laderas oct-dic y planos ene o jun-jul para evitar heladas (no es Toacaso)."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": {
+            "tipo": "inicio_de_lluvias"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.ciclo_siembra.fuentes[2]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "lo ideal para la zona andina es efectuar la instalación cuando comience la época de lluvia de septiembre a octubre. En zonas de clima más benigno como en Ecuador, se puede alargar hasta enero"
+            }
+          ]
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion de Ecuador; el ensayo de Purace (Colombia) solo da ciclo total."
+        },
+        "tolerancia_helada": {
+          "valor": "media",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[1]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "Las temperaturas ambientales bajas (por debajo de 5°C), especialmente durante la floración, producen esterilidad de polen y falta de fertilización"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[2]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "los cultivares en Ecuador son adaptados a condiciones de valle andino, es decir con ausencia de temperaturas extremadamente bajas"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[0]",
+              "url": "https://agris.fao.org/search/ru/records/6878df965d9ad5f58d604635",
+              "cita": "cultivars from the altiplano of Peru tolerated temperatures of -8°C for 4 hours ... At -4°C ... reductions were 50.7 and 65.7%"
+            }
+          ],
+          "nota": "Tolerante en estado vegetativo y sensible en floracion. Ensayo Jacobsen 2000 con cultivares peruanos del altiplano; el de valle interandino (tipo Ecuador) aguanto -8 C solo 2 h frente a 4 h. Cultivares ecuatorianos adaptados a valle andino."
+        },
+        "fase_sensible_helada": {
+          "valor": [
+            "floracion"
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[1]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "Las temperaturas ambientales bajas (por debajo de 5°C), especialmente durante la floración, producen esterilidad de polen y falta de fertilización"
+            }
+          ]
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": {
+            "valor_c": -5,
+            "duracion_h": null
+          },
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.clima.temperatura_c",
+              "cita": "soporta heladas de -5 °C (F1)"
+            }
+          ],
+          "nota": "Sin fase ni duracion y contradicho por el ensayo Jacobsen (perdida de rendimiento de 50,7 % en 12 hojas y 65,7 % en floracion a -4 C, cultivares peruanos)."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": 5,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.helada.fuentes[1]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "Las temperaturas ambientales bajas (por debajo de 5°C), especialmente durante la floración, producen esterilidad de polen y falta de fertilización"
+            }
+          ],
+          "nota": "'por debajo de 5 C' de temperatura ambiental; no se aclara si es aire a 2 m."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.suelo.drenaje",
+              "cita": "no soporta excesos de agua (F1)"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.exceso_agua.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "En el caso de exceso de humedad, que empeora el problema de mildiu, se pueden instalar drenes cada 30 m"
+            }
+          ],
+          "nota": "F2 (Peru/Bolivia): 4-5 dias de exceso de humedad afectan o matan la planta."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha no precisa la fase; solo 'exceso de humedad cerca de cosecha provoca germinacion en panoja' (cualitativo)."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Quinua es Amaranthaceae: que no sea hospedera de P. infestans es inferencia sin cita."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": [
+            {
+              "nombre": "mildiu (Peronospora farinosa)",
+              "favorecida_por": "exceso de humedad"
+            }
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.exceso_agua.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "En el caso de exceso de humedad, que empeora el problema de mildiu, se pueden instalar drenes cada 30 m"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.sanidad.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "La enfermedad principal en la quinua es el mildiu (Peronospora farinosa)"
+            }
+          ]
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha solo dice que en Ecuador se cultiva en secano; no califica la tolerancia."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha da germinacion/emergencia y floracion-llenado como fases criticas pero con fuente 'GEN' no identificable y 'sin cifra de fase critica para Ecuador'."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha (F1) solo dice que 'veranillos prolongados con alta temperatura diurna bajan el rendimiento', sin cifra."
+        },
+        "exigencia_nitrogeno": {
+          "valor": "media",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.indicadores.fertilidad.valor",
+              "cita": "Extraccion 'media'"
+            }
+          ],
+          "nota": "Extrae 65 kg N por 5000 kg/ha de materia seca (Cari 1988 via CIP/INIAP)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.quinua.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "amaranto": {
+      "nombre": "Amaranto (ataco / sangorache / kiwicha)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 1500,
+            "max": 2800
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.amaranto.indicadores.altitud_temperatura.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "El amaranto presenta un rango de adaptación entre 1.500 y 2.800 msnm ... Las localidades más aptas están situadas entre los 2.000 y 2.600 msnm"
+            }
+          ],
+          "nota": "Ficha clima: 2700-3200 (F1) y F2: 2000-3300; la ficha anota que INIAP/CIP 'CONTRADICE el dato previo'. Se tipa el mas restrictivo."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 5,
+            "max": 7
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.amaranto.ciclo_meses.nota",
+              "cita": "F1: cosecha de 5 a 7 meses después de la siembra"
+            }
+          ],
+          "nota": "INIAP: 4-6 meses (INIAP Alegria 150-180 d)."
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              10,
+              11
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.amaranto.clima.notas",
+              "cita": "Siembra con las primeras lluvias, octubre-noviembre (F1)"
+            }
+          ]
+        },
+        "siembra_condicion_lluvia": {
+          "valor": {
+            "tipo": "inicio_de_lluvias"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.amaranto.clima.notas",
+              "cita": "Siembra con las primeras lluvias, octubre-noviembre (F1)"
+            }
+          ]
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.amaranto.indicadores.helada.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "El amaranto, debido a su susceptibilidad a las heladas, se cultiva en zonas de la Sierra más bajas, principalmente en los valles interandinos"
+            }
+          ],
+          "nota": "Cualitativo, sin cifra; se cultiva en zonas bajas y valles interandinos (CIP/INIAP 2002)."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.amaranto.indicadores.exceso_agua.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "el mal de semillero (causado por Pythium, Phytophtera y Rhizoctonia), que se presentan en el primer mes del cultivo, y sobre todo en suelos con mucha materia orgánica o anegados"
+            }
+          ],
+          "nota": "Mal de semillero (Pythium, Phytophthora, Rhizoctonia) en el primer mes, sobre todo con suelos muy organicos o anegados."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": [
+            "plantula"
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.amaranto.indicadores.exceso_agua.fuentes[0]",
+              "url": "https://urkuwayku.com/wp-content/uploads/2021/09/Cultivo-de-granos-andinos-en-Ecuador-2002.pdf",
+              "cita": "el mal de semillero (causado por Pythium, Phytophtera y Rhizoctonia), que se presentan en el primer mes del cultivo, y sobre todo en suelos con mucha materia orgánica o anegados"
+            }
+          ]
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "El mal de semillero involucra 'Phytophthora spp.' sin precisar P. infestans (la ficha lo advierte)."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "El mal de semillero ya esta recogido en tolerancia_exceso_agua/fase_sensible_exceso_agua."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": "alta",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.amaranto.indicadores.fertilidad.fuentes[0]",
+              "url": "https://journal.espe.edu.ec/ojs/index.php/vinculos/article/download/197/480",
+              "cita": "el amaranto es un cultivo que extrae altas cantidades de nitrógeno"
+            }
+          ],
+          "nota": "CONFLICTO: suelo.exigencia_fertilidad de la ficha dice 'baja'; el ensayo ESPE (Ecuador) dice 'extrae altas cantidades de nitrogeno'. Se tipa el ensayo."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.amaranto.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "qaniwa": {
+      "nombre": "Qañiwa (cañihua)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 3800,
+            "max": 4200
+          },
+          "origen": "andes",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 3800"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 4200"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.clima.notas",
+              "cita": "altiplano de Puno, Perú, y Bolivia"
+            }
+          ],
+          "nota": "Fuente 2 (Peru/Bolivia); 'F1 no la trata: sin dato para Ecuador'."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 5.3,
+            "max": 5.3
+          },
+          "origen": "andes",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.indicadores.ciclo_siembra.valor",
+              "cita": "ciclo fenologico 158 dias"
+            }
+          ],
+          "nota": "INIA Peru a 4045 msnm, solo resumen de buscador."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin meses de siembra para la sierra con cita de Ecuador/Andes."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": "alta",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.clima.notas",
+              "cita": "es el cultivo que más resiste bajas temperaturas y heladas (sin cifra)"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.qaniwa.indicadores.helada.fuentes[0]",
+              "url": "https://repositorio.inia.gob.pe/bitstreams/7b90cb33-eaf4-4f42-9a3c-955b561736eb/download",
+              "cita": "(resumen de buscador) cultivos resistentes a heladas como la cañihua y quinua"
+            }
+          ],
+          "nota": "Cualitativo (F2 y ensayo INIA Peru); sin cifra confirmada (-10 C de EcoCrop solo en resumen de buscador)."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: sin fuente; el dato previo 'no tolera encharcamiento' no se reconfirmo."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Mixto: el ensayo INIA Peru (resumen) la da por resistente a sequia y la fuente 2 dice sensible a la falta de humedad al inicio del crecimiento."
+        },
+        "fase_sensible_sequia": {
+          "valor": [
+            "inicio_crecimiento"
+          ],
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.clima.notas",
+              "cita": "sensible a la falta de humedad al inicio del crecimiento"
+            }
+          ],
+          "nota": "Fuente 2 (Peru/Bolivia)."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.qaniwa.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "haba": {
+      "nombre": "Haba (Vicia faba L.)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2600,
+            "max": 3400,
+            "alcance": "variedad INIAP 442-Sultana"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.haba.indicadores.altitud_temperatura.fuentes[0]",
+              "url": "https://primicias.ec/noticias/economia/haba-quinua-variedades-semillas-ecuador",
+              "cita": "una altura de 2.600 a 3.400 metros sobre el nivel del mar (verificado_texto, nota de prensa 2023 sobre INIAP)"
+            }
+          ],
+          "nota": "Ficha clima: 2000-3600 (F1). La ficha anota: 'Parcela a 3588 msnm queda por encima del rango recomendado'. La recomendacion es de una variedad (nota de prensa), no del cultivo."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6,
+            "max": 12
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.ciclo_meses.nota",
+              "cita": "Fuente 1: grano listo entre 6 y 12 meses según variedad y altitud"
+            }
+          ]
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              8,
+              9,
+              10,
+              11,
+              12,
+              1,
+              2,
+              3,
+              4
+            ],
+            "sobre_3200_msnm": [
+              10
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "alta",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.clima.notas",
+              "cita": "meses más adecuados agosto-abril"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.clima.notas",
+              "cita": "sembrar en octubre"
+            }
+          ],
+          "nota": "La ficha: 'sobre 3 200 msnm sembrar en octubre'."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'Epoca de siembra respecto a lluvia: sin dato fiable'."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo Australia/China (Manning 2024: dano bajo ~1 C en flores): otra region."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Floracion como fase mas sensible viene de Australia (otra region)."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": {
+            "valor_c": 1,
+            "duracion_h": 1
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.clima.temperatura_c",
+              "cita": "Soporta 1 a 8 °C durante una hora sin perder producción"
+            }
+          ],
+          "nota": "Duracion de 1 hora; no es umbral de dano."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.suelo.drenaje",
+              "cita": "el exceso de humedad es perjudicial"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.indicadores.exceso_agua.valor",
+              "cita": "Dato dado por el usuario (fuente 2): exceso de humedad perjudicial"
+            }
+          ],
+          "nota": "Cualitativo; la ficha lo atribuye a la fuente 2 (Peru/Bolivia). Las cifras de saturacion son de Canada (otra region)."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.haba.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = True"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "chocho": {
+      "nombre": "Chocho o tarwi (Lupinus mutabilis)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2800,
+            "max": 3400,
+            "max_reportado": 3600
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.altitud_temperatura.fuentes[1]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+              "cita": "cultivada en zonas agroecologicas situadas entre los 2800 y 3400 m de altitud (verificado_texto)"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.altitud_temperatura.fuentes[0]",
+              "url": "https://minerva.usc.gal/bitstreams/d5ae72f9-200b-44ed-89ec-f3c852898b77/download",
+              "cita": "being cultivated between 2800 and 3600 m a.s.l. ... distributed between 2000 and 3800 m above sea level (verificado_texto)"
+            }
+          ],
+          "nota": "Ficha clima: 2800-3600 (F1). Chalampuente: 'cultivado entre 2800 y 3600 msnm'."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 10,
+            "max": 12
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.ciclo_siembra.fuentes[0]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+              "cita": "el ciclo del cultivo es de 10 a 12 meses ... sembrar en octubre a noviembre ... mejoradas ... de diciembre a marzo (verificado_texto)"
+            }
+          ],
+          "nota": "Solo variedades nativas; las mejoradas tienen ciclo mas corto sin cifra."
+        },
+        "meses_siembra": {
+          "valor": {
+            "meses": [
+              10,
+              11,
+              12,
+              1,
+              2,
+              3
+            ],
+            "nativas": [
+              10,
+              11
+            ],
+            "mejoradas": [
+              12,
+              1,
+              2,
+              3
+            ],
+            "ficha_sierra_norte_centro": [
+              12,
+              1,
+              2
+            ]
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.ciclo_siembra.fuentes[0]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+              "cita": "el ciclo del cultivo es de 10 a 12 meses ... sembrar en octubre a noviembre ... mejoradas ... de diciembre a marzo (verificado_texto)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.clima.notas",
+              "cita": "Siembra dic-feb en sierra norte y central"
+            }
+          ]
+        },
+        "siembra_condicion_lluvia": {
+          "valor": {
+            "tipo": "lluvia_acumulada_min_mm",
+            "mm": 100
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.clima.notas",
+              "cita": "sembrar tras acumular ≥100 mm de lluvia"
+            }
+          ],
+          "nota": "La ficha no cita la fuente numerada de esa frase."
+        },
+        "dias_a_floracion": {
+          "valor": {
+            "min": 97,
+            "max": 110
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.ciclo_siembra.fuentes[1]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/e47e2f28-3b2b-4dd9-821e-d3163b3085d9/download",
+              "cita": "tabla dias a floracion 20%: Chocho 110 (3200 msnm), 100 (3100), 97 (2793) (verificado_texto)"
+            }
+          ],
+          "nota": "Cotopaxi 2793-3200 msnm, ensayo de abono verde (floracion 20 %); no es cultivo para grano."
+        },
+        "tolerancia_helada": {
+          "valor": "media",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.clima.temperatura_c",
+              "cita": "planta adulta resistente a heladas, plántula y fase de eje floral susceptibles"
+            }
+          ]
+        },
+        "fase_sensible_helada": {
+          "valor": [
+            "plantula",
+            "eje_floral"
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.clima.temperatura_c",
+              "cita": "plántula y fase de eje floral susceptibles"
+            }
+          ]
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.exceso_agua.fuentes[0]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+              "cita": "franco arenosa o arenosa con un buen drenaje y un ph de 5.5 a 7 para evitar acumulacion de agua (verificado_texto)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.suelo.drenaje",
+              "cita": "Necesita buen drenaje"
+            }
+          ],
+          "nota": "Tesis UTC (Cotopaxi)."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: hospedero de gorgojo/nematodos de papa 'sin dato'; sin cita sobre P. infestans."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": [
+            {
+              "nombre": "antracnosis (Colletotrichum)",
+              "favorecida_por": "alta precipitacion",
+              "perdida_max_pct": 100
+            }
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.chocho.indicadores.sanidad.fuentes[0]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/30e03199-697b-4d83-b1d6-3a250b7e85dd/download",
+              "cita": "ocasiona perdidas en el rendimiento inclusive del 100 % cuando existen epocas de alta precipitacion, es transmitida a traves de la semilla (verificado_texto)"
+            }
+          ]
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo hay fase sensible (floracion y fructificacion); la tolerancia general no esta calificada."
+        },
+        "fase_sensible_sequia": {
+          "valor": [
+            "floracion",
+            "fructificacion"
+          ],
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.clima.lluvia_mm",
+              "cita": "susceptible a sequía en floración y fructificación"
+            }
+          ]
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.chocho.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = True"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "arveja": {
+      "nombre": "Arveja (Pisum sativum L.)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 1700,
+            "max": 2800
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 1700"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 2800"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.arveja.indicadores.agua.fuentes[0]",
+              "url": "https://repositorio.utc.edu.ec/bitstreams/e47e2f28-3b2b-4dd9-821e-d3163b3085d9/download",
+              "cita": "altitudes de 1700 a 2800 m. con precipitaciones de 400 a 600 mm durante todo el ciclo y T promedio de 12 a 16 C (verificado_texto)"
+            }
+          ],
+          "nota": "Fuente 2 da 1000-3200. La ficha: a >3000 msnm la arveja rinde poco (ensayo Cotopaxi de abono verde)."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 3.2,
+            "max": 4
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.ciclo_meses.nota",
+              "cita": "95 días a cosecha en verde y 115-120 días en seco"
+            }
+          ],
+          "nota": "Una sola variedad (INIAP-432 Lojanita)."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin meses de siembra para la sierra con cita de Ecuador/Andes."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": {
+            "min": 76,
+            "max": 81
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.indicadores.ciclo_siembra.valor",
+              "cita": "Floracion 20% en Cotopaxi a 2793-3200 msnm: 76-81 dias"
+            }
+          ],
+          "nota": "Ensayo de abono verde, no cultivo para grano."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo Australia/EEUU (vainas delgadas, floracion-llenado): otra region."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Floracion-llenado viene de Australia (otra region)."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": {
+            "valor_c": -3,
+            "duracion_h": null
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.clima.temperatura_c",
+              "cita": "daño por helada bajo -3 °C"
+            }
+          ],
+          "nota": "La ficha cita a Galindo (2020) y Saavedra (2022) via fuente 8 (UTC 2025). Contradice la sensibilidad 'muy susceptible' de Australia (otra region)."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": "baja",
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.suelo.drenaje",
+              "cita": "la pudrición radical se presenta en suelos con mal drenaje (fuente 8)"
+            }
+          ],
+          "nota": "Las cifras de encharcamiento son de Canada (otra region) y no se usan."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": {
+            "valor_c": 35,
+            "efecto": "el crecimiento se detiene"
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.clima.temperatura_c",
+              "cita": "sobre 35 °C"
+            }
+          ],
+          "nota": "La ficha cita a Galindo (2020) y Saavedra (2022) via fuente 8 (UTC 2025)."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.arveja.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = True"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "lenteja": {
+      "nombre": "Lenteja (Lens culinaris)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 1000,
+            "max": 3000
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lenteja.clima.altitud_msnm_min",
+              "cita": "altitud_msnm_min = 1000"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lenteja.clima.altitud_msnm_max",
+              "cita": "altitud_msnm_max = 3000"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lenteja.clima.notas",
+              "cita": "según fuente 2 (cuadro cultivos andinizados, Perú/Bolivia)"
+            }
+          ],
+          "nota": "EcoCrop da altitud absoluta maxima 3800 (base global)."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo FAO EcoCrop (global) 70-240 dias y FENALCE Colombia 150-200 d; la ficha: 'no hay ciclo de variedad ecuatoriana verificado'."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin meses de siembra para la sierra con cita de Ecuador/Andes."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo Australia/Canada (plantulas toleran, floracion vulnerable): otra region."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo FAO EcoCrop (global): absoluto 5 C."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo EcoCrop (global) y saskpulse (Canada): otra region."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia a la sequia con cita de Ecuador/Andes."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": "otra_region",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Solo FAO EcoCrop (global): absoluto 32 C."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": true,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.lenteja.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = True"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    },
+    "abono": {
+      "nombre": "Abono verde (vicia, tarwi, tréboles)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fija_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        }
+      }
+    },
+    "pasto": {
+      "nombre": "Pasto o pradera (incluye alfalfa y trébol blanco con raigrás y dactilo)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fija_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        }
+      }
+    },
+    "barbecho": {
+      "nombre": "Barbecho (descanso)",
+      "campos": {
+        "altitud_msnm": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "tolerancia_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "fija_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: practica de rotacion (abono verde, pasto o descanso), no un cultivo de cosecha al que se le tipen estas condiciones."
+        }
+      }
+    },
+    "olluco": {
+      "nombre": "Olluco / ulluku / añu según región (Ullucus tuberosus), sinónimo de melloco y lizas",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2800,
+            "max": 4000,
+            "ideal_min": 3000,
+            "ideal_max": 3600
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.altitud_temperatura.fuentes[1]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "between 2800 and 4000 m a.s.l. (ideal 3000-3600 m); temperatures between 8 and 14 C"
+            }
+          ],
+          "nota": "Ficha: 2000-4000 (fuente 2, Peru/Bolivia). Revision 2026: 2800-4000 (ideal 3000-3600)."
+        },
+        "ciclo_meses": {
+          "valor": {
+            "min": 6,
+            "max": 7.3
+          },
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.olluco.ciclo_meses.nota",
+              "cita": "Fuente 2: 180 a 220 días según altitud y variedad"
+            }
+          ],
+          "nota": "Fuente 1 (melloco, Ecuador): 160 a 260 dias."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: 'Epocas de siembra recomendadas en meses: no hallado'."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": {
+            "min": 98,
+            "max": 130
+          },
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.ciclo_siembra.valor",
+              "cita": "floracion a 98-130 dias"
+            }
+          ],
+          "nota": "Saraguro (Loja), 2850 msnm; no es Toacaso ni 3588 msnm."
+        },
+        "tolerancia_helada": {
+          "valor": "media",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.helada.fuentes[0]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive"
+            },
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.helada.fuentes[1]",
+              "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+              "cita": "las heladas causan daño tanto a las plantas como a los tubérculos"
+            }
+          ],
+          "nota": "Evidencia mixta: revision 2026 'tolerante a helada'; CIP (Peru) y Saraguro (Ecuador) reportan dano y ecotipos rojo/blanco mas susceptibles que el verde."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "CIP: dano en plantas y en tuberculos mal aporcados o dejados en campo (noches de fines de mayo a julio); no define fase fenologica."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": "andes",
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cifra; la pudricion 'gotera' (Pythium) depende de suelo arcilloso y T < 18 C: es condicional, no una tolerancia general."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "La ficha: hospedero de P. infestans NO hallado; el capitulo CIP no lista Phytophthora (ausencia, no prueba)."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": [
+            {
+              "nombre": "manchas foliares (Ascochyta, Alternaria) y Botrytis",
+              "favorecida_por": "humedad del ambiente, neblina y lluvia"
+            }
+          ],
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.sanidad.fuentes[3]",
+              "url": "https://cipotato.org/wp-content/uploads/2014/06/04_enfermedades.pdf",
+              "cita": "La intensidad de la enfermedad depende de la humedad del ambiente. (mancha oval, Ascochyta)"
+            },
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.exceso_agua.valor",
+              "cita": "Botrytis, Alternaria y Ascochyta favorecidas por neblina/lluvia/agua libre"
+            }
+          ],
+          "nota": "Datos del CIP (Peru central)."
+        },
+        "tolerancia_sequia": {
+          "valor": "alta",
+          "origen": "andes",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.olluco.indicadores.helada.fuentes[0]",
+              "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13465246/",
+              "cita": "tolerant to frost and drought, allowing it to thrive where other crops, such as maize, do not survive"
+            }
+          ],
+          "nota": "Revision 2026: 'tolerant to frost and drought'. Sin cifra."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.olluco.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      },
+      "nota": "Las fichas 'lizas' y 'olluco' tienen contenido identico en cultivos.json (mismo cultivo, Ullucus tuberosus); se tipan igual."
+    },
+    "avena": {
+      "nombre": "Avena",
+      "campos": {
+        "altitud_msnm": {
+          "valor": {
+            "min": 2000,
+            "max": 3400
+          },
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.avena.indicadores.altitud_temperatura.fuentes[0]",
+              "url": "https://elproductor.com/2020/11/ecuador-tendra-una-nueva-semilla-de-avena-para-la-sierra-y-la-costa",
+              "cita": "(resumen de buscador) se adapta de 2000 a 3.400 metros sobre el nivel del mar"
+            }
+          ],
+          "nota": "Nota de prensa (resumen de buscador). Ficha clima: 500-4000 (fuente 2, Peru/Bolivia)."
+        },
+        "ciclo_meses": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin duracion de ciclo con cita de Ecuador/Andes."
+        },
+        "meses_siembra": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin meses de siembra para la sierra con cita de Ecuador/Andes."
+        },
+        "siembra_condicion_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dato que ligue la siembra a la lluvia con cita de Ecuador/Andes."
+        },
+        "dias_a_floracion": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin dias a floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_helada": {
+          "valor": "alta",
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "indicadores",
+              "ref": "cultivos.json#cultivos.avena.indicadores.helada.fuentes[0]",
+              "url": "https://elproductor.com/2020/11/ecuador-tendra-una-nueva-semilla-de-avena-para-la-sierra-y-la-costa",
+              "cita": "(resumen de buscador) resistente a heladas, tolerante a estrés hídrico y resistente a roya"
+            }
+          ],
+          "nota": "Una sola variedad (INIAP-Fortaleza 2020) segun nota de prensa; otra publicacion dice que la avena resiste menos que el centeno."
+        },
+        "fase_sensible_helada": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a helada con cita de Ecuador/Andes."
+        },
+        "temperatura_minima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura minima tolerada con cita de Ecuador/Andes."
+        },
+        "umbral_frio_floracion_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin umbral de frio en floracion con cita de Ecuador/Andes."
+        },
+        "tolerancia_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin tolerancia al exceso de agua con cita de Ecuador/Andes."
+        },
+        "fase_sensible_exceso_agua": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible al exceso de agua con cita de Ecuador/Andes."
+        },
+        "hospedero_lancha": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita explicita de que sea (o no) hospedero de Phytophthora infestans; no se infiere por familia botanica."
+        },
+        "condiciones_lancha_referencia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "No aplica: solo se tipa para la papa (unico hospedero confirmado)."
+        },
+        "enfermedad_favorecida_por_humedad": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin enfermedad con condicion de humedad citada para Ecuador/Andes."
+        },
+        "tolerancia_sequia": {
+          "valor": "media",
+          "origen": "ecuador",
+          "fiabilidad": "baja",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.avena.indicadores.helada.valor",
+              "cita": "avena menos resistente que centeno"
+            }
+          ],
+          "nota": "Nota de prensa y un resumen de buscador; sin cifra."
+        },
+        "fase_sensible_sequia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin fase sensible a la sequia con cita de Ecuador/Andes."
+        },
+        "temperatura_maxima_tolerada_c": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin temperatura maxima tolerada con cita de Ecuador/Andes."
+        },
+        "exigencia_nitrogeno": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin nivel de exigencia de nitrogeno con cita de Ecuador/Andes (la exigencia de fertilidad de la ficha, cuando existe, no se toma como cita propia)."
+        },
+        "fija_nitrogeno": {
+          "valor": false,
+          "origen": "ecuador",
+          "fiabilidad": "media",
+          "fuente": [
+            {
+              "tipo": "ficha",
+              "ref": "cultivos.json#cultivos.avena.efecto_rotacion.fija_nitrogeno",
+              "cita": "fija_nitrogeno = False"
+            }
+          ],
+          "nota": "Campo existente de la ficha (fuentes 1 y 2); sin cita propia por campo."
+        },
+        "perdida_nitrogeno_por_lluvia": {
+          "valor": null,
+          "origen": null,
+          "fiabilidad": null,
+          "fuente": [],
+          "razon_null": "Sin cita de Ecuador/Andes de que la lluvia haga perder nitrogeno en este cultivo (no se infiere de otros cultivos)."
+        }
+      }
+    }
+  },
+  "resumen": {
+    "celdas_total": 360,
+    "con_dato_total": 103,
+    "null_total": 257,
+    "cultivos_aplicables_15": {
+      "con_dato": 103,
+      "null": 197,
+      "nota": "Excluye abono, pasto y barbecho (practicas sin cosecha propia: todo null por 'no aplica')."
+    },
+    "por_cultivo": {
+      "papa": {
+        "con_dato": 10,
+        "null": 10
+      },
+      "oca": {
+        "con_dato": 5,
+        "null": 15
+      },
+      "lizas": {
+        "con_dato": 7,
+        "null": 13
+      },
+      "cebada": {
+        "con_dato": 6,
+        "null": 14
+      },
+      "trigo": {
+        "con_dato": 2,
+        "null": 18
+      },
+      "maiz": {
+        "con_dato": 10,
+        "null": 10
+      },
+      "quinua": {
+        "con_dato": 12,
+        "null": 8
+      },
+      "amaranto": {
+        "con_dato": 9,
+        "null": 11
+      },
+      "qaniwa": {
+        "con_dato": 5,
+        "null": 15
+      },
+      "haba": {
+        "con_dato": 6,
+        "null": 14
+      },
+      "chocho": {
+        "con_dato": 11,
+        "null": 9
+      },
+      "arveja": {
+        "con_dato": 7,
+        "null": 13
+      },
+      "lenteja": {
+        "con_dato": 2,
+        "null": 18
+      },
+      "abono": {
+        "con_dato": 0,
+        "null": 20
+      },
+      "pasto": {
+        "con_dato": 0,
+        "null": 20
+      },
+      "barbecho": {
+        "con_dato": 0,
+        "null": 20
+      },
+      "olluco": {
+        "con_dato": 7,
+        "null": 13
+      },
+      "avena": {
+        "con_dato": 4,
+        "null": 16
+      }
+    },
+    "por_campo": {
+      "altitud_msnm": {
+        "con_dato": 15,
+        "null": 3
+      },
+      "ciclo_meses": {
+        "con_dato": 12,
+        "null": 6
+      },
+      "meses_siembra": {
+        "con_dato": 7,
+        "null": 11
+      },
+      "siembra_condicion_lluvia": {
+        "con_dato": 5,
+        "null": 13
+      },
+      "dias_a_floracion": {
+        "con_dato": 5,
+        "null": 13
+      },
+      "tolerancia_helada": {
+        "con_dato": 9,
+        "null": 9
+      },
+      "fase_sensible_helada": {
+        "con_dato": 3,
+        "null": 15
+      },
+      "temperatura_minima_tolerada_c": {
+        "con_dato": 4,
+        "null": 14
+      },
+      "umbral_frio_floracion_c": {
+        "con_dato": 1,
+        "null": 17
+      },
+      "tolerancia_exceso_agua": {
+        "con_dato": 6,
+        "null": 12
+      },
+      "fase_sensible_exceso_agua": {
+        "con_dato": 1,
+        "null": 17
+      },
+      "hospedero_lancha": {
+        "con_dato": 1,
+        "null": 17
+      },
+      "condiciones_lancha_referencia": {
+        "con_dato": 1,
+        "null": 17
+      },
+      "enfermedad_favorecida_por_humedad": {
+        "con_dato": 4,
+        "null": 14
+      },
+      "tolerancia_sequia": {
+        "con_dato": 3,
+        "null": 15
+      },
+      "fase_sensible_sequia": {
+        "con_dato": 3,
+        "null": 15
+      },
+      "temperatura_maxima_tolerada_c": {
+        "con_dato": 3,
+        "null": 15
+      },
+      "exigencia_nitrogeno": {
+        "con_dato": 4,
+        "null": 14
+      },
+      "fija_nitrogeno": {
+        "con_dato": 15,
+        "null": 3
+      },
+      "perdida_nitrogeno_por_lluvia": {
+        "con_dato": 1,
+        "null": 17
+      }
+    }
+  },
+  "decisiones_pendientes": [
+    {
+      "id": "D1",
+      "tema": "Conflicto de altitud entre la ficha y 'indicadores'",
+      "detalle": "quinua: clima 2200-3000 (F1) vs indicadores 2300-3700 y 'a 3588 msnm es viable pero con riesgo de helada' (manual CIP/INIAP 2002); amaranto: 2700-3200 vs 1500-2800 (INIAP/CIP); haba: 3600 vs 3400 (variedad Sultana); chocho: 3600 vs 3400; cebada: 3900 vs 3500 (3600 con variedades de limite alto). El filtro F4 del motor usa clima.altitud_msnm: descarta la quinua a 3588 m aunque la propia ficha la da por viable con riesgo.",
+      "recomendacion": "Revision agronomica de la ficha de quinua antes de usar R3. Mientras tanto, los campos tipados usan el valor mas restrictivo bien citado (menos para quinua, donde se dejo el de la ficha y se anoto el conflicto)."
+    },
+    {
+      "id": "D3",
+      "tema": "Fiabilidad minima para emitir una advertencia",
+      "detalle": "Hoy: fiabilidad >= media. Con 'baja' (avena, papa fase de helada, oca tolerancia) el campo existe pero no dispara nada.",
+      "recomendacion": "Mantener >= media; con 'baja' a lo sumo R8."
+    },
+    {
+      "id": "D7",
+      "tema": "Datos mensuales de la parcela: version canonica",
+      "detalle": "El script que usted indico (backend/src/match_nasa_sentinel.py) NO calcula estos agregados mensuales: solo alinea la ventana NASA de 7 dias con cada foto, corrige la temperatura con el sesgo medio contra Open-Meteo y evalua los cruces; tampoco estan en resultado_match.json. Su origen sigue sin identificar. El resumen no trae noches de feb, mar, may, nov, ni lluvia de may-jun, ni HR de may, jun, oct, nov. Mi recalculo independiente desde response_1794715361072.json (T min - 6,47 C, 2021-2025, mes calendario) NO coincide exactamente con los agregados del encargo: noches ene 3,6 / jun 9,2 / jul 15,6 / ago 16,4 / sep 12,6 (encargo 3,8 / 10,4 / 16,4 / 17,0 / 12,8); lluvia oct 106, nov 102, dic 119, ene 117 mm/mes (encargo >= 121 en oct-abr). No es un error mio ni suyo comprobado: puede ser la ventana de anios o la definicion de mes.",
+      "recomendacion": "Indicarme el script y la ventana que generan los agregados y publicar una tabla mensual completa (12 meses x 3 indicadores) como entrada de las reglas. Las reglas usan hoy SOLO los valores del encargo y tratan los meses sin dato como 'sin dato'."
+    },
+    {
+      "id": "D9",
+      "tema": "Interpretaciones propias en la ficha tipada",
+      "detalle": "oca.tolerancia_helada = media (fiabilidad baja), maiz.tolerancia_helada = baja y maiz.temperatura_minima_tolerada_c = 8 (media) son lecturas mias de frases de la ficha, marcadas en su nota.",
+      "recomendacion": "Que el agronomo las confirme o se pasen a null. Hoy no activan nada practico en la parcela (maiz lo filtra la altitud; oca en R8 cuenta como 'no confiable')."
+    },
+    {
+      "id": "D10",
+      "tema": "Fichas duplicadas 'lizas' y 'olluco'",
+      "detalle": "Contenido identico (mismo cultivo). Se tiparon igual y los casos de prueba las tratan juntas.",
+      "recomendacion": "Decidir en el paso 5 si se fusionan o se mantienen como alias."
+    }
+  ]
+}

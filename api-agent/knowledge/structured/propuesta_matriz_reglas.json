@@ -1,0 +1,2400 @@
+{
+  "_meta": {
+    "descripcion": "PROPUESTA de matriz de reglas deterministas (paso 2). El motor decide si hay advertencia; el LLM solo redacta; un validador comprueba; si falla se usa la plantilla.",
+    "generado": "2026-11-15",
+    "depende_de": "propuesta_campos_tipados.json",
+    "estado": "no la lee ningun codigo; el evaluador de referencia que comprueba los casos vive fuera del repo (scratchpad) y no es el motor",
+    "politicas_globales": [
+      "Solo candidatos: las reglas se evaluan unicamente para cultivos que el motor ya dejo pasar; un cultivo no candidato no genera nada.",
+      "Campo null, de otra region o de fiabilidad baja => no hay advertencia (a lo sumo R8 'no hay dato confiable').",
+      "Un mes sin dato en la tabla de la parcela es 'sin dato', nunca 0: no cuenta ni a favor ni en contra.",
+      "Ninguna regla baja puntaje (decision D4).",
+      "Maximo 2 advertencias por cultivo recomendado: primero atencion, luego info; empate por prioridad R1 > R5 > R3 > R2 > R9 > R6 > R7 > R10 > R11 > R4 > R8. R7 reemplaza a R6 si ambas se activan para el mismo cultivo.",
+      "Lenguaje de riesgo ('podria', 'se estiman'), trato de 'usted', frases cortas; cada mensaje manda a consultar a un tecnico o al INIAP.",
+      "El LLM solo recibe regla, severidad, cultivo y evidencia ya decididos y redacta con esos numeros.",
+      "Validador (comprobado en este documento con los casos): todo numero del texto esta en la evidencia; menciona al cultivo candidato; maximo 2 advertencias; sin dosis ni productos (kg, litros, fungicida, fertiliz*, urea, etc.). Si falla: plantilla fija de la regla."
+    ],
+    "parametros_propuestos": {
+      "NOCHES_FRECUENTES_MIN": 10,
+      "UMBRAL_NOCHE_C": 3,
+      "HR_ALTA_MIN_PCT": 70,
+      "HR_UMBRAL_PCT": 82,
+      "R5_MESES_INFO": 2,
+      "R5_MESES_ATENCION": 4,
+      "LLUVIA_LLUVIOSO_MIN_MM": 121,
+      "LLUVIA_SECO_MAX_MM": 62,
+      "MAX_ADVERTENCIAS": 2
+    },
+    "aviso_parametros": "NINGUN parametro viene de una fuente agronomica: son cortes de los agregados de la parcela (ver D2)."
+  },
+  "parcela": {
+    "altitud_msnm": 3588,
+    "fuente": "knowledge/docs/07-indicadores-remote-sensing.md y agregados de 5 anios del encargo",
+    "noches_le3_por_mes": {
+      "enero": 3.8,
+      "febrero": null,
+      "marzo": null,
+      "abril": 1.2,
+      "mayo": null,
+      "junio": 10.4,
+      "julio": 16.4,
+      "agosto": 17.0,
+      "septiembre": 12.8,
+      "octubre": 4.4,
+      "noviembre": null,
+      "diciembre": 3.8
+    },
+    "lluvia_mm_por_mes_rango_del_grupo": {
+      "enero": [
+        121,
+        216
+      ],
+      "febrero": [
+        121,
+        216
+      ],
+      "marzo": [
+        121,
+        216
+      ],
+      "abril": [
+        121,
+        216
+      ],
+      "mayo": null,
+      "junio": null,
+      "julio": [
+        43,
+        62
+      ],
+      "agosto": [
+        43,
+        62
+      ],
+      "septiembre": [
+        43,
+        62
+      ],
+      "octubre": [
+        121,
+        216
+      ],
+      "noviembre": [
+        121,
+        216
+      ],
+      "diciembre": [
+        121,
+        216
+      ]
+    },
+    "hr_gt82_pct_dias_por_mes_rango_del_grupo": {
+      "enero": [
+        70,
+        95
+      ],
+      "febrero": [
+        70,
+        95
+      ],
+      "marzo": [
+        70,
+        95
+      ],
+      "abril": [
+        70,
+        95
+      ],
+      "mayo": null,
+      "junio": null,
+      "julio": [
+        5,
+        13
+      ],
+      "agosto": [
+        5,
+        13
+      ],
+      "septiembre": [
+        5,
+        13
+      ],
+      "octubre": null,
+      "noviembre": null,
+      "diciembre": [
+        70,
+        95
+      ]
+    },
+    "aviso": "null = no esta en el resumen del encargo. Lluvia y HR vienen como rango del grupo (jul-sep, oct-abr, dic-abr), no por mes. Ver D7.",
+    "tmax_dia_max_c_por_mes_recalculo_propio": {
+      "enero": 15.8,
+      "febrero": 15.1,
+      "marzo": 15.8,
+      "abril": 16.0,
+      "mayo": 15.5,
+      "junio": 15.5,
+      "julio": 14.9,
+      "agosto": 16.0,
+      "septiembre": 16.3,
+      "octubre": 16.5,
+      "noviembre": 15.5,
+      "diciembre": 16.0
+    },
+    "no_usado": "NDVI/NDRE/NDMI, humedad de suelo y alertas del estado actual no entran en ninguna regla (R-NV1, R-NV8, R-NV9)."
+  },
+  "reglas": [
+    {
+      "id": "R1",
+      "nombre": "Altitud mas alta (o mas baja) que el rango de las fuentes de Ecuador/Andes",
+      "viable_hoy": "si",
+      "campo_ficha": "altitud_msnm {min, max, max_con_variedades_especiales | max_reportado}",
+      "indicador_parcela": "Altitud de la parcela (3588 msnm). Es un dato fijo de la parcela, no un indicador de remote sensing.",
+      "umbral": "altitud_parcela > max, o < min, del campo tipado. Solo con fiabilidad >= media.",
+      "ventana": "No aplica (condicion estatica).",
+      "severidad": "atencion si fiabilidad=alta y esta fuera incluso de max_con_variedades_especiales/max_reportado; info si fiabilidad=media o si esta dentro de max_con_variedades_especiales/max_reportado.",
+      "efecto_puntaje": "solo advertencia. El motor ya descarta con +-200 m (filtro F4) y emite 'adaptacion marginal' dentro del margen usando la ficha; R1 solo agrega los casos en que el campo tipado es MAS restrictivo que la ficha (haba, chocho, cebada).",
+      "no_se_genera_si": [
+        "campo null o fiabilidad baja (avena)",
+        "altitud dentro del rango",
+        "el cultivo no es candidato",
+        "el motor ya emitio la advertencia 'marginal' para ese cultivo (evitar duplicado; decision D5)"
+      ],
+      "fuente_umbral": "Rangos publicados por INIAP/FAO/CIP citados en propuesta_campos_tipados.json (campo altitud_msnm). No hay umbral inventado.",
+      "calibrado_en_campo": "no (literatura y fichas de variedad; no medido en Toacaso)",
+      "origen_umbral": "ecuador (haba, chocho, cebada, maiz, arveja, amaranto, oca, papa) / andes (trigo, lizas, lenteja, qaniwa)",
+      "requiere_validacion_agronomica": "no",
+      "nota_validacion": "El mensaje solo repite un rango publicado. Lo que si necesita decision es D1 (rangos en conflicto dentro de la ficha).",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "cebada",
+        "trigo",
+        "maiz",
+        "quinua",
+        "amaranto",
+        "qaniwa",
+        "haba",
+        "chocho",
+        "arveja",
+        "lenteja"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "cebada",
+        "haba",
+        "chocho"
+      ],
+      "casos_prueba": [
+        "T01",
+        "T02",
+        "T03",
+        "T04",
+        "T05",
+        "T06",
+        "T16",
+        "T19",
+        "T20",
+        "T26",
+        "T28",
+        "T35",
+        "T36"
+      ],
+      "plantillas": {
+        "sobre": "{Cultivo} se cultiva, según {fuente}, hasta unos {max} metros de altura. Su parcela está a {altitud_parcela} metros. A esa altura podría rendir menos de lo esperado. Consulte a un técnico o al INIAP antes de decidir.",
+        "sobre_extra": "{Cultivo} se cultiva, según {fuente}, hasta unos {max} metros de altura. Hay reportes de cultivo hasta {extra} metros. Su parcela está a {altitud_parcela} metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+        "bajo": "{Cultivo} se da, según {fuente}, desde unos {min} metros de altura. Su parcela está a {altitud_parcela} metros, más abajo. Podría no darse bien. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T01",
+        "mensaje": "El chocho se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene."
+      }
+    },
+    {
+      "id": "R2",
+      "nombre": "Noches frias en el ciclo de un cultivo que no aguanta el frio",
+      "viable_hoy": "si (sin efecto en la parcela de 3588 m: maiz y amaranto los descarta el filtro de altitud)",
+      "campo_ficha": "temperatura_minima_tolerada_c (valor_c >= 3) o tolerancia_helada = baja",
+      "indicador_parcela": "Noches <= 3 C por mes (temperatura corregida por altura).",
+      "umbral": "Solo se cruza si el cultivo tolera una minima >= 3 C (cualquier noche contada esta por debajo) o es 'baja' cualitativa con fiabilidad >= media. Si la minima tolerada es < 3 C (quinua -5, arveja -3, haba 1) el indicador no discrimina y NO se advierte. Frecuentes = >= 10 noches/mes; ocasionales = 1-9.",
+      "ventana": "Meses del ciclo: ceil(ciclo_meses.max) meses desde el mes de siembra. Meses sin dato se ignoran (no cuentan como 0).",
+      "severidad": "atencion si algun mes de la ventana es 'frecuente'; info si solo hay 'ocasionales'.",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "tolerancia null / minima tolerada < 3 C / fiabilidad baja",
+        "ningun mes de la ventana tiene dato de noches",
+        "cultivo no candidato",
+        "el ciclo no esta tipado"
+      ],
+      "fuente_umbral": "El umbral de 3 C es el del indicador de la parcela (remote-sensing/nasa-power/process_2.py: ROJO si T min <= 3 C), NO un umbral de dano de ningun cultivo. El corte 10 noches/mes es un hueco en los datos (ocasionales <= 4,4; frecuentes >= 10,4). La minima tolerada del maiz (8 C) es una frase ambigua de F1 (FAO Ecuador).",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "ecuador (maiz, amaranto); cortes de frecuencia: datos de la parcela",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Validar (a) la lectura 'soporta minimas hasta 8 C', (b) si 3 C corregidos equivalen a riesgo para el cultivo, (c) el corte de 10 noches.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "maiz",
+        "amaranto"
+      ],
+      "cultivos_que_la_activan_en_3588m": [],
+      "casos_prueba": [
+        "T15",
+        "T16",
+        "T17",
+        "T18",
+        "T29",
+        "T39"
+      ],
+      "plantillas": {
+        "minima": "{Cultivo} no resiste bien el frío: {fuente} dice que aguanta mínimas de hasta {minima_tolerada_c} °C. En su zona se estiman noches de {umbral_noche_c} °C o menos en estos meses del cultivo: {lista}. Podría dañarse. Consulte a un técnico o al INIAP.",
+        "cualitativa": "{Cultivo} es sensible al frío, según {fuente}. En su zona se estiman noches de {umbral_noche_c} °C o menos en estos meses del cultivo: {lista}. Podría dañarse. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T15",
+        "mensaje": "El maíz no resiste bien el frío: una fuente de Ecuador dice que aguanta mínimas de hasta 8 °C. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches). Podría dañarse. Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R3",
+      "nombre": "Noches frias en el ciclo de la quinua (esterilidad de polen en floracion)",
+      "viable_hoy": "si (sin efecto hoy: la ficha de quinua tiene altitud 2200-3000 y el motor la descarta a 3588 m; ver D1)",
+      "campo_ficha": "umbral_frio_floracion_c (quinua = 5) y fase_sensible_helada = floracion",
+      "indicador_parcela": "Noches <= 3 C por mes (temperatura corregida).",
+      "umbral": "El umbral de la ficha (5 C) es mayor que el del indicador (3 C): toda noche contada esta por debajo de 5 C. Si el campo fuera <= 3 la regla no se aplica.",
+      "ventana": "Ciclo completo (ceil(ciclo_meses.max) meses desde la siembra): NO hay dias a floracion de Ecuador para quinua, asi que no se puede acotar a la floracion; el mensaje lo dice ('si la floracion cae en esos meses').",
+      "severidad": "atencion si hay un mes 'frecuente' en la ventana; info si solo 'ocasionales'.",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "umbral null o fiabilidad baja",
+        "umbral <= 3 C",
+        "sin datos de noches en la ventana",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Manual CIP/INIAP 2002 (Cultivo de granos andinos en Ecuador): 'temperaturas ambientales bajas (por debajo de 5 C), especialmente durante la floracion, producen esterilidad de polen'. Es temperatura ambiental, no se aclara si es aire a 2 m.",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "ecuador (el ensayo de Jacobsen 2000 es de cultivares peruanos y no se usa como umbral)",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Falta confirmar el 5 C y la fase; sin dias a floracion la ventana es todo el ciclo (puede sobreavisar).",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "quinua"
+      ],
+      "cultivos_que_la_activan_en_3588m": [],
+      "casos_prueba": [
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "plantillas": {
+        "floracion": "En la floración, {cultivo} es sensible al frío. {Fuente} indica que por debajo de {umbral_frio_floracion_c} °C la flor puede quedar estéril. En su zona se estiman noches de {umbral_noche_c} °C o menos en: {lista}. Podría afectar la cosecha si la floración cae en esos meses. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T12",
+        "mensaje": "En la floración, la quinua es sensible al frío. Una fuente de Ecuador indica que por debajo de 5 °C la flor puede quedar estéril. En su zona se estiman noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches). Podría afectar la cosecha si la floración cae en esos meses. Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R4",
+      "nombre": "Mucha lluvia mensual para un cultivo que no soporta el agua estancada",
+      "viable_hoy": "si (activa hoy para haba y chocho; quinua, maiz, amaranto y arveja los descarta el filtro de altitud)",
+      "campo_ficha": "tolerancia_exceso_agua = baja (+ fase_sensible_exceso_agua)",
+      "indicador_parcela": "Lluvia mensual (mm/mes).",
+      "umbral": "Mes 'lluvioso' = 121 mm o mas (minimo observado en el grupo oct-abr: 121-216). No hay cifra agronomica de que lluvia mensual dana a estos cultivos.",
+      "ventana": "Si fase_sensible_exceso_agua incluye 'plantula' (amaranto): mes de siembra y el siguiente. Si no: todo el ciclo.",
+      "severidad": "info (siempre)",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "tolerancia null / no es 'baja' / fiabilidad baja",
+        "ningun mes de la ventana es lluvioso (los meses sin dato no cuentan)",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "La parte del cultivo (no soporta excesos de agua) tiene cita de Ecuador/Andes. El corte de 121 mm es un corte de los datos de la parcela (y coincide con el 120 mm de la alerta NUTRIENTES de process_2.py), sin respaldo agronomico.",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "cultivo: ecuador/andes; corte de lluvia: datos de la parcela",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Regla ruidosa: las ventanas de siembra recomendadas ya caen en la epoca de lluvias, asi que casi siempre se activa. Ver D6.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "maiz",
+        "quinua",
+        "amaranto",
+        "haba",
+        "chocho",
+        "arveja"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "haba",
+        "chocho"
+      ],
+      "casos_prueba": [
+        "T01",
+        "T05",
+        "T06",
+        "T12",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T17",
+        "T18",
+        "T19",
+        "T20",
+        "T21",
+        "T26",
+        "T29",
+        "T34",
+        "T35",
+        "T39"
+      ],
+      "plantillas": {
+        "ciclo": "En {meses} llueve mucho en su zona (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). {Cultivo} no soporta bien el agua estancada, según {fuente}. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+        "plantula": "Al inicio del cultivo, cuando la planta es chica, llueve mucho en su zona (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes) en {meses}. {Cultivo} no soporta bien el agua estancada, según {fuente}. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T01",
+        "mensaje": "En diciembre, enero, febrero, marzo, abril, octubre y noviembre llueve mucho en su zona (entre 121 y 216 mm al mes). El chocho no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico."
+      }
+    },
+    {
+      "id": "R5",
+      "nombre": "Aire muy humedo durante el ciclo de un hospedero de la lancha",
+      "viable_hoy": "si (activa hoy para papa)",
+      "campo_ficha": "hospedero_lancha = true",
+      "indicador_parcela": "Presion de lancha: % de dias del mes con HR > 82 %.",
+      "umbral": "Mes de 'HR alta' = al menos 70 % de dias con HR > 82 % (minimo del grupo dic-abr: 70-95 %; jul-sep: 5-13 %). Se advierte con >= 2 meses de HR alta en el ciclo (info) y >= 4 (atencion).",
+      "ventana": "Ciclo completo: ceil(ciclo_meses.max) meses desde el mes de siembra.",
+      "severidad": "info con 2-3 meses de HR alta; atencion con 4 o mas.",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "hospedero_lancha null o false",
+        "menos de 2 meses de HR alta en el ciclo",
+        "sin dato de HR en los meses del ciclo",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Que la papa es hospedera: ficha (Ecuador, alta). Los cortes de 70 %, 2 y 4 meses son de los datos de la parcela, sin fuente agronomica. El HR>80 % de FONTAGRO cita una referencia mexicana y CIP Quito asocia el inoculo NEGATIVAMENTE con la HR: evidencia contradictoria. Tampoco hay dato de lancha sobre 3500 m (huecos_indicadores).",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "hospedero: ecuador; cortes: datos de la parcela; HR>82 %: process_2.py",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Imprescindible un agronomo: el vinculo HR-lancha a 3588 m no esta confirmado en Ecuador. El mensaje se redacto como riesgo, no como hecho.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "papa"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "papa"
+      ],
+      "casos_prueba": [
+        "T07",
+        "T09",
+        "T10",
+        "T25",
+        "T31",
+        "T37"
+      ],
+      "plantillas": {
+        "base": "Para {cultivo}, de los {meses_ciclo} meses del ciclo, {meses_hr_alta} caen en meses de aire muy húmedo: en ellos, entre {hr_dias_min_pct} y {hr_dias_max_pct} % de los días tienen más de {hr_umbral_pct} % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T07",
+        "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote."
+      }
+    },
+    {
+      "id": "R6",
+      "nombre": "Siembra fuera de los meses documentados para la sierra",
+      "viable_hoy": "si (activa hoy para cebada, haba y chocho; papa se excluye por siembra todo el ano)",
+      "campo_ficha": "meses_siembra (y siembra_condicion_lluvia)",
+      "indicador_parcela": "Lluvia mensual del mes de siembra (como contexto).",
+      "umbral": "mes de siembra no esta en meses_siembra (si hay 'sobre_3200_msnm' y la parcela esta a mas de 3200 m, se usa esa lista). El indicador solo sube la severidad: mes 'seco' = 62 mm o menos (jul-sep: 43-62).",
+      "ventana": "Mes de siembra.",
+      "severidad": "atencion si el mes es seco y el cultivo tiene condicion de lluvia; info en el resto.",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "meses_siembra null o fiabilidad baja",
+        "meses_siembra.todo_el_anio_en_algunas_zonas = true (papa)",
+        "el mes esta en la lista",
+        "R7 se activo para el mismo cultivo (R7 la reemplaza)",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Los meses vienen de F1 (FAO Ecuador), INIAP y tesis UTC (citados). 'Seco' (<= 62 mm) es un corte de los datos de la parcela.",
+      "calibrado_en_campo": "no (ficha da 'mes exacto para Toacaso no confirmado')",
+      "origen_umbral": "ecuador; corte de lluvia: datos de la parcela",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Los calendarios son generales para la sierra, no para Toacaso.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "cebada",
+        "maiz",
+        "quinua",
+        "amaranto",
+        "haba",
+        "chocho"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "cebada",
+        "haba",
+        "chocho"
+      ],
+      "casos_prueba": [
+        "T03",
+        "T04",
+        "T06",
+        "T14",
+        "T18",
+        "T20",
+        "T29",
+        "T35",
+        "T36"
+      ],
+      "plantillas": {
+        "seco": "En la sierra de Ecuador, {cultivo} se siembra en {meses}, según {fuente}. Usted piensa sembrar en {mes}, cuando en su zona llueve poco (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). Puede salir peor. Consulte a un técnico o al INIAP.",
+        "fuera": "En la sierra de Ecuador, {cultivo} se siembra en {meses}, según {fuente}. Usted piensa sembrar en {mes}, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+        "seco_sobre": "A más de {altitud_m} metros, {cultivo} se siembra en {meses}, según {fuente}. Usted piensa sembrar en {mes}, cuando en su zona llueve poco (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). Puede salir peor. Consulte a un técnico o al INIAP.",
+        "fuera_sobre": "A más de {altitud_m} metros, {cultivo} se siembra en {meses}, según {fuente}. Usted piensa sembrar en {mes}, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T03",
+        "mensaje": "En la sierra de Ecuador, la cebada se siembra en octubre, noviembre y diciembre, según una fuente de Ecuador. Usted piensa sembrar en enero, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R7",
+      "nombre": "Siembra de chocho con menos lluvia que la minima que pide la ficha",
+      "viable_hoy": "si (activa hoy para chocho)",
+      "campo_ficha": "siembra_condicion_lluvia {tipo: lluvia_acumulada_min_mm, mm: 100}",
+      "indicador_parcela": "Lluvia mensual del mes de siembra.",
+      "umbral": "La lluvia mensual maxima de la parcela en el mes de siembra es menor que 100 mm (jul-sep: 43-62). Si el mes no tiene dato, no se genera.",
+      "ventana": "Mes de siembra.",
+      "severidad": "atencion",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "campo null o de otro tipo",
+        "mes sin dato de lluvia (mayo, junio)",
+        "lluvia maxima del mes >= 100 mm",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "100 mm: clima.notas de la ficha de chocho ('sembrar tras acumular >=100 mm de lluvia'; la ficha no da la fuente numerada). Se compara lluvia ACUMULADA con la lluvia MENSUAL media: no es lo mismo.",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "ecuador (F1, sin numero de fuente en la frase)",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Confirmar si '100 mm acumulados' se mide desde el inicio de lluvias o en el mes; la lluvia de NASA no esta corregida por altura.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "chocho"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "chocho"
+      ],
+      "casos_prueba": [
+        "T19"
+      ],
+      "plantillas": {
+        "base": "Para {cultivo}, {fuente} dice sembrar cuando ya hayan caído unos {lluvia_min_siembra_mm} mm de lluvia. En {mes} en su zona llueve poco (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). Considere esperar las lluvias. Consulte a un técnico."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T19",
+        "mensaje": "Para el chocho, una fuente de Ecuador dice sembrar cuando ya hayan caído unos 100 mm de lluvia. En agosto en su zona llueve poco (entre 43 y 62 mm al mes). Considere esperar las lluvias. Consulte a un técnico."
+      }
+    },
+    {
+      "id": "R8",
+      "nombre": "Noches frias y no hay dato confiable de tolerancia al frio del cultivo",
+      "viable_hoy": "si (activa hoy para papa, cebada, oca; lenteja y trigo sin ciclo o filtradas)",
+      "campo_ficha": "tolerancia_helada, temperatura_minima_tolerada_c y umbral_frio_floracion_c (los tres null o de fiabilidad baja) + ciclo_meses",
+      "indicador_parcela": "Noches <= 3 C por mes.",
+      "umbral": "Algun mes de la ventana con >= 10 noches <= 3 C.",
+      "ventana": "Ciclo completo desde el mes de siembra.",
+      "severidad": "info",
+      "efecto_puntaje": "solo advertencia (nunca puntaje)",
+      "no_se_genera_si": [
+        "el cultivo tiene algun dato de tolerancia al frio con fiabilidad >= media (aunque no discrimine)",
+        "R2 o R3 ya se activaron",
+        "no hay mes frecuente en la ventana",
+        "ciclo no tipado",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "No hay umbral: es la ausencia de dato. Los cortes de frecuencia son de los datos de la parcela.",
+      "calibrado_en_campo": "no aplica",
+      "origen_umbral": "datos de la parcela",
+      "requiere_validacion_agronomica": "no",
+      "nota_validacion": "No afirma nada agronomico, solo dice que no hay dato. Es de baja prioridad y casi nunca cabe en las 2 advertencias (ver D6).",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "papa",
+        "oca",
+        "cebada"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "papa",
+        "oca",
+        "cebada"
+      ],
+      "casos_prueba": [
+        "T03",
+        "T04",
+        "T08",
+        "T10",
+        "T11",
+        "T24",
+        "T31",
+        "T36"
+      ],
+      "plantillas": {
+        "base": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta {cultivo}. En su zona hay noches de {umbral_noche_c} °C o menos en: {lista}. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T08",
+        "mensaje": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta la papa. En su zona hay noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R9",
+      "nombre": "Calor por encima de lo que tolera el cultivo",
+      "viable_hoy": "si en el diseno; NUNCA se activa con los datos de la parcela (T max diaria maxima corregida en 5 anios: 16,5 C; los topes citados son 28, 30 y 35 C)",
+      "campo_ficha": "temperatura_maxima_tolerada_c {valor_c, efecto}",
+      "indicador_parcela": "T max diaria maxima del mes (corregida por altura). NO esta en los agregados del encargo: uso un recalculo propio desde response_*.json (T2M_MAX - 7,81 C, 2021-2025). El JSON del backend solo trae estado_estres_calor = VERDE en todas las ventanas (rojo si hay 3 dias seguidos con T max > 22 C).",
+      "umbral": "T max diaria maxima del mes >= valor_c del campo (oca 28, maiz 30, arveja 35).",
+      "ventana": "Ciclo completo desde el mes de siembra.",
+      "severidad": "atencion",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "campo null o de otra region (lenteja: EcoCrop) o fiabilidad baja",
+        "ningun mes de la ventana alcanza el tope",
+        "sin dato de T max en los meses del ciclo",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Topes de la ficha: oca 'mas de 28 C destruye la planta' (F1), maiz 'desde 30 C hay problemas de absorcion' (F1), arveja 'sobre 35 C' (F8, UTC). El 22 C del semaforo de calor del codigo no se usa: no es un dano de cultivo.",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "ecuador",
+      "requiere_validacion_agronomica": "no",
+      "nota_validacion": "Solo repite un tope publicado y con los datos actuales no se activa. Su utilidad es dejar la puerta abierta si cambia la parcela o el clima. Ver D12 (la T max mensual es un recalculo mio).",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "oca",
+        "maiz",
+        "arveja"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "oca"
+      ],
+      "casos_prueba": [
+        "T33",
+        "T34"
+      ],
+      "plantillas": {
+        "base": "{Cultivo} no aguanta bien el calor: {fuente} dice que desde {tmax_tolerada_c} °C {efecto_txt}. En su zona se estiman días de hasta esta temperatura en: {lista}. Podría afectarlo. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T33",
+        "mensaje": "La oca no aguanta bien el calor: una fuente de Ecuador dice que desde 28 °C puede destruir la planta. En su zona se estiman días de hasta esta temperatura en: enero (hasta 29 °C). Podría afectarlo. Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R10",
+      "nombre": "Poca lluvia en la etapa sensible a la sequia",
+      "viable_hoy": "si (dormida: solo se activa si se siembra fuera de las ventanas documentadas; activa para chocho y cebada)",
+      "campo_ficha": "fase_sensible_sequia (+ dias_a_floracion si la fase es floracion; no se aplica si tolerancia_sequia = alta)",
+      "indicador_parcela": "Lluvia mensual como proxy de deficit de agua. No hay agregado mensual de humedad de raiz del lado seco; el JSON actual muestra humedad_raiz 75,4 %, estado_riego VERDE_OPTIMO en las 9 fotos y la alerta SEQUIA nunca activa.",
+      "umbral": "Algun mes de la ventana con clase 'seco' (lluvia maxima <= 62 mm; jul-sep: 43-62).",
+      "ventana": "inicio_crecimiento: mes de siembra y el siguiente. floracion: mes de siembra + floor(dias_a_floracion / 30,4) (chocho: +3 meses). Otras fases (cebada): ciclo completo, y el mensaje dice que no se sabe en que mes cae la etapa.",
+      "severidad": "info",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "fase null o fiabilidad baja",
+        "tolerancia_sequia = alta",
+        "ningun mes de la ventana es seco (los meses sin dato no cuentan)",
+        "ciclo no tipado y fase sin ubicacion",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Las fases salen de INIAP (cebada, ficha de Ecuador), de la ficha de chocho (susceptible a sequia en floracion y fructificacion) y de F2 (qaniwa). El corte de 62 mm es de los datos de la parcela. No se usa la evapotranspiracion: el codigo la mezcla con mm de lluvia (doc 07).",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "fases: ecuador/andes; corte de lluvia: datos de la parcela",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Los dias a floracion del chocho son de un ensayo de abono verde a 2793-3200 msnm, no de 3588; el mes de floracion es aproximado.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "cebada",
+        "qaniwa",
+        "chocho"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "cebada",
+        "chocho"
+      ],
+      "casos_prueba": [
+        "T04",
+        "T20",
+        "T35",
+        "T36",
+        "T38"
+      ],
+      "plantillas": {
+        "floracion": "{Cultivo} es sensible a la falta de agua en la floración, según {fuente}. Con su fecha de siembra la floración podría caer en {meses}, cuando en su zona llueve poco (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). Podría rendir menos. Consulte a un técnico o al INIAP.",
+        "inicio": "{Cultivo} es sensible a la falta de agua al inicio del crecimiento, según {fuente}. En {meses} en su zona llueve poco (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). Podría crecer mal. Consulte a un técnico o al INIAP.",
+        "ciclo": "{Cultivo} es sensible a la falta de agua en ciertas etapas, según {fuente}. En su ciclo hay meses de poca lluvia: {meses} (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). No se sabe en qué mes cae esa etapa. Consulte a un técnico o al INIAP."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T35",
+        "mensaje": "El chocho es sensible a la falta de agua en la floración, según una fuente de Ecuador. Con su fecha de siembra la floración podría caer en julio, cuando en su zona llueve poco (entre 43 y 62 mm al mes). Podría rendir menos. Consulte a un técnico o al INIAP."
+      }
+    },
+    {
+      "id": "R11",
+      "nombre": "Mucha lluvia en el ciclo de un cultivo muy exigente en nitrogeno (posible perdida de nitrogeno)",
+      "viable_hoy": "si (activa hoy para papa)",
+      "campo_ficha": "perdida_nitrogeno_por_lluvia = true + exigencia_nitrogeno = alta (y fija_nitrogeno distinto de true)",
+      "indicador_parcela": "Lluvia mensual.",
+      "umbral": "Algun mes del ciclo en clase 'lluvioso' (>= 121 mm). Coincide con los 120 mm de la alerta NUTRIENTES del codigo, que ademas exige GWETTOP > 75 % (humedad de capa superior de NASA, sin corregir por altura; no se usa aqui).",
+      "ventana": "Ciclo completo desde el mes de siembra (no hay dato de en que momento absorbe el N en Ecuador).",
+      "severidad": "info",
+      "efecto_puntaje": "solo advertencia",
+      "no_se_genera_si": [
+        "perdida_nitrogeno_por_lluvia null (maiz, amaranto: no hay cita de lixiviacion para ellos)",
+        "fija_nitrogeno = true (leguminosas)",
+        "exigencia no es alta o fiabilidad baja",
+        "ningun mes lluvioso en el ciclo",
+        "sin dato de lluvia",
+        "cultivo no candidato"
+      ],
+      "fuente_umbral": "Gaibor 2024 (suelos volcanicos de Chimborazo): el N 'puede perderse por nitrificacion, lixiviacion y volatilizacion', solo cualitativo; la ficha dice que no hay cifras de lavado con lluvia fuerte en papa de Sierra. El corte de 121 mm es de los datos de la parcela.",
+      "calibrado_en_campo": "no",
+      "origen_umbral": "ecuador (cualitativo); corte de lluvia: datos de la parcela",
+      "requiere_validacion_agronomica": "si",
+      "nota_validacion": "Se activa casi siempre que se siembra papa en la epoca lluviosa; ver D6. El mensaje no da dosis ni productos ni dice 'fraccione'.",
+      "cultivos_que_cumplen_la_condicion_estatica": [
+        "papa"
+      ],
+      "cultivos_que_la_activan_en_3588m": [
+        "papa"
+      ],
+      "casos_prueba": [
+        "T07",
+        "T08",
+        "T09",
+        "T10",
+        "T11",
+        "T25",
+        "T31"
+      ],
+      "plantillas": {
+        "base": "En {meses} llueve mucho en su zona (entre {lluvia_min_mm} y {lluvia_max_mm} mm al mes). {Cultivo} necesita mucho nitrógeno y, según {fuente}, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote."
+      },
+      "ejemplo_renderizado": {
+        "caso": "T07",
+        "mensaje": "En noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote."
+      }
+    }
+  ],
+  "reglas_no_viables": [
+    {
+      "id": "R-NV1",
+      "nombre": "Vigor/fenologia (NDVI, NDRE, NDMI) contra la fase del cultivo",
+      "motivo": "indicadores.fenologia_indices.ndvi_por_fase_numerico, ndre y ndmi son null en todas las fichas (la ficha de papa lo lista en huecos_indicadores: no hay valores numericos por fase, y menos en altura andina). Sin un campo tipado con cita no hay contra que comparar la serie de NDVI de la parcela (0,202-0,448; nunca verde).",
+      "que_falta": "Curvas NDVI por fase para papa/cultivos de Sierra con Sentinel-2 y fuente andina."
+    },
+    {
+      "id": "R-NV2",
+      "nombre": "Umbral de lluvia que provoca perdida de nitrogeno",
+      "motivo": "R11 solo avisa de forma cualitativa (papa). La ficha: 'perdidas_lavado: solo cualitativo; no se hallaron cifras de lavado con lluvia fuerte en papa de sierra'. El corte de 121 mm es de los datos de la parcela, no de un estudio. Maiz y amaranto son exigentes en N pero no tienen cita de perdida por lluvia.",
+      "que_falta": "Estudio de lixiviacion de N en suelos volcanicos de la Sierra con cifras, y citas para maiz y amaranto."
+    },
+    {
+      "id": "R-NV3",
+      "nombre": "Helada en floracion acotada al mes de floracion (papa, lizas, chocho, arveja)",
+      "motivo": "Hay dias a floracion (papa 104 d, lizas 98-130 d, chocho 97-110 d, arveja 76-81 d) pero ninguno de esos cultivos tiene a la vez tolerancia/umbral de helada con fiabilidad >= media y una fase sensible conocida: papa (fase solo de Puno, fiabilidad baja), lizas (evidencia mixta), chocho (sin umbral), arveja (helada solo de Australia). Los dias a floracion son de otras altitudes (3050, 2850, 2793-3200 msnm), no de 3588.",
+      "que_falta": "Umbral de helada por fase para papa de la Sierra (la ficha: 'no encontrado; tesis USFQ inaccesible')."
+    },
+    {
+      "id": "R-NV4",
+      "nombre": "Helada de la papa (el cultivo de la parcela)",
+      "motivo": "tolerancia_helada de papa = null: 'variedades sensibles y tolerantes' (F2, Peru) sin dato para Fripapa ni Superchola; -2,5 C y -1 C son de origen no confirmado o periodistico. Solo R8 ('no hay dato confiable') puede mencionarla.",
+      "que_falta": "Ficha INIAP de helada por variedad y fase."
+    },
+    {
+      "id": "R-NV5",
+      "nombre": "Lluvia anual de la parcela contra el rango anual de la ficha",
+      "motivo": "El resumen no trae lluvia de mayo y junio, la lluvia NASA (celda de ~50 km a 2501 m) no esta corregida por altura y los rangos de la ficha mezclan base anual y base ciclo (papa 700-1200 anual; arveja 250-380 por ciclo). Ademas, con los meses conocidos la parcela recibe 121-216 mm/mes durante 7 meses: los totales del ciclo casi siempre superan los minimos de la ficha, asi que no discriminarian; lo que importa es la distribucion (R10).",
+      "que_falta": "Tabla mensual completa y corregida por altura; campo tipado con base explicita (anual|ciclo)."
+    },
+    {
+      "id": "R-NV6",
+      "nombre": "Que otro cultivo 'no es hospedero' de la lancha (mensaje tranquilizador)",
+      "motivo": "Ninguna ficha tiene cita explicita de que un cultivo NO sea hospedero de P. infestans (cebada, quinua: inferencia o conocimiento general). Un mensaje 'no hay riesgo de lancha' seria una afirmacion sin fuente. hospedero_lancha = null no equivale a false.",
+      "que_falta": "Cita de Ecuador/Andes por cultivo."
+    },
+    {
+      "id": "R-NV8",
+      "nombre": "NDRE bajo (poca clorofila) contra la exigencia de nitrogeno del cultivo",
+      "motivo": "fenologia_indices.ndre es null en todas las fichas (no hay NDRE por fase). Ademas el NDRE de hoy (0,2495; semaforo AMARILLO_NUTRICION y cruce NUTRICION_PROBABLE) es del cultivo en pie a mitad de ciclo y no dice cuanto nitrogeno tiene el suelo para el SIGUIENTE cultivo. El umbral de 0,35 es del codigo, no de un cultivo.",
+      "que_falta": "NDRE por fase en papa de la Sierra y una relacion NDRE-nitrogeno del suelo validada."
+    },
+    {
+      "id": "R-NV9",
+      "nombre": "Reglas con el estado actual (humedad de raiz, estado_riego, alertas de la semana)",
+      "motivo": "Las reglas de esta matriz son de PLANIFICACION (que cultivo sembrar y cuando) y usan la climatologia mensual. El estado de hoy (humedad_raiz 75,4 %, estado_riego VERDE_OPTIMO en las 9 fotos, SEQUIA y calor sin alerta) describe el cultivo en curso y no cambia la eleccion del siguiente; ademas la humedad de raiz de NASA no se corrige por altura y el semaforo casi no varia.",
+      "que_falta": "Un conjunto aparte de reglas de MONITOREO del cultivo en curso (mensajes ya presentes en el JSON del backend), con su propia validacion."
+    },
+    {
+      "id": "R-NV7",
+      "nombre": "Calibracion de R5 con las condiciones de lancha del ensayo de Carchi",
+      "motivo": "condiciones_lancha_referencia (2650 msnm, HR 86,7 %, 128 mm/mes, 12,4 C) es de un ensayo, no un umbral, tiene fiabilidad baja y la ficha no da su URL. Se tipa pero ninguna regla lo usa.",
+      "que_falta": "Fuente del ensayo y umbral de lancha para altura."
+    }
+  ],
+  "candidatos_probables_en_3588m": {
+    "cultivos": [
+      "papa",
+      "oca",
+      "lizas",
+      "olluco",
+      "cebada",
+      "haba",
+      "chocho",
+      "avena"
+    ],
+    "criterio": "clima.altitud_msnm_min/max de cultivos.json con margen de 200 m (app/engine/filters.py y models.py, leidos sin ejecutar el motor); solo aproximacion."
+  },
+  "casos_prueba": [
+    {
+      "id": "T01",
+      "titulo": "Chocho a 3588 m, siembra en diciembre",
+      "entrada": {
+        "candidatos": [
+          "chocho"
+        ],
+        "mes_siembra": 12,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "chocho"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "3588 > 3400 (INIAP) pero <= 3600 (reportado): info. Diciembre es mes de siembra (R6 no) y llueve 121-216 mm (R7 no). R4: sensible al exceso de agua y hay meses lluviosos en el ciclo.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "El chocho se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "En diciembre, enero, febrero, marzo, abril, octubre y noviembre llueve mucho en su zona (entre 121 y 216 mm al mes). El chocho no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T02",
+      "titulo": "Cebada, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "cebada"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "3588 > 3500 pero <= 3600 de variedades especiales: info. Octubre esta en la ventana. Sin tolerancia al exceso de agua tipada (R4 no). R8: sin noches frecuentes en octubre-marzo (max 4,4).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "La cebada se cultiva, según una fuente de Ecuador, hasta unos 3500 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T03",
+      "titulo": "Cebada, siembra en enero (fuera de ventana, mes lluvioso)",
+      "entrada": {
+        "candidatos": [
+          "cebada"
+        ],
+        "mes_siembra": 1,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "cebada"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R8"
+      ],
+      "motivo": "R6 info: enero no esta en oct-dic y llueve (no es mes seco). R8 (junio 10,4 noches) queda fuera por el tope de 2.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "La cebada se cultiva, según una fuente de Ecuador, hasta unos 3500 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "En la sierra de Ecuador, la cebada se siembra en octubre, noviembre y diciembre, según una fuente de Ecuador. Usted piensa sembrar en enero, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T04",
+      "titulo": "Cebada, siembra en agosto (mes seco)",
+      "entrada": {
+        "candidatos": [
+          "cebada"
+        ],
+        "mes_siembra": 8,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "cebada"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R10",
+        "R8"
+      ],
+      "motivo": "R6 atencion: agosto fuera de ventana, llueve 43-62 mm y la cebada se siembra al inicio de lluvias. El orden pone atencion antes que info. R10 (sequia) y R8 quedan fuera por el tope.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "cebada",
+          "mensaje": "En la sierra de Ecuador, la cebada se siembra en octubre, noviembre y diciembre, según una fuente de Ecuador. Usted piensa sembrar en agosto, cuando en su zona llueve poco (entre 43 y 62 mm al mes). Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "La cebada se cultiva, según una fuente de Ecuador, hasta unos 3500 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T05",
+      "titulo": "Haba, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "haba"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "haba"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "A mas de 3200 m la ventana es solo octubre: R6 no. Altitud 3588 > 3400 con fiabilidad media: info. Sin R8: el haba SI tiene temperatura minima tolerada tipada (1 C), aunque no discrimina con el indicador <=3 C.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "El haba se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Su parcela está a 3588 metros. A esa altura podría rendir menos de lo esperado. Consulte a un técnico o al INIAP antes de decidir.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). El haba no soporta bien el agua estancada, según una guía de los Andes (Perú y Bolivia). Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T06",
+      "titulo": "Haba, siembra en marzo (fuera de la ventana de >3200 m)",
+      "entrada": {
+        "candidatos": [
+          "haba"
+        ],
+        "mes_siembra": 3,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "haba"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "R6 info (sobre 3200 m solo octubre; el haba no tiene condicion de lluvia tipada, por eso no sube a atencion).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "El haba se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Su parcela está a 3588 metros. A esa altura podría rendir menos de lo esperado. Consulte a un técnico o al INIAP antes de decidir.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "A más de 3200 metros, el haba se siembra en octubre, según una fuente de Ecuador. Usted piensa sembrar en marzo, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T07",
+      "titulo": "Papa, siembra en noviembre",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 11,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Ciclo de 7 meses (noviembre-mayo): diciembre-abril son 5 meses con 70-95 % de dias con HR>82 % (>=4: atencion). R6 no aplica: la fuente dice que en ciertas zonas se siembra todo el ano.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T08",
+      "titulo": "Papa, siembra en junio",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 6,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Junio-diciembre: solo diciembre tiene HR alta (1 mes < 2): R5 no. Junio-septiembre tienen 10-17 noches <=3 C y no hay tolerancia a helada tipada: R8 'no hay dato confiable'.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En octubre, noviembre y diciembre llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta la papa. En su zona hay noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T09",
+      "titulo": "Papa, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Octubre-abril: 5 meses de HR alta y todo el ciclo en meses lluviosos (R11).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T10",
+      "titulo": "Papa, siembra en diciembre",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 12,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R8"
+      ],
+      "motivo": "Diciembre-junio: 5 meses de HR alta; junio (10,4 noches) activa R8.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T11",
+      "titulo": "Papa, siembra en mayo",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 5,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Mayo-noviembre: ningun mes de HR alta; junio-septiembre con noches frecuentes -> R8.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En octubre y noviembre llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta la papa. En su zona hay noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T12",
+      "titulo": "Quinua, altitud forzada 3000 m (aislar R3), siembra en enero",
+      "entrada": {
+        "candidatos": [
+          "quinua"
+        ],
+        "mes_siembra": 1,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R3",
+          "severidad": "atencion",
+          "cultivo": "quinua"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "quinua"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Aislamiento de regla: a 3588 m el filtro del motor descarta la quinua. Enero-agosto incluye jun-ago con 10-17 noches (<5 C en floracion): atencion.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R3",
+          "severidad": "atencion",
+          "cultivo": "quinua",
+          "mensaje": "En la floración, la quinua es sensible al frío. Una fuente de Ecuador indica que por debajo de 5 °C la flor puede quedar estéril. En su zona se estiman noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches). Podría afectar la cosecha si la floración cae en esos meses. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "quinua",
+          "mensaje": "En enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La quinua no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T13",
+      "titulo": "Quinua, altitud forzada 3000 m, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "quinua"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R3",
+          "severidad": "info",
+          "cultivo": "quinua"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "quinua"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Octubre-mayo: solo noches ocasionales (<=4,4): info.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R3",
+          "severidad": "info",
+          "cultivo": "quinua",
+          "mensaje": "En la floración, la quinua es sensible al frío. Una fuente de Ecuador indica que por debajo de 5 °C la flor puede quedar estéril. En su zona se estiman noches de 3 °C o menos en: octubre (4,4 noches), diciembre (3,8 noches), enero (3,8 noches), abril (1,2 noches). Podría afectar la cosecha si la floración cae en esos meses. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "quinua",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La quinua no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T14",
+      "titulo": "Quinua, altitud forzada 3000 m, siembra en julio (mes seco, fuera de ventana)",
+      "entrada": {
+        "candidatos": [
+          "quinua"
+        ],
+        "mes_siembra": 7,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R3",
+          "severidad": "atencion",
+          "cultivo": "quinua"
+        },
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "quinua"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "Julio: seco y fuera de oct-ene con condicion 'inicio de lluvias': R6 atencion; julio-septiembre con noches frecuentes: R3 atencion.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R3",
+          "severidad": "atencion",
+          "cultivo": "quinua",
+          "mensaje": "En la floración, la quinua es sensible al frío. Una fuente de Ecuador indica que por debajo de 5 °C la flor puede quedar estéril. En su zona se estiman noches de 3 °C o menos en: julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Podría afectar la cosecha si la floración cae en esos meses. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "quinua",
+          "mensaje": "En la sierra de Ecuador, la quinua se siembra en octubre, noviembre, diciembre y enero, según una fuente de Ecuador. Usted piensa sembrar en julio, cuando en su zona llueve poco (entre 43 y 62 mm al mes). Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T15",
+      "titulo": "Maiz, altitud forzada 3000 m, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "maiz"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "maiz"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Minima tolerada 8 C >= 3: cualquier noche <=3 C esta por debajo. Octubre-junio incluye junio (10,4): atencion.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz",
+          "mensaje": "El maíz no resiste bien el frío: una fuente de Ecuador dice que aguanta mínimas de hasta 8 °C. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "maiz",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). El maíz no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T16",
+      "titulo": "Maiz a 3588 m (si el filtro F4 lo dejara pasar), siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "maiz"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "atencion",
+          "cultivo": "maiz"
+        },
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "R1 atencion (3588 > 3000, fiabilidad alta). Caso hipotetico: ver T-NC1, el motor lo descarta.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "atencion",
+          "cultivo": "maiz",
+          "mensaje": "El maíz se cultiva, según una fuente de Ecuador, hasta unos 3000 metros de altura. Su parcela está a 3588 metros. A esa altura podría rendir menos de lo esperado. Consulte a un técnico o al INIAP antes de decidir.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz",
+          "mensaje": "El maíz no resiste bien el frío: una fuente de Ecuador dice que aguanta mínimas de hasta 8 °C. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T17",
+      "titulo": "Amaranto, altitud forzada 2800 m, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "amaranto"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 2800,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R2",
+          "severidad": "info",
+          "cultivo": "amaranto"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "amaranto"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Sensibilidad cualitativa (sin cifra). Octubre-abril: solo noches ocasionales. R4 con ventana de plantula (octubre-noviembre).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R2",
+          "severidad": "info",
+          "cultivo": "amaranto",
+          "mensaje": "El amaranto es sensible al frío, según una fuente de Ecuador. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: octubre (4,4 noches), diciembre (3,8 noches), enero (3,8 noches), abril (1,2 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "amaranto",
+          "mensaje": "Al inicio del cultivo, cuando la planta es chica, llueve mucho en su zona (entre 121 y 216 mm al mes) en octubre y noviembre. El amaranto no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T18",
+      "titulo": "Amaranto, altitud forzada 2800 m, siembra en enero",
+      "entrada": {
+        "candidatos": [
+          "amaranto"
+        ],
+        "mes_siembra": 1,
+        "altitud_msnm": 2800,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "amaranto"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "amaranto"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "Enero-julio incluye junio-julio (10-16 noches): atencion. R6 info: fuera de octubre-noviembre pero es mes lluvioso.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "amaranto",
+          "mensaje": "El amaranto es sensible al frío, según una fuente de Ecuador. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches), julio (16,4 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "amaranto",
+          "mensaje": "En la sierra de Ecuador, el amaranto se siembra en octubre y noviembre, según una fuente de Ecuador. Usted piensa sembrar en enero, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T19",
+      "titulo": "Chocho, siembra en agosto (seco, menos de 100 mm)",
+      "entrada": {
+        "candidatos": [
+          "chocho"
+        ],
+        "mes_siembra": 8,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R7",
+          "severidad": "atencion",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "R7 reemplaza a R6 (misma causa): la ficha pide >=100 mm acumulados y agosto da 43-62 mm.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R7",
+          "severidad": "atencion",
+          "cultivo": "chocho",
+          "mensaje": "Para el chocho, una fuente de Ecuador dice sembrar cuando ya hayan caído unos 100 mm de lluvia. En agosto en su zona llueve poco (entre 43 y 62 mm al mes). Considere esperar las lluvias. Consulte a un técnico.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "El chocho se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T20",
+      "titulo": "Chocho, siembra en mayo (la lluvia de mayo NO esta en el resumen)",
+      "entrada": {
+        "candidatos": [
+          "chocho"
+        ],
+        "mes_siembra": 5,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "chocho"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R10",
+        "R4"
+      ],
+      "motivo": "Adversario: sin dato de lluvia para mayo. R7 no se activa (no se inventa), R6 solo informa que esta fuera de la ventana.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "El chocho se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "En la sierra de Ecuador, el chocho se siembra en octubre, noviembre, diciembre, enero, febrero y marzo, según una fuente de Ecuador. Usted piensa sembrar en mayo, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T21",
+      "titulo": "Arveja, altitud forzada 2800 m, siembra en noviembre",
+      "entrada": {
+        "candidatos": [
+          "arveja"
+        ],
+        "mes_siembra": 11,
+        "altitud_msnm": 2800,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "arveja"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "El dato de helada de Australia no esta tipado: no hay R2/R3/R8. La arveja tiene minima tolerada -3 C (<3): el indicador <=3 C no discrimina.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "arveja",
+          "mensaje": "En noviembre, diciembre, enero y febrero llueve mucho en su zona (entre 121 y 216 mm al mes). La arveja no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T22",
+      "titulo": "Lenteja, altitud forzada 3000 m, siembra en julio (campos vacios)",
+      "entrada": {
+        "candidatos": [
+          "lenteja"
+        ],
+        "mes_siembra": 7,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: ciclo, tolerancias y meses son null (datos de otra region). Ninguna advertencia, ni siquiera R8 (sin ventana de ciclo).",
+      "mensajes_ejemplo": []
+    },
+    {
+      "id": "T23",
+      "titulo": "Oca, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "oca"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [],
+      "omitidas_por_tope": [],
+      "motivo": "Dentro del rango 3000-3800. Su tolerancia a helada es 'media' con fiabilidad baja: cuenta como no confiable, pero octubre-mayo no tiene noches frecuentes.",
+      "mensajes_ejemplo": []
+    },
+    {
+      "id": "T24",
+      "titulo": "Oca, siembra en junio",
+      "entrada": {
+        "candidatos": [
+          "oca"
+        ],
+        "mes_siembra": 6,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "oca"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Junio-enero: junio-septiembre con noches frecuentes y dato de fiabilidad baja -> 'no hay dato confiable'.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "oca",
+          "mensaje": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta la oca. En su zona hay noches de 3 °C o menos en: junio (10,4 noches), julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T25",
+      "titulo": "Cultivo no candidato",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Quinua, maiz y amaranto cumplen condiciones de R2-R4 pero no estan en candidatos (el filtro de altitud los descarto): no se evalua nada para ellos.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T26",
+      "titulo": "Haba con dato de helada solo de Australia (mostrar todas)",
+      "entrada": {
+        "candidatos": [
+          "haba"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 5
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "haba"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: el dato de Australia no entro a la ficha tipada. Aun mostrando hasta 5 advertencias no hay R2/R3/R8 para el haba.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "El haba se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Su parcela está a 3588 metros. A esa altura podría rendir menos de lo esperado. Consulte a un técnico o al INIAP antes de decidir.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "haba",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). El haba no soporta bien el agua estancada, según una guía de los Andes (Perú y Bolivia). Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T27",
+      "titulo": "Avena a 3588 m: altitud de fiabilidad baja",
+      "entrada": {
+        "candidatos": [
+          "avena"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: el rango 2000-3400 de la avena viene de una nota de prensa (fiabilidad baja): R1 no advierte. Sin ciclo tipado: R8 tampoco.",
+      "mensajes_ejemplo": []
+    },
+    {
+      "id": "T28",
+      "titulo": "Qaniwa a 3588 m (por debajo de su rango)",
+      "entrada": {
+        "candidatos": [
+          "qaniwa"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "atencion",
+          "cultivo": "qaniwa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "3588 < 3800 (F2 Peru/Bolivia, fiabilidad alta): atencion 'bajo'. El motor la descarta por el margen de 200 m: caso hipotetico.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "atencion",
+          "cultivo": "qaniwa",
+          "mensaje": "La qaniwa se da, según una guía de los Andes (Perú y Bolivia), desde unos 3800 metros de altura. Su parcela está a 3588 metros, más abajo. Podría no darse bien. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T29",
+      "titulo": "Maiz, altitud forzada 3000 m, siembra en febrero, datos incompletos",
+      "entrada": {
+        "candidatos": [
+          "maiz"
+        ],
+        "mes_siembra": 2,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "maiz"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R4"
+      ],
+      "motivo": "Feb-oct: febrero, marzo y mayo no estan en el resumen de noches: se ignoran (no cuentan como 0) y aun asi junio-septiembre activan atencion.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz",
+          "mensaje": "El maíz no resiste bien el frío: una fuente de Ecuador dice que aguanta mínimas de hasta 8 °C. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches), julio (16,4 noches), agosto (17 noches), septiembre (12,8 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "maiz",
+          "mensaje": "En la sierra de Ecuador, el maíz se siembra en octubre, noviembre y diciembre, según una fuente de Ecuador. Usted piensa sembrar en febrero, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T30",
+      "titulo": "Parcela sin datos de clima",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "sin datos",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: sin datos de HR ni de noches no hay R5 ni R8. Nunca se genera una advertencia sin evidencia.",
+      "mensajes_ejemplo": []
+    },
+    {
+      "id": "T31",
+      "titulo": "Papa, siembra en agosto (limite R5: 3 meses de HR alta)",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 8,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "info",
+          "cultivo": "papa"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [
+        "R8"
+      ],
+      "motivo": "Agosto-febrero: diciembre, enero y febrero = 3 meses (>=2 y <4): info. R6 no aplica a la papa (siembra todo el ano).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 3 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R11",
+          "severidad": "info",
+          "cultivo": "papa",
+          "mensaje": "En octubre, noviembre, diciembre, enero y febrero llueve mucho en su zona (entre 121 y 216 mm al mes). La papa necesita mucho nitrógeno y, según una fuente de Ecuador, parte del nitrógeno puede perderse del suelo. Es un riesgo, no algo medido. Consulte a un técnico o al INIAP sobre cómo cuidar la fertilidad del lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T32",
+      "titulo": "Lizas/olluco, siembra en octubre",
+      "entrada": {
+        "candidatos": [
+          "lizas",
+          "olluco"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [],
+      "omitidas_por_tope": [],
+      "motivo": "Dentro del rango 2800-4000, tolerancia a helada 'media' con fiabilidad media, sin tolerancia al exceso de agua tipada: ninguna regla aplica.",
+      "mensajes_ejemplo": []
+    },
+    {
+      "id": "T33",
+      "titulo": "Oca con un enero hipotetico de 29 C de maxima (aislar R9)",
+      "entrada": {
+        "candidatos": [
+          "oca"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": {
+          "1": 29.0
+        },
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R9",
+          "severidad": "atencion",
+          "cultivo": "oca"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Hipotetico: con los datos reales la maxima diaria corregida de 5 anios es 16,5 C y R9 nunca se activa (oca tolera hasta 28 C, F1).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R9",
+          "severidad": "atencion",
+          "cultivo": "oca",
+          "mensaje": "La oca no aguanta bien el calor: una fuente de Ecuador dice que desde 28 °C puede destruir la planta. En su zona se estiman días de hasta esta temperatura en: enero (hasta 29 °C). Podría afectarlo. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T34",
+      "titulo": "Arveja (altitud forzada 2800 m) con un enero hipotetico de 36 C",
+      "entrada": {
+        "candidatos": [
+          "arveja"
+        ],
+        "mes_siembra": 11,
+        "altitud_msnm": 2800,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": {
+          "1": 36.0
+        },
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R9",
+          "severidad": "atencion",
+          "cultivo": "arveja"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "arveja"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Hipotetico: 36 >= 35 C en un mes del ciclo (noviembre-febrero). R9 va antes que R4 por severidad.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R9",
+          "severidad": "atencion",
+          "cultivo": "arveja",
+          "mensaje": "La arveja no aguanta bien el calor: una fuente de Ecuador dice que desde 35 °C el crecimiento se detiene. En su zona se estiman días de hasta esta temperatura en: enero (hasta 36 °C). Podría afectarlo. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "arveja",
+          "mensaje": "En noviembre, diciembre, enero y febrero llueve mucho en su zona (entre 121 y 216 mm al mes). La arveja no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T35",
+      "titulo": "Chocho sembrado en abril: la floracion cae en julio (mostrar todas)",
+      "entrada": {
+        "candidatos": [
+          "chocho"
+        ],
+        "mes_siembra": 4,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 5
+      },
+      "esperado": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "chocho"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "chocho"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "97-110 dias = 3 meses despues de abril: julio, mes seco (43-62 mm). Abril esta fuera de la ventana de siembra (R6 info, es lluvioso).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "El chocho se cultiva, según una fuente de Ecuador, hasta unos 3400 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R6",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "En la sierra de Ecuador, el chocho se siembra en octubre, noviembre, diciembre, enero, febrero y marzo, según una fuente de Ecuador. Usted piensa sembrar en abril, fuera de ese tiempo. Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "El chocho es sensible a la falta de agua en la floración, según una fuente de Ecuador. Con su fecha de siembra la floración podría caer en julio, cuando en su zona llueve poco (entre 43 y 62 mm al mes). Podría rendir menos. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "chocho",
+          "mensaje": "En abril, octubre, noviembre, diciembre, enero, febrero y marzo llueve mucho en su zona (entre 121 y 216 mm al mes). El chocho no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T36",
+      "titulo": "Cebada sembrada en agosto (mostrar todas)",
+      "entrada": {
+        "candidatos": [
+          "cebada"
+        ],
+        "mes_siembra": 8,
+        "altitud_msnm": 3588,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 5
+      },
+      "esperado": [
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "cebada"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada"
+        },
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "cebada"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "cebada"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Sin dias a floracion la fase sensible a la sequia no se ubica: R10 usa todo el ciclo (agosto-enero tiene agosto y septiembre secos) y lo dice.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R6",
+          "severidad": "atencion",
+          "cultivo": "cebada",
+          "mensaje": "En la sierra de Ecuador, la cebada se siembra en octubre, noviembre y diciembre, según una fuente de Ecuador. Usted piensa sembrar en agosto, cuando en su zona llueve poco (entre 43 y 62 mm al mes). Puede salir peor. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R1",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "La cebada se cultiva, según una fuente de Ecuador, hasta unos 3500 metros de altura. Hay reportes de cultivo hasta 3600 metros. Su parcela está a 3588 metros, en el límite. Pregunte a un técnico o al INIAP qué conviene.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "La cebada es sensible a la falta de agua en ciertas etapas, según una fuente de Ecuador. En su ciclo hay meses de poca lluvia: agosto y septiembre (entre 43 y 62 mm al mes). No se sabe en qué mes cae esa etapa. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R8",
+          "severidad": "info",
+          "cultivo": "cebada",
+          "mensaje": "No hay datos confiables de Ecuador o los Andes sobre cuánto frío aguanta la cebada. En su zona hay noches de 3 °C o menos en: agosto (17 noches), septiembre (12,8 noches). Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T37",
+      "titulo": "Papa sin dato de lluvia en la parcela",
+      "entrada": {
+        "candidatos": [
+          "papa"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3588,
+        "parcela": "sin lluvia",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: sin lluvia no hay R11; R5 sigue porque la HR si tiene dato. Cada regla usa solo su indicador.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R5",
+          "severidad": "atencion",
+          "cultivo": "papa",
+          "mensaje": "Para la papa, de los 7 meses del ciclo, 5 caen en meses de aire muy húmedo: en ellos, entre 70 y 95 % de los días tienen más de 82 % de humedad en el aire. Con esa humedad la lancha puede aparecer con más facilidad. Es un riesgo, no algo que ya pasó. Consulte a un técnico o al INIAP sobre cómo vigilar su lote.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T38",
+      "titulo": "Qaniwa (hipotetico, altitud forzada 3900 m) sembrada en julio",
+      "entrada": {
+        "candidatos": [
+          "qaniwa"
+        ],
+        "mes_siembra": 7,
+        "altitud_msnm": 3900,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 2
+      },
+      "esperado": [
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "qaniwa"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Sensible a la falta de agua al inicio del crecimiento (F2): julio-agosto son secos (43-62 mm).",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R10",
+          "severidad": "info",
+          "cultivo": "qaniwa",
+          "mensaje": "La qaniwa es sensible a la falta de agua al inicio del crecimiento, según una guía de los Andes (Perú y Bolivia). En julio y agosto en su zona llueve poco (entre 43 y 62 mm al mes). Podría crecer mal. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        }
+      ]
+    },
+    {
+      "id": "T39",
+      "titulo": "Maiz exigente en N pero sin cita de perdida por lluvia (altitud forzada 3000 m, mostrar todas)",
+      "entrada": {
+        "candidatos": [
+          "maiz"
+        ],
+        "mes_siembra": 10,
+        "altitud_msnm": 3000,
+        "parcela": "datos del encargo (07-indicadores)",
+        "tmax_hipotetica_c": null,
+        "max_advertencias": 5
+      },
+      "esperado": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "maiz"
+        }
+      ],
+      "omitidas_por_tope": [],
+      "motivo": "Adversario: el maiz tiene exigencia de nitrogeno alta pero perdida_nitrogeno_por_lluvia es null (la cita de lixiviacion es solo de papa): no hay R11.",
+      "mensajes_ejemplo": [
+        {
+          "regla": "R2",
+          "severidad": "atencion",
+          "cultivo": "maiz",
+          "mensaje": "El maíz no resiste bien el frío: una fuente de Ecuador dice que aguanta mínimas de hasta 8 °C. En su zona se estiman noches de 3 °C o menos en estos meses del cultivo: junio (10,4 noches). Podría dañarse. Consulte a un técnico o al INIAP.",
+          "validador": "ok"
+        },
+        {
+          "regla": "R4",
+          "severidad": "info",
+          "cultivo": "maiz",
+          "mensaje": "En octubre, noviembre, diciembre, enero, febrero, marzo y abril llueve mucho en su zona (entre 121 y 216 mm al mes). El maíz no soporta bien el agua estancada, según una fuente de Ecuador. Revise que el terreno drene bien. Si tiene dudas, consulte a un técnico.",
+          "validador": "ok"
+        }
+      ]
+    }
+  ],
+  "decisiones_pendientes": [
+    {
+      "id": "D1",
+      "tema": "Conflicto de altitud entre la ficha y 'indicadores'",
+      "detalle": "quinua: clima 2200-3000 (F1) vs indicadores 2300-3700 y 'a 3588 msnm es viable pero con riesgo de helada' (manual CIP/INIAP 2002); amaranto: 2700-3200 vs 1500-2800 (INIAP/CIP); haba: 3600 vs 3400 (variedad Sultana); chocho: 3600 vs 3400; cebada: 3900 vs 3500 (3600 con variedades de limite alto). El filtro F4 del motor usa clima.altitud_msnm: descarta la quinua a 3588 m aunque la propia ficha la da por viable con riesgo.",
+      "recomendacion": "Revision agronomica de la ficha de quinua antes de usar R3. Mientras tanto, los campos tipados usan el valor mas restrictivo bien citado (menos para quinua, donde se dejo el de la ficha y se anoto el conflicto)."
+    },
+    {
+      "id": "D2",
+      "tema": "Cortes de las reglas que no vienen de una fuente agronomica",
+      "detalle": "10 noches/mes (frecuentes), 70 % de dias con HR>82 % (HR alta), 2 y 4 meses (R5), 121 mm (lluvioso), 62 mm (seco). Son cortes de los agregados de la parcela. Ademas el umbral de 3 C es el del indicador, no un dano de cultivo.",
+      "recomendacion": "Aceptarlos como provisionales con 'requiere validacion: si' y severidad info/atencion sin tocar puntaje, o esperar al agronomo. No inventar otros."
+    },
+    {
+      "id": "D3",
+      "tema": "Fiabilidad minima para emitir una advertencia",
+      "detalle": "Hoy: fiabilidad >= media. Con 'baja' (avena, papa fase de helada, oca tolerancia) el campo existe pero no dispara nada.",
+      "recomendacion": "Mantener >= media; con 'baja' a lo sumo R8."
+    },
+    {
+      "id": "D4",
+      "tema": "Puede alguna regla bajar puntaje?",
+      "detalle": "Todas estan como 'solo advertencia'. El unico candidato razonable a futuro es R1 (dato duro de altitud), pero el motor ya lo hace con la ficha.",
+      "recomendacion": "Ninguna baja puntaje hasta que un agronomo valide los cortes."
+    },
+    {
+      "id": "D5",
+      "tema": "Duplicidad con las advertencias que ya emite el motor",
+      "detalle": "scoring.py ya avisa 'altitud fuera de rango (dentro del margen)', 'comparte hospedero de plagas' y 'datos con respaldo de otra region'. R1 podria repetir la primera.",
+      "recomendacion": "Deduplicar por (cultivo, tipo) en el paso 3; R1 solo cuando el campo tipado sea mas restrictivo que la ficha."
+    },
+    {
+      "id": "D6",
+      "tema": "Reglas ruidosas (R4 y R8)",
+      "detalle": "R4 casi siempre se activa (las siembras recomendadas ya caen en lluvias); R11 se activa para la papa en cualquier siembra con meses lluviosos; R8 sale para cualquier cultivo sin dato de helada con noches frecuentes en el ciclo; R9 nunca se activa y R10 solo con siembras fuera de ventana. Con el tope de 2, R8 casi nunca se muestra.",
+      "recomendacion": "Mostrar R4, R8 y R11 solo en el registro/al tecnico, no al agricultor, o desactivarlas."
+    },
+    {
+      "id": "D7",
+      "tema": "Datos mensuales de la parcela: version canonica",
+      "detalle": "El script que usted indico (backend/src/match_nasa_sentinel.py) NO calcula estos agregados mensuales: solo alinea la ventana NASA de 7 dias con cada foto, corrige la temperatura con el sesgo medio contra Open-Meteo y evalua los cruces; tampoco estan en resultado_match.json. Su origen sigue sin identificar. El resumen no trae noches de feb, mar, may, nov, ni lluvia de may-jun, ni HR de may, jun, oct, nov. Mi recalculo independiente desde response_1794715361072.json (T min - 6,47 C, 2021-2025, mes calendario) NO coincide exactamente con los agregados del encargo: noches ene 3,6 / jun 9,2 / jul 15,6 / ago 16,4 / sep 12,6 (encargo 3,8 / 10,4 / 16,4 / 17,0 / 12,8); lluvia oct 106, nov 102, dic 119, ene 117 mm/mes (encargo >= 121 en oct-abr). No es un error mio ni suyo comprobado: puede ser la ventana de anios o la definicion de mes.",
+      "recomendacion": "Indicarme el script y la ventana que generan los agregados y publicar una tabla mensual completa (12 meses x 3 indicadores) como entrada de las reglas. Las reglas usan hoy SOLO los valores del encargo y tratan los meses sin dato como 'sin dato'."
+    },
+    {
+      "id": "D8",
+      "tema": "Incertidumbre de la temperatura corregida",
+      "detalle": "Las noches <= 3 C usan T min NASA (celda de ~50 km a 2501 m) corregida con un sesgo medio de -6,47 C contra Open-Meteo (1690 dias): no hay estacion en la parcela y el error por noche no esta cuantificado.",
+      "recomendacion": "Mensajes con 'se estiman' (ya asi) y no usar el conteo como diagnostico."
+    },
+    {
+      "id": "D9",
+      "tema": "Interpretaciones propias en la ficha tipada",
+      "detalle": "oca.tolerancia_helada = media (fiabilidad baja), maiz.tolerancia_helada = baja y maiz.temperatura_minima_tolerada_c = 8 (media) son lecturas mias de frases de la ficha, marcadas en su nota.",
+      "recomendacion": "Que el agronomo las confirme o se pasen a null. Hoy no activan nada practico en la parcela (maiz lo filtra la altitud; oca en R8 cuenta como 'no confiable')."
+    },
+    {
+      "id": "D11",
+      "tema": "Planificacion frente a monitoreo",
+      "detalle": "Las reglas cruzan la ficha con la climatologia mensual para decidir el siguiente cultivo. Varios indicadores del JSON del backend (humedad de raiz, estado_riego, NDRE/NDVI de hoy, alertas de la semana) describen el cultivo en curso y no entran (R-NV8, R-NV9).",
+      "recomendacion": "Tratar el monitoreo del cultivo en curso como un conjunto de reglas aparte, con sus propias fichas y validacion."
+    },
+    {
+      "id": "D12",
+      "tema": "T max mensual de la parcela (R9)",
+      "detalle": "El encargo no trae T max por mes. Use un recalculo propio desde response_*.json (T2M_MAX - 7,81 C, 2021-2025; maxima diaria por mes entre 14,9 y 16,5 C). No coincide necesariamente con el script canonico (D7). Con estos valores R9 nunca se activa aunque cambiara en unos grados.",
+      "recomendacion": "Aceptarlo como dato provisional o entregarme la T max mensual canonica."
+    },
+    {
+      "id": "D10",
+      "tema": "Fichas duplicadas 'lizas' y 'olluco'",
+      "detalle": "Contenido identico (mismo cultivo). Se tiparon igual y los casos de prueba las tratan juntas.",
+      "recomendacion": "Decidir en el paso 5 si se fusionan o se mantienen como alias."
+    }
+  ]
+}

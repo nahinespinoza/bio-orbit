@@ -99,6 +99,8 @@ class Transition:
 class KnowledgeBase:
     crops: dict[str, Crop]                             # en el orden del grafo
     edges: dict[str, list[Transition]] = field(default_factory=dict)
+    sensitivities: dict[str, dict] = field(default_factory=dict)   # crop_id → campo → {valor, origen, fiabilidad, fuente}
+    signals: dict[str, dict] = field(default_factory=dict)         # alertas vigentes del remote-sensing (ver advisories.py)
 
     def edge(self, from_crop: str | None, to_crop: str) -> Transition | None:
         if from_crop is None:
@@ -118,6 +120,8 @@ class PlotInput:
     last_pest: list[str]               # normalizado
     rotation_cycles: int = DEFAULT_CYCLES
     use_source5: bool = False
+    observations: list[str] = field(default_factory=list)   # lo que el agricultor ve en su lote (ver advisories.OBSERVATIONS)
+    notes: list[str] = field(default_factory=list)          # contexto libre del agricultor; el motor no lo usa, lo lee el agente
 
     @property
     def history(self) -> list[str]:

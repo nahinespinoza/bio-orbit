@@ -8,7 +8,7 @@ VALID = {"previous_crops": ["papa", "cebada"], "priorities": ["speed", "fewer_pe
 
 def test_health(make_client):
     body = make_client().get("/health").json()
-    assert body["status"] == "ok" and body["crops"] == 27
+    assert body["status"] == "ok" and body["crops"] == 18
     assert body["llm_enabled"] is False and body["retrieval_mode"] == "bm25"
 
 
@@ -33,7 +33,7 @@ def test_recommend_rejects_bad_enum_at_schema_level(make_client):
 
 def test_crops_list_alias_and_404(make_client):
     c = make_client()
-    assert len(c.get("/v1/crops").json()) == 27
+    assert len(c.get("/v1/crops").json()) == 18
     assert c.get("/v1/crops/tarwi").json()["crop_id"] == "chocho"
     r = c.get("/v1/crops/xyz")
     assert r.status_code == 404

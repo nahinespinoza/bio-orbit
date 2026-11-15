@@ -49,6 +49,7 @@ def explain(result: dict) -> str:
         if t["transition"]:
             lines.append(f"- Transición desde el cultivo anterior: {t['transition']['kind']} — {t['transition']['source_note']}.")
         lines.extend(f"- ⚠ {w}" for w in t["warnings"])
+        lines.extend(f"- ⚠ Alerta del clima ({a['rule']}, {a['level']}): {a['message']}" for a in t.get("advisories", []))
         lines.append("")
 
     block(result["recommendation"], "Sembrar ahora")

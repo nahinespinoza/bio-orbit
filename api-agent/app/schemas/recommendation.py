@@ -29,6 +29,9 @@ class RecommendationInput(BaseModel):
     # Se validan en el motor (códigos TOO_MANY_PRIORITIES, DUPLICATE_PRIORITIES, INVALID_PRIORITY…).
     priorities: list[str] = Field(default_factory=list, examples=[["market_value", "speed"]])
     last_pest: list[str] = Field(default_factory=list)
+    observations: list[Literal["frost", "blight", "dry_soil", "waterlogging"]] = Field(
+        default_factory=list, description="Lo que el agricultor ve en su lote: helada, lancha, suelo seco, agua empozada")
+    notes: list[str] = Field(default_factory=list, description="Contexto libre del agricultor; el motor no lo usa, lo lee el agente")
     rotation_cycles: int = 4
     use_source5: bool = False
 

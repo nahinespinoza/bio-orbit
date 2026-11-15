@@ -1,5 +1,6 @@
 """Punto de entrada del motor: recommend(raw_input, kb) → resultado estructurado (ESPECIFICACION.md §6)."""
 
+from app.engine.advisories import advisories_for, remote_sensing_scope
 from app.engine.filters import hard_filters
 from app.engine.models import SPEC_VERSION, WEIGHTS, KnowledgeBase, PlotInput
 from app.engine.rotation import build_rotation
@@ -76,6 +77,8 @@ def recommend(raw: dict, kb: KnowledgeBase, *, allow_unknown_crops: bool = False
     top = scored[:3]
     for t in top:
         t["rotation"] = build_rotation(t["crop"], history, plot, kb)
+        t["advisories"] = advisories_for(t["crop"], kb, observations=plot.observations,   # señal × sensibilidad de la ficha
+                                         altitude_masl=plot.altitude_masl)
     weights = WEIGHTS[len(plot.priorities)]
     missing = list(dict.fromkeys(f"{t['name']}: {p['priority']}" for t in top for p in t["breakdown"]["priorities"] if p["missing"]))
     return {
@@ -90,5 +93,7 @@ def recommend(raw: dict, kb: KnowledgeBase, *, allow_unknown_crops: bool = False
         "outside_graph": [kb.crops[c].name for c in outside],
         "warnings": warnings,
         "missing_data": missing,
+        "remote_sensing_date": kb.signals.get("_fecha_datos", {}).get("mensaje"),
+        "remote_sensing_scope": remote_sensing_scope(kb.signals, plot.altitude_masl) if kb.signals else None,
         "note": NOTE,
     }

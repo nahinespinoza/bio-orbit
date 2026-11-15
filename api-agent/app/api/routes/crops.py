@@ -14,7 +14,7 @@ def list_crops(services: Services = Depends(get_services)) -> list[dict]:
     return crops_repo.list_crops(services.conn)
 
 
-@router.get("/{crop}", summary="Ficha de un cultivo (acepta nombres comunes: tarwi, ataco, fréjol…)")
+@router.get("/{crop}", summary="Ficha de un cultivo (acepta nombres comunes: tarwi, ataco, ulluco…)")
 def get_crop(crop: str, services: Services = Depends(get_services)) -> dict:
     crop_id, suggestions = resolve_crop(crop, services.kb)
     if crop_id is None:

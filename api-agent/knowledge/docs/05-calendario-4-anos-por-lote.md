@@ -1,7 +1,7 @@
 # Calendario de rotación de 4 años por lote (finca tipo, sierra de Ecuador)
 
 > **Qué es:** una finca dividida en **4 lotes de igual área** (25 % cada uno), con la rotación **desfasada un año entre lotes**. Así, cada año hay un lote de cada etapa: siempre hay papa, cereal, leguminosa y descanso, y los ingresos y el trabajo se reparten.
-> **Alcance:** las secuencias vienen de la fuente 1 (FAO, producción orgánica de cultivos andinos, Ecuador). **El desfase en 4 lotes es una práctica general, no lo dicen las fuentes.** Las fuentes tampoco dan meses de siembra: el calendario se organiza por **año/ciclo**, no por mes. Las fechas las debe fijar el agricultor según su piso altitudinal y su lluvia.
+> **Alcance:** las secuencias vienen de la fuente 1 (FAO, producción orgánica de cultivos andinos, Ecuador). **El desfase en 4 lotes es una práctica general, no lo dicen las fuentes.** El calendario se organiza por **año/ciclo**, no por mes, igual que el motor, que recomienda un cultivo por ciclo. Las fichas sí traen meses de siembra para varios cultivos (ver «Meses de siembra según las fichas»), pero cambian con el piso altitudinal y la lluvia: la fecha exacta la fija el agricultor.
 
 ---
 
@@ -17,6 +17,8 @@ Base: Cuadro 5 de la fuente 1 (pasto, papa, cereal, leguminosa, pasto).
 | **3** | **Leguminosa** | Haba, arveja, vicia | Repone nitrógeno. |
 | **4** | **Descanso con pasto** | Pasto | Recupera suelo; opcionalmente forraje. |
 
+> **Zonas altas:** las opciones de la tabla son para la sierra en general. El motor descarta cada cultivo según el rango de altitud de su ficha, con 200 m de margen. Por encima de unos 3 500 m, el cereal de la etapa 2 queda en **cebada** (o avena); maíz, quinua, ataco y trigo se descartan. En la etapa 3 quedan **haba** y **vicia** (abono verde); la arveja se descarta desde 3 000 m. Detalle en [01-reglas-elegir-siguiente-cultivo.md](01-reglas-elegir-siguiente-cultivo.md), sección 3.
+
 ### Calendario por lote
 
 | | **Año 1** | **Año 2** | **Año 3** | **Año 4** |
@@ -30,7 +32,7 @@ Cada año hay un lote de papa, uno de cereal, uno de leguminosa y uno en descans
 
 ---
 
-## Plan 2: rotación de haba de la fuente 1 (sin descanso)
+## Plan 2: rotación de haba de la fuente 1 que incluye papa (sin descanso)
 
 Sale directamente de la fuente 1 (cultivo de haba): **haba, papa, cebada, haba o chocho**.
 
@@ -57,6 +59,24 @@ Sale directamente de la fuente 1 (cultivo de haba): **haba, papa, cebada, haba o
 
 ---
 
+## Meses de siembra según las fichas
+
+Épocas de siembra en la sierra de Ecuador que traen las fichas de cultivo. Sirven para ubicar cada ciclo en el año; no cambian el orden de la rotación.
+
+| Cultivo | Época de siembra | Fuente |
+|---|---|---|
+| **Papa** | Mayo a junio, y octubre a diciembre. En algunos sectores, todo el año. | 1 |
+| **Haba** | Enero a febrero, y desde octubre. Sobre 3 200 m, de preferencia en octubre. | 1 |
+| **Chocho** | Diciembre a febrero (sierra norte y central). | 1 |
+| **Maíz** | Octubre a diciembre, con el inicio de las lluvias. | 1 |
+| **Quinua** | Octubre a enero. | 1 |
+| **Amaranto / ataco** | Octubre a noviembre, con las primeras lluvias. | 1 |
+
+- **Sin mes en las fichas:** cebada, trigo, avena, arveja, lenteja, qañiwa, abono verde, oca y olluco / lizas. Para oca y melloco (olluco) la fuente 1 sí da época: oca de fines de septiembre a inicios de noviembre; melloco de octubre a diciembre en Cotopaxi y Chimborazo.
+- **Papa:** se cosecha a los 6 o 7 meses de la siembra (fuente 1), y los residuos incorporados tardan de 3 a 4 meses en descomponerse (fuente 1). Conviene contar ese tiempo antes del cultivo siguiente. *(propuesta)*
+
+---
+
 ## Bitácora por lote (propuesta, apoyada en fuente 5)
 
 Anotar en cada ciclo, por lote:
@@ -68,15 +88,15 @@ Anotar en cada ciclo, por lote:
 | Rendimiento | Comparar entre lotes y ciclos. |
 | Plagas y enfermedades observadas | Aplicar el filtro F3 al decidir el siguiente cultivo. |
 | Abonos o insumos aplicados | Controlar la fertilidad. |
-| Costos e ingresos | Alimentar el dominio de rentabilidad de [03-tabla-de-puntaje.md](03-tabla-de-puntaje.md). |
+| Costos e ingresos | Comparar con el nivel de mercado de las fichas, que usa la prioridad «valor de mercado» de [03-tabla-de-puntaje.md](03-tabla-de-puntaje.md). |
 
 ---
 
 ## Límites
 
-- **Sin fechas ni rendimientos:** ninguna fuente da meses de siembra ni compara rendimientos entre estos planes.
+- **Fechas por cultivo, no por plan:** las fichas dan meses de siembra de cada cultivo (fuente 1), pero ninguna fuente arma un calendario mensual de la rotación ni compara rendimientos entre estos planes.
 - **Plan 1 es una adaptación:** la compresión del Cuadro 5 a 4 años es mía y no está probada en las fuentes.
 - **Zona:** vale para la sierra de Ecuador. Para costa o Amazonía no hay respaldo confiable.
 - **Si una plaga persiste en un lote**, hay que alargar el descanso o cambiar de cereal antes de volver a sembrar papa. *(propuesta)*
 
-Documentos relacionados: [01-reglas-elegir-siguiente-cultivo.md](01-reglas-elegir-siguiente-cultivo.md), [02-rotacion-explicacion-beneficios-caracteristicas.md](02-rotacion-explicacion-beneficios-caracteristicas.md), [03-tabla-de-puntaje.md](03-tabla-de-puntaje.md), [04-contexto-rotacion-de-cultivos.md](04-contexto-rotacion-de-cultivos.md).
+Documentos relacionados: [01-reglas-elegir-siguiente-cultivo.md](01-reglas-elegir-siguiente-cultivo.md), [02-rotacion-explicacion-beneficios-caracteristicas.md](02-rotacion-explicacion-beneficios-caracteristicas.md), [03-tabla-de-puntaje.md](03-tabla-de-puntaje.md), [04-contexto-rotacion-de-cultivos.md](04-contexto-rotacion-de-cultivos.md), [06-pool-de-cultivos-con-tags.md](06-pool-de-cultivos-con-tags.md), [07-indicadores-remote-sensing.md](07-indicadores-remote-sensing.md).
