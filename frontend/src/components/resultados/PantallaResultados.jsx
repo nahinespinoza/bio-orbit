@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Check, ChevronLeft, CloudRain, Droplets, Layers, LoaderCircle, RefreshCw, Satellite, Sprout, Wheat, WifiOff, Zap,
+  Check, ChevronLeft, CloudRain, Droplets, Layers, LoaderCircle, RefreshCw, Satellite, Sprout, WifiOff, Zap,
 } from 'lucide-react'
 import { PERIODO, obtenerDatosNasa } from '../../lib/nasa.js'
 import {
-  MESES_LARGOS, PREFERENCIAS_INICIALES, analizarFinca, compararRotaciones, formato, zonasRemoteSensing,
+  MESES_LARGOS, analizarFinca, formato, zonasRemoteSensing,
 } from './analisis.js'
 import MapaSalud from './MapaSalud.jsx'
 import GraficoLluvia from './GraficoLluvia.jsx'
-import Rotaciones from './Rotaciones.jsx'
+import RecomendacionesIA, { AccesoPitagoras } from './RecomendacionesIA.jsx'
 import Widget from '../ui/Widget.jsx'
 import FilaAnalisis from '../ui/FilaAnalisis.jsx'
 import { IlustracionClima } from '../ui/Ilustraciones.jsx'
@@ -31,7 +31,7 @@ const TITULOS = {
   verdor: 'Salud del cultivo',
   humedad: 'Agua en el suelo',
   lluvia: 'Lluvia en tu zona',
-  siembra: 'Plan de siembra',
+  siembra: 'Recomendaciones',
 }
 
 const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1)
@@ -41,7 +41,6 @@ const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1)
 // parcela cubre 5 años (2021–2026): cada mes tiene 4 o 5 años con dato.
 const RS_MIN_AÑOS = 4
 const fechaCorta = (iso) => iso.split('-').reverse().join('/')
-const diaMes = (iso) => fechaCorta(iso).slice(0, 5)
 const pct = (v) => `${Math.round(v)}%`
 
 // Nombre corto de cada alerta para las etiquetas de riesgo de las tarjetas
@@ -123,13 +122,12 @@ function estacionDelMes(mediana, promedio) {
 // `finca` ({ nombre, parcelas }) + `reporte` (lib/reporte.js): tarjeta "Resumen de la semana".
 // `selector` ({ fincas, activaId, onElegir, onNueva }): con varias fincas, la cabecera cambia de finca sin volver.
 export default function PantallaResultados({
-  ubicacion, parcela, modo, remoteSensing: rs, finca, reporte, selector, onVolver, onProfundo, onAnalisis,
+  ubicacion, parcela, modo, remoteSensing: rs, finca, reporte, selector, onVolver, onAnalisis,
 }) {
   const [datos, setDatos] = useState(null)
   const [intento, setIntento] = useState(0)
   const [paso, setPaso] = useState(0)
   const [detalle, setDetalle] = useState(null) // null = lista | verdor | humedad | lluvia | siembra
-  const [prefs, setPrefs] = useState(PREFERENCIAS_INICIALES)
   const [presentacion, setPresentacion] = useState(null) // null | 'interactivo' | 'resumido'
   const contenidoRef = useRef(null)
   const profundo = modo === 'Profundo'
@@ -170,10 +168,6 @@ export default function PantallaResultados({
           })
         : null,
     [datos, parcela, ubicacion, rs],
-  )
-  const comparacion = useMemo(
-    () => (analisis ? compararRotaciones(analisis.lluvia, prefs) : null),
-    [analisis, prefs],
   )
 
   const onAnalisisRef = useRef(onAnalisis)
@@ -255,7 +249,6 @@ export default function PantallaResultados({
   const nombreMes = MESES_LARGOS[analisis.mesActual]
   const estacion = estacionDelMes(mesAhora.mediana, lluvia.promedioMes)
   const consejoLluvia = acciones.find((a) => a.id === 'lluvia' || a.id === 'sin-datos')
-  const recomendado = comparacion.planes.find((p) => p.id === comparacion.recomendado)
 
   // Remote-sensing (Parcela 1): lo que se presenta sale del resumen
   const r = rs?.resumen
@@ -267,12 +260,6 @@ export default function PantallaResultados({
     },
     humedad: agua.titulo && { titulo: agua.titulo, texto: agua.texto },
   }
-
-  const textoSiembra = !profundo
-    ? 'Descubre qué sembrar en los próximos 4 años'
-    : comparacion.ejemplo
-      ? 'Calculado con lluvia de ejemplo: reintenta con conexión'
-      : `Te recomendamos: ${recomendado.nombre.toLowerCase()}`
 
   const lista = (
     <>
@@ -338,21 +325,10 @@ export default function PantallaResultados({
               onClick={() => setDetalle('lluvia')}
             />
           </li>
-          <li>
-            <FilaAnalisis
-              tono="verde"
-              Icono={Wheat}
-              titulo="Plan de siembra"
-              texto={textoSiembra}
-              nota={profundo ? 'Próximos 4 años' : 'Análisis profundo'}
-              onClick={() => {
-                if (!profundo) onProfundo()
-                setDetalle('siembra')
-              }}
-            />
-          </li>
         </ul>
       </section>
+
+      <AccesoPitagoras onClick={() => setDetalle('siembra')} />
 
       <p className="rs-fuentes-linea">
         <Satellite size={14} /> Datos de la NASA: GPM IMERG y POWER
@@ -363,7 +339,6 @@ export default function PantallaResultados({
   // Parcela 1 (remote-sensing): clima → estado de la parcela → alertas → análisis
   const listaRS = r && (() => {
     const alertas = alertasRS(rs)
-    const v = r.ventanaVulnerable
     return (
       <>
         <Widget
@@ -415,27 +390,10 @@ export default function PantallaResultados({
                   : 'Sin datos de lluvia para el próximo mes.'}
               </AnalisisCard>
             </li>
-            <li>
-              <AnalisisCard
-                tono="verde"
-                Icono={Wheat}
-                titulo="Plan de siembra"
-                nota={profundo ? 'Próximos 4 años' : 'Análisis profundo'}
-                onClick={() => {
-                  if (!profundo) onProfundo()
-                  setDetalle('siembra')
-                }}
-              >
-                {v && (
-                  <span className="rs-ventana">
-                    Ventana vulnerable: {v.dias} días ({diaMes(v.desde)} al {diaMes(v.hasta)})
-                  </span>
-                )}
-                <span>{v ? 'La temporada pasada el cultivo estuvo débil: conviene rotar.' : textoSiembra}</span>
-              </AnalisisCard>
-            </li>
           </ul>
         </section>
+
+        <AccesoPitagoras onClick={() => setDetalle('siembra')} />
 
         {r.confianza && (
           <p className="rs-fuentes-linea">
@@ -501,10 +459,8 @@ export default function PantallaResultados({
             </>
           )}
           {detalle === 'lluvia' && vistaLluvia}
-          {detalle === 'siembra' && profundo && (
-            <div className="rs-rotacion">
-              <Rotaciones comparacion={comparacion} prefs={prefs} onPrefs={setPrefs} />
-            </div>
+          {detalle === 'siembra' && (
+            <RecomendacionesIA finca={finca} ubicacion={ubicacion} monitoreada={Boolean(rs)} />
           )}
         </div>
       </div>

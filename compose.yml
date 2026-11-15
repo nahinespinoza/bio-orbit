@@ -41,6 +41,8 @@ services:
       - "8000"
 
   frontend:
+    depends_on:
+      - api-agent
     build:
       context: ./frontend
     restart: unless-stopped
