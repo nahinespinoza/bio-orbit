@@ -6,9 +6,9 @@ from sqlite3 import Connection
 from typing import Annotated, NotRequired
 
 from langchain.agents import AgentState
-from langchain_core.retrievers import BaseRetriever
 
 from app.engine.models import KnowledgeBase
+from app.rag.retriever import SourceSearch
 
 
 class CropAdvisorState(AgentState):
@@ -25,4 +25,4 @@ class AgentContext:
     """Dependencias de solo lectura que reciben las herramientas (runtime.context)."""
     kb: KnowledgeBase
     conn: Connection
-    retriever: BaseRetriever
+    sources: SourceSearch

@@ -1,10 +1,12 @@
 """Agente con memoria de corto plazo. Usa create_agent real, herramientas reales e InMemorySaver;
 solo el modelo de chat está guionado (no llama a OpenAI)."""
 
+import json
 from datetime import timedelta
 
 from langchain.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
+import pytest
 
 from app.agent.factory import make_history_trimmer
 from app.engine.recommender import recommend
@@ -132,3 +134,67 @@ def test_history_trimmer_cuts_at_user_turn():
     kept = [m.id for m in out["messages"][1:]]
     assert kept == ["h2", "a2", "t2", "a2b", "h3"]  # la llamada a herramienta y su resultado siguen juntos
     assert trim.before_model({"messages": msgs[:4]}, None) is None
+
+
+# --- Búsqueda acotada: ficha por secciones --------------------------------------------------------------
+
+def _tool_content(model, call_index=1):
+    return next(m for m in model.seen[call_index] if isinstance(m, ToolMessage)).content
+
+
+def test_get_crop_profile_returns_requested_sections(make_client, scripted):
+    model = scripted(tool_call("get_crop_profile", {"crop": "papa", "sections": ["plagas"]}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Qué plagas tiene la papa?")
+    body = json.loads(_tool_content(model))
+    assert set(body["sections"]) == {"plagas"} and "indicadores" not in _tool_content(model)
+
+
+def test_crop_sections_resolves_alias(make_client, scripted):
+    model = scripted(tool_call("get_crop_profile", {"crop": "tarwi", "sections": ["mano_obra"]}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Cuánto trabajo da el tarwi?")
+    assert json.loads(_tool_content(model))["crop_id"] == "chocho"
+
+
+@pytest.mark.parametrize("sections", [[], ["indicadores"]])
+def test_get_crop_profile_rejects_invalid_sections(make_client, scripted, sections):
+    model = scripted(tool_call("get_crop_profile", {"crop": "papa", "sections": sections}, "c1"), AIMessage(content="Ok."))
+    r = send(make_client(model), SID, "Ficha de la papa")
+    assert r.status_code == 200 and "sections" in _tool_content(model)
+
+
+def test_section_literal_matches_repository():
+    from typing import get_args
+
+    from app.agent.tools import Section
+    from app.repository.crops import PROFILE_SECTIONS
+    assert set(get_args(Section)) == set(PROFILE_SECTIONS)
+
+
+# --- Búsqueda acotada: RAG filtrado por cultivo ---------------------------------------------------------
+
+def test_search_sources_with_crop_filters(make_client, scripted):
+    model = scripted(tool_call("search_sources", {"query": "plagas", "crop": "quinua"}, "c1"), AIMessage(content="Ok."))
+    b = send(make_client(model), SID, "¿Qué plagas tiene la quinua?").json()
+    assert b["citations"]
+    assert "resultados generales" not in _tool_content(model)
+
+
+def test_search_sources_unknown_crop_says_so(make_client, scripted):
+    model = scripted(tool_call("search_sources", {"query": "rotación", "crop": "tomate"}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Y el tomate?")
+    assert _tool_content(model).startswith("No reconozco «tomate» como cultivo; resultados generales.")
+
+
+def test_search_sources_unrecognized_crop_suggests(make_client, scripted):
+    model = scripted(tool_call("search_sources", {"query": "plagas", "crop": "quinoa"}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Plagas de la quinoa?")
+    assert _tool_content(model).startswith("No reconozco «quinoa» como cultivo (parecidos: quinua")
+
+
+def test_search_sources_untagged_crop_does_not_claim_absence(make_client, scripted):
+    # olluco está en el pool, pero la ingesta no etiqueta sus fragmentos: no se puede filtrar, y no hay que decir que no hay pasajes
+    model = scripted(tool_call("search_sources", {"query": "plagas", "crop": "olluco"}, "c1"), AIMessage(content="Ok."))
+    send(make_client(model), SID, "¿Plagas del olluco?")
+    content = _tool_content(model)
+    assert content.startswith("No pude filtrar los pasajes por «olluco»; resultados generales.")
+    assert "No hay pasajes" not in content

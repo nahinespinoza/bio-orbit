@@ -180,8 +180,8 @@ Los errores de las rutas devuelven `detail: {code, message}`:
 |---|---|
 | `update_plot` | Valida y guarda en el estado los datos del lote que dio el agricultor |
 | `recommend_crop` | Ejecuta el motor con el lote registrado (exige los datos obligatorios) |
-| `search_sources` | Busca pasajes en las fuentes y acumula las citas |
-| `get_crop_profile` | Devuelve la ficha completa de un cultivo |
+| `search_sources` | Busca pasajes en las fuentes (opcionalmente solo los de un cultivo) y acumula las citas |
+| `get_crop_profile` | Devuelve las secciones pedidas de la ficha de un cultivo (nunca los indicadores de investigación) |
 | `list_crops` | Devuelve los cultivos conocidos |
 
 ### Motor de reglas (`app/engine/`)

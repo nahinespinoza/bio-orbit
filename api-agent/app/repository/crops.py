@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+from collections.abc import Sequence
 from pathlib import Path
 
 from app.engine.advisories import read_signals
@@ -84,4 +85,39 @@ def get_crop_profile(conn: sqlite3.Connection, crop_id: str) -> dict | None:
         "profile": json.loads(row["profile_json"]),
         "next_crops": next_crops,
         "sources": [dict(r) for r in source_rows],
+    }
+
+
+# Secciones que el agente puede pedir. Los `indicadores*` de la ficha son notas de investigación: no se entregan
+# (lo útil de ellos ya está depurado en `sensibilidades`).
+PROFILE_SECTIONS: tuple[str, ...] = (
+    "suelo", "clima", "ciclo_meses", "plagas", "enfermedades", "efecto_rotacion", "mano_obra", "facilidad_cultivo",
+    "mercado", "huecos", "fuentes", "siguientes", "sensibilidades",
+)
+NO_SENSITIVITIES = {"valor": None, "nota": "Sin datos de sensibilidad con cita de Ecuador o los Andes."}
+
+
+def get_crop_sections(conn: sqlite3.Connection, crop_id: str, sections: Sequence[str], sensitivities: dict) -> dict | None:
+    """Cabecera corta del cultivo + solo las secciones pedidas. None si el cultivo no existe."""
+    invalid = [s for s in sections if s not in PROFILE_SECTIONS]
+    if invalid:
+        raise ValueError(f"Secciones no válidas: {', '.join(invalid)}. Opciones: {', '.join(PROFILE_SECTIONS)}.")
+    full = get_crop_profile(conn, crop_id)
+    if full is None:
+        return None
+    profile = full["profile"]
+
+    def value(section: str):
+        if section == "siguientes":
+            return full["next_crops"]
+        if section == "fuentes":
+            return {"citas": profile.get("fuentes"), "detalle": full["sources"]}
+        if section == "sensibilidades":
+            return sensitivities.get(crop_id) or NO_SENSITIVITIES
+        return profile.get(section)
+
+    return {
+        **{k: full[k] for k in ("crop_id", "name", "family", "crop_type", "tags", "confidence")},
+        "alcance_geografico": profile.get("alcance_geografico"),
+        "sections": {s: value(s) for s in sections},
     }
